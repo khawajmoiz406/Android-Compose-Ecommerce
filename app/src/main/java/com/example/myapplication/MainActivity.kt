@@ -30,7 +30,9 @@ fun MainScreen() {
     SnackbarUtils.init(snackbarHostState, scope)
 
     MyApplicationTheme {
-        Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { innerPadding ->
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) }
+        ) { innerPadding ->
             innerPadding.calculateTopPadding()
             LoginScreen()
         }

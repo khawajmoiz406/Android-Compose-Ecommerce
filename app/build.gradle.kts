@@ -70,4 +70,9 @@ dependencies {
     implementation(libs.network.okhttp)
     implementation(libs.network.retrofit.converter)
     implementation(libs.network.okhttp.logging)
+
+    //Navigation
+    implementation(libs.androidx.navigation.runtime.android)
+    implementation(libs.androidx.navigation.compose.android)
+    implementation(libs.androidx.navigation.compose)
 }
