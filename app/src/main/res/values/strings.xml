@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">My Application</string>
+
+    <string name="ok">OK</string>
+    <string name="unknown_error">Unknown Error</string>
+    <string name="internet_error">You are not connected to internet. Please check your internet connection and try again.</string>
+    <string name="login">Login</string>
+</resources>
