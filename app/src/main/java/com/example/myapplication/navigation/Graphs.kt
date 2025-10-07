@@ -7,7 +7,7 @@ import androidx.navigation.compose.navigation
 import com.example.myapplication.ui.auth.login.presentation.LoginScreen
 import com.example.myapplication.ui.dashboard.DashboardScreen
 import com.example.myapplication.ui.dashboard.home.presentation.HomeScreen
-import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
+import com.example.myapplication.ui.landing.splash.SplashScreen
 
 fun NavGraphBuilder.landingGraph(navController: NavController) = navigation(
     route = Destinations.LandingGraph.route,

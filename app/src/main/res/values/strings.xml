@@ -18,5 +18,8 @@
     <string name="internal_server_error">Internal server error. Please try again later.</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
+    <string name="rating">Rating</string>
+    <string name="brand">Brand</string>
+    <string name="in_stock">In Stock</string>
 
 </resources>

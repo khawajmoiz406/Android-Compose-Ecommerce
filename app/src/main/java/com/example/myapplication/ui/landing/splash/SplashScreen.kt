@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.landing.splash.presentation
+package com.example.myapplication.ui.landing.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
