@@ -1,5 +1,5 @@
 package com.example.myapplication.base
 
-interface BaseUseCase<out T : Any, in P : BaseRequest> {
+interface BaseUseCase<out T, in P> {
     suspend fun invoke(params: P): Result<T>
 }

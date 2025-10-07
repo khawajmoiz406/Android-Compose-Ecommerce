@@ -1,8 +1,11 @@
 package com.example.myapplication.ui.auth.login.presentation
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class LoginUiState(
-    var isLoading: Boolean = false,
-    var error: String = "",
-    var email: String = "",
-    var password: String = "",
+    val isLoading: Boolean = false,
+    val error: String = "",
+    val email: String = "",
+    val password: String = "",
 )

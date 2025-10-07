@@ -12,6 +12,7 @@ koin = "4.1.0"
 retrofit = "2.11.0"
 okhttp = "4.12.0"
 navigation = "2.9.5"
+coil = "2.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,6 +38,8 @@ network-okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref 
 androidx-navigation-runtime-android = { group = "androidx.navigation", name = "navigation-runtime-android", version.ref = "navigation" }
 androidx-navigation-compose-android = { group = "androidx.navigation", name = "navigation-compose-android", version.ref = "navigation" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+ui-coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+ui-coil-svg = { group = "io.coil-kt", name = "coil-svg", version.ref = "coil" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

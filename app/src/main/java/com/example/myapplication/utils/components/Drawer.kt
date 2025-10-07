@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,15 +40,20 @@ import com.example.myapplication.BuildConfig
 import com.example.myapplication.R
 import com.example.myapplication.models.helper.NavigationItem
 import com.example.myapplication.navigation.Destinations
+import com.example.myapplication.navigation.NavGraph
+import com.example.myapplication.utils.theme.MyApplicationTheme
 
 @Composable
 fun Drawer(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestination = navBackStackEntry?.destination?.route ?: ""
+    val currentRoute = navBackStackEntry?.destination?.route ?: ""
+    if (currentRoute !in drawerItemsList.map { it.route }) return
 
     Column(
-        modifier = Modifier.fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxHeight()
+            .fillMaxWidth(0.8f)
     ) {
         Image(
             painter = painterResource(R.drawable.ic_launcher_foreground),
@@ -62,7 +68,7 @@ fun Drawer(navController: NavController) {
             itemsIndexed(drawerItemsList) { index, item ->
                 DrawerItem(
                     item = item,
-                    selectedRoute = currentDestination,
+                    selectedRoute = currentRoute,
                     onClick = { onItemClicked(item.route, navController) }
                 )
                 if (index < drawerItemsList.size - 1) {
@@ -155,9 +161,14 @@ private val drawerItemsList = listOf(
     )
 )
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun DrawerPreview() {
     val navController = rememberNavController()
-    Drawer(navController = navController)
+
+    MyApplicationTheme {
+        Scaffold(
+            topBar = { Drawer(navController) },
+        ) { innerPadding -> NavGraph(navController, innerPadding) }
+    }
 }

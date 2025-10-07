@@ -5,12 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import com.example.myapplication.ui.auth.login.presentation.LoginScreen
+import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.navigation.NavGraph
 import com.example.myapplication.utils.SnackbarUtils
 import com.example.myapplication.utils.theme.MyApplicationTheme
 
@@ -25,16 +25,15 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val snackbarHostState = remember { SnackbarHostState() }
+    val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
     SnackbarUtils.init(snackbarHostState, scope)
 
     MyApplicationTheme {
         Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) }
-        ) { innerPadding ->
-            innerPadding.calculateTopPadding()
-            LoginScreen()
-        }
+            snackbarHost = { SnackbarUtils.CustomSnackbarHost(snackbarHostState) },
+            content = { innerPadding -> NavGraph(navController, innerPadding) }
+        )
     }
 }

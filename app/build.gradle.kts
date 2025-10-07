@@ -75,4 +75,8 @@ dependencies {
     implementation(libs.androidx.navigation.runtime.android)
     implementation(libs.androidx.navigation.compose.android)
     implementation(libs.androidx.navigation.compose)
+
+    //Coil
+    implementation(libs.ui.coil)
+    implementation(libs.ui.coil.svg)
 }

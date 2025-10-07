@@ -1,15 +1,17 @@
 package com.example.myapplication.models.response
 
-import com.google.gson.annotations.SerializedName
+import androidx.compose.runtime.Immutable
 import java.io.Serializable
 
+@Immutable
 data class User(
-    @SerializedName("id")
-    val id: Int? = 0,
-    @SerializedName("username")
-    val name: String? = "",
-    @SerializedName("email_id")
-    val email: String? = "",
-    @SerializedName("pass")
-    val password: String? = ""
+    val accessToken: String?,
+    val email: String?,
+    val firstName: String?,
+    val gender: String?,
+    val id: Int?,
+    val image: String?,
+    val lastName: String?,
+    val refreshToken: String?,
+    val username: String?
 ) : Serializable

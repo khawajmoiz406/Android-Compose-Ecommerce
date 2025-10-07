@@ -1,33 +1,33 @@
 package com.example.myapplication.base
 
 import android.content.Context
-import com.example.myapplication.R
+import com.example.myapplication.core.remote.ApiException
 import com.example.myapplication.utils.NetworkUtils
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import retrofit2.HttpException
 import retrofit2.Response
-import java.net.UnknownHostException
 
-open class BaseRemoteRepo : KoinComponent {
-    private val context: Context by inject()
+open class BaseRemoteRepo(private val context: Context) {
 
     suspend fun <T> fetch(apiFunction: suspend () -> Response<T>): Result<T> {
         return try {
-            if (!NetworkUtils.isNetworkAvailable(context)) Result.failure<T>(Throwable(context.getString(R.string.internet_error)))
+            if (!NetworkUtils.isNetworkAvailable(context)) Result.failure<T>(ApiException.NetworkException(context))
 
             val response = apiFunction.invoke()
             if (response.isSuccessful && response.body() != null) Result.success(response.body()!!)
 
-            val error = response.errorBody()?.string() ?: response.message() ?: context.getString(R.string.unknown_error)
-            Result.failure(Throwable(error))
+            Result.failure(createHttpError(response))
 
-        } catch (e: HttpException) {
-            Result.failure(e)
-        } catch (e: UnknownHostException) {
-            Result.failure(e)
         } catch (ex: Exception) {
             Result.failure(ex)
+        }
+    }
+
+    private fun createHttpError(response: Response<*>): Throwable {
+        return when (response.code()) {
+            401 -> ApiException.AuthenticationException(context)
+            403 -> ApiException.AuthorizationException(context)
+            404 -> ApiException.NotFoundException(context)
+            500 -> ApiException.ServerException(context)
+            else -> ApiException.UnknownException(context)
         }
     }
 }

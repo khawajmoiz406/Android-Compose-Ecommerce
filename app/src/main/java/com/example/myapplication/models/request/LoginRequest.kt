@@ -1,14 +1,16 @@
 package com.example.myapplication.models.request
 
 import com.example.myapplication.base.BaseRequest
+import com.example.myapplication.utils.Constants
 
 data class LoginRequest(
     val email: String,
     val password: String
 ) : BaseRequest() {
-    override fun toMap(): Map<String, String> = mapOf(
-        "email" to email,
-        "password" to password
+    override fun toMap(): Map<String, Any> = mapOf(
+        "username" to email,
+        "password" to password,
+        "expiresInMins" to Constants.TOKEN_TIMEOUT,
     )
 
 }
