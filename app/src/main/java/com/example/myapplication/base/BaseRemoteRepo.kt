@@ -2,22 +2,28 @@ package com.example.myapplication.base
 
 import android.content.Context
 import com.example.myapplication.core.remote.ApiException
+import com.example.myapplication.models.helper.ErrorResponse
 import com.example.myapplication.utils.NetworkUtils
+import com.google.gson.Gson
 import retrofit2.Response
 
 open class BaseRemoteRepo(private val context: Context) {
+    val headers = hashMapOf("Content-Type" to "application/json")
 
-    suspend fun <T> fetch(apiFunction: suspend () -> Response<T>): Result<T> {
-        return try {
-            if (!NetworkUtils.isNetworkAvailable(context)) Result.failure<T>(ApiException.NetworkException(context))
+    suspend fun <T> fetch(addToken: Boolean = true, apiFunction: suspend () -> Response<T>): Result<T> {
+        try {
+            if (!NetworkUtils.isNetworkAvailable(context))
+                return Result.failure(ApiException.NetworkException(context))
 
             val response = apiFunction.invoke()
-            if (response.isSuccessful && response.body() != null) Result.success(response.body()!!)
 
-            Result.failure(createHttpError(response))
+            if (response.isSuccessful && response.body() != null)
+                return Result.success(response.body()!!)
+
+            return Result.failure(createHttpError(response))
 
         } catch (ex: Exception) {
-            Result.failure(ex)
+            return Result.failure(ex)
         }
     }
 
@@ -25,9 +31,13 @@ open class BaseRemoteRepo(private val context: Context) {
         return when (response.code()) {
             401 -> ApiException.AuthenticationException(context)
             403 -> ApiException.AuthorizationException(context)
-            404 -> ApiException.NotFoundException(context)
             500 -> ApiException.ServerException(context)
-            else -> ApiException.UnknownException(context)
+            404 -> ApiException.NotFoundException(context)
+            else -> {
+                val jsonBody = response.errorBody()?.string()
+                val errorJson = Gson().fromJson(jsonBody, ErrorResponse::class.java)
+                ApiException.UnknownException(context, exception = errorJson.message)
+            }
         }
     }
 }

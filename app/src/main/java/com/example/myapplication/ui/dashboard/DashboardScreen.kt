@@ -8,17 +8,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.navigation.bottomNavGraph
+import com.example.myapplication.utils.components.BottomNav
 import com.example.myapplication.utils.components.Drawer
 
 @Composable
 fun DashboardScreen() {
     val navController = rememberNavController()
 
-    Scaffold(topBar = { Drawer(navController) }) { innerPadding ->
+    Scaffold(topBar = { Drawer(navController) }, bottomBar = { BottomNav(navController) }) { innerPadding ->
         NavHost(
             navController = navController,
-            route = Destinations.BottomGraph.route,
-            startDestination = Destinations.Home.route,
+            startDestination = Destinations.BottomGraph.route,
             modifier = Modifier.padding(innerPadding),
             builder = { bottomNavGraph(navController) }
         )

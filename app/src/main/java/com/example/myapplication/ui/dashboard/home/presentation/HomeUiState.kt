@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 
 @Immutable
 data class HomeUiState(
-    val isLoading: Boolean = false,
     val error: String = "",
+    val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false
 )

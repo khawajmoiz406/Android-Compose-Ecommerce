@@ -19,6 +19,6 @@ sealed class ApiException(val error: String) : Throwable() {
     data class ServerException(private val context: Context) :
         ApiException(error = context.getString(R.string.internal_server_error))
 
-    data class UnknownException(private val context: Context) :
-        ApiException(error = context.getString(R.string.unknown_error))
+    data class UnknownException(private val context: Context, private val exception: String? = null) :
+        ApiException(error = exception ?: context.getString(R.string.unknown_error))
 }

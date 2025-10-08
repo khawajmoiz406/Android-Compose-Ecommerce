@@ -1,15 +1,16 @@
 package com.example.myapplication.utils.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,15 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.example.myapplication.R
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
@@ -42,67 +41,86 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
-            .height(300.dp)
+            .height(200.dp)
+            .clickable { onClick?.invoke() }
     ) {
-        AsyncImage(
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.ic_launcher_background),
+        NetworkImage(
+            imageUrl = item.thumbnail ?: "",
+            contentScale = ContentScale.Fit,
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.6f)
+                .weight(0.6f)
                 .clip(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)),
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(item.thumbnail)
-                .crossfade(true)
-                .crossfade(500)
-                .build(),
         )
 
-        Box(modifier = Modifier.weight(0.4f).background(Color.White)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(0.4f)
+                .background(Color.White)
+        ) {
             Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                 Spacer(Modifier.height(10.dp))
 
-                Text(text = item.title ?: "", fontSize = 15.sp, fontWeight = FontWeight.Medium)
+                Text(
+                    text = item.title ?: "",
+                    fontSize = 13.sp,
+                    lineHeight = 13.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.Medium,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
 
-                Spacer(Modifier.height(10.dp))
+                Spacer(Modifier.height(5.dp))
+
+                Text(
+                    text = "$${item.price}",
+                    fontSize = 16.sp,
+                    lineHeight = 16.sp,
+                    color = Color.Black,
+                    fontWeight = FontWeight.SemiBold,
+                )
+
+                Spacer(Modifier.height(5.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
-
                     Text(
-                        text = "$${item.price}",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.weight(1f, fill = true)
+                        text = "${stringResource(R.string.brand)}: ${item.brand?.trim()}",
+                        fontSize = 10.sp,
+                        lineHeight = 10.sp,
+                        color = Color.Black,
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Spacer(Modifier.width(5.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.End,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = Color.Yellow,
+                            modifier = Modifier.size(12.dp)
+                        )
 
-                    Column {
-                        Text(text = "${stringResource(R.string.brand)}: ${item.brand?.trim()}", fontSize = 12.sp)
+                        Spacer(Modifier.width(5.dp))
 
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.End,
-                        ) {
-                            Icon(imageVector = Icons.Default.Star, contentDescription = null, tint = Color.Yellow)
-                            Spacer(Modifier.width(5.dp))
-                            Text(text = "${stringResource(R.string.rating)}: ${item.rating}", fontSize = 12.sp)
-                        }
+
+                        Text(
+                            text = "${item.rating}",
+                            fontSize = 10.sp,
+                            lineHeight = 10.sp,
+                            color = Color.Black,
+                        )
                     }
                 }
-
-                Spacer(Modifier.height(10.dp))
-
-                Text(text = "${stringResource(R.string.in_stock)}: ${item.stock}", fontSize = 10.sp)
-
-                Text(text = item.returnPolicy ?: "", fontSize = 10.sp)
             }
         }
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, device = Devices.PIXEL_7)
 @Composable
 fun PreviewItemProduct() {
     ItemProduct(
@@ -120,9 +138,7 @@ fun PreviewItemProduct() {
             sku = "BEA-ESS-ESS-001",
             weight = 4,
             dimensions = Dimensions(
-                width = 15.14,
-                height = 13.08,
-                depth = 22.99
+                width = 15.14, height = 13.08, depth = 22.99
             ),
             warrantyInformation = "1 week warranty",
             shippingInformation = "Ships in 3-5 business days",
@@ -134,15 +150,13 @@ fun PreviewItemProduct() {
                     date = "2025-04-30T09:41:02.053Z",
                     reviewerName = "Eleanor Collins",
                     reviewerEmail = "eleanor.collins@x.dummyjson.com"
-                ),
-                Review(
+                ), Review(
                     rating = 4,
                     comment = "Very satisfied!",
                     date = "2025-04-30T09:41:02.053Z",
                     reviewerName = "Lucas Gordon",
                     reviewerEmail = "lucas.gordon@x.dummyjson.com"
-                ),
-                Review(
+                ), Review(
                     rating = 5,
                     comment = "Highly impressed!",
                     date = "2025-04-30T09:41:02.053Z",

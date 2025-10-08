@@ -92,7 +92,7 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = koinVi
             shape = RoundedCornerShape(10.dp),
             label = { Text(text = stringResource(R.string.password)) },
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            onValueChange = { viewModel.updateUiState(uiState.value.copy(email = it)) },
+            onValueChange = { viewModel.updateUiState(uiState.value.copy(password = it)) },
             placeholder = { Text(text = stringResource(R.string.password)) },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             leadingIcon = {
@@ -115,7 +115,10 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel = koinVi
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Button(onClick = { viewModel.login() }, modifier = Modifier.defaultMinSize(minWidth = 150.dp)) {
+        Button(
+            onClick = { if (!uiState.value.isLoading) viewModel.login() },
+            modifier = Modifier.defaultMinSize(minWidth = 150.dp)
+        ) {
             when (uiState.value.isLoading) {
                 false -> Text(
                     stringResource(R.string.login),

@@ -9,6 +9,6 @@ import com.example.myapplication.models.response.User
 class LoginRemoteRepoImpl(context: Context, private val apis: ApiService) : LoginRemoteRepo,
     BaseRemoteRepo(context) {
     override suspend fun login(request: LoginRequest): Result<User> {
-        return fetch { apis.login(request.toMap()) }
+        return fetch { apis.login(headers = headers, body = request.toMap()) }
     }
 }

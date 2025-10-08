@@ -13,16 +13,20 @@ class HomeViewModel(private val productsUseCase: GetProductsUseCase) :
     BaseViewModel<HomeUiState, Unit>(HomeUiState()) {
     val products: MutableStateFlow<List<Product>> = MutableStateFlow(emptyList())
 
-    fun getProducts() = viewModelScope.launch {
-        updateUiState(uiState.value.copy(isLoading = true))
+    init {
+        getProducts()
+    }
+
+    fun getProducts(fromSwipe: Boolean = false) = viewModelScope.launch {
+        updateUiState(uiState.value.copy(isLoading = true, isRefreshing = fromSwipe))
         productsUseCase.invoke(Unit)
             .onSuccess { data ->
-                updateUiState(uiState.value.copy(isLoading = false))
-                products.update { data ?: emptyList() }
+                updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false))
+                products.update { data?.products ?: emptyList() }
             }
             .onFailure { error ->
                 val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
-                updateUiState(uiState.value.copy(isLoading = false, error = errorStr))
+                updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false, error = errorStr))
             }
     }
 }

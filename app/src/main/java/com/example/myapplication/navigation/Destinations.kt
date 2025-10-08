@@ -25,7 +25,7 @@ sealed class Destinations(val route: String) {
     data object Settings : Destinations("settings")
 
     //Other routes
-    data object Details : Destinations("details/{id}") {
-        fun createRoute(id: String) = "details/$id"
+    data object ProductDetail : Destinations("product_detail/{id}") {
+        fun createRoute(id: Int) = "product_detail/$id"
     }
 }
