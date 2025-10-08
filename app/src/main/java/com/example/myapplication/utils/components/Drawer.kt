@@ -47,13 +47,13 @@ import com.example.myapplication.utils.theme.MyApplicationTheme
 fun Drawer(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
-    if (currentRoute !in drawerItemsList.map { it.route }) return
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxHeight()
             .fillMaxWidth(0.8f)
+            .background(MaterialTheme.colorScheme.background)
     ) {
         Image(
             painter = painterResource(R.drawable.ic_launcher_foreground),
