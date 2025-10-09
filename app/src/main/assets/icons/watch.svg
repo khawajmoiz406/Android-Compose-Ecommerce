@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.3"
+    stroke-linecap="round" stroke-linejoin="round">
+    <!-- Straps -->
+    <rect x="10" y="2" width="4" height="3" rx="0.5" />
+    <rect x="10" y="19" width="4" height="3" rx="0.5" />
+    <!-- Watch face -->
+    <circle cx="12" cy="12" r="5" />
+    <!-- Hands -->
+    <path d="M12 12l0-2" />
+    <path d="M12 12l1.5 1.5" />
+</svg>

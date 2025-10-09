@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="1.3"
+    stroke-linecap="round" stroke-linejoin="round">
+    <!-- Bag body -->
+    <rect x="4" y="9" width="16" height="10" rx="2" />
+    <!-- Bag handle -->
+    <path d="M8 9V7a4 4 0 0 1 8 0v2" />
+    <!-- Clasp line -->
+    <line x1="4" y1="13" x2="20" y2="13" />
+</svg>
