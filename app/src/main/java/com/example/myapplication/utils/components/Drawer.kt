@@ -17,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -40,8 +39,6 @@ import com.example.myapplication.BuildConfig
 import com.example.myapplication.R
 import com.example.myapplication.models.helper.NavigationItem
 import com.example.myapplication.navigation.Destinations
-import com.example.myapplication.navigation.NavGraph
-import com.example.myapplication.utils.theme.MyApplicationTheme
 
 @Composable
 fun Drawer(navController: NavController) {
@@ -165,10 +162,5 @@ private val drawerItemsList = listOf(
 @Composable
 fun DrawerPreview() {
     val navController = rememberNavController()
-
-    MyApplicationTheme {
-        Scaffold(
-            topBar = { Drawer(navController) },
-        ) { innerPadding -> NavGraph(navController, innerPadding) }
-    }
+    Drawer(navController)
 }

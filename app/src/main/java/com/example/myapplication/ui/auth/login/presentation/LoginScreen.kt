@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.R
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
@@ -54,12 +54,13 @@ import com.example.myapplication.utils.SnackbarUtils
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun LoginScreen(navController: NavController, viewModel: LoginViewModel = koinViewModel()) {
+fun LoginScreen(viewModel: LoginViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
+    val navController = LocalParentNavController.current
     var passwordVisible by remember { mutableStateOf(false) }
 
-    LaunchedEffect(lifecycleOwner) { handleEvents(navController, viewModel) }
+    LaunchedEffect(lifecycleOwner) { navController?.let { handleEvents(it, viewModel) } }
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -154,7 +155,6 @@ private suspend fun handleEvents(navController: NavController, viewModel: LoginV
             }
 
             is LoginEvents.OnLoginSuccess -> {
-                SnackbarUtils.show("Login has been successful. Welcome ${event.user.username}")
                 navController.navigate(Destinations.DrawerGraph.route) {
                     popUpTo(Destinations.Login.route) { inclusive = true }
                     launchSingleTop = true
@@ -169,9 +169,7 @@ private suspend fun handleEvents(navController: NavController, viewModel: LoginV
 @Composable
 fun LoginPreview() {
     val context = LocalContext.current
-    val navController = rememberNavController()
     LoginScreen(
-        navController,
         LoginViewModel(
             LoginUseCase(
                 LoginRemoteRepoImpl(

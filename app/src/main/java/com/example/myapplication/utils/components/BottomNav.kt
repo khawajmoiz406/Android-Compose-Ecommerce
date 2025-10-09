@@ -1,67 +1,90 @@
 package com.example.myapplication.utils.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.R
 import com.example.myapplication.models.helper.NavigationItem
 import com.example.myapplication.navigation.Destinations
-import com.example.myapplication.navigation.NavGraph
-import com.example.myapplication.utils.theme.MyApplicationTheme
+import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
 
 @Composable
 fun BottomNav(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
-    if (currentRoute !in bottomNavItems.map { it.route }) return
+    val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
     NavigationBar(
-        contentColor = MaterialTheme.colorScheme.primary,
+        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
+            .height(75.sdp)
             .navigationBarsPadding()
-            .padding(horizontal = 25.dp)
-            .clip(RoundedCornerShape(40.dp))
     ) {
         bottomNavItems.map { item ->
-            val isSelected = currentRoute == item.route
-            val color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
-
-            NavigationBarItem(
-                selected = isSelected,
-                alwaysShowLabel = false,
+            BottomNavItem(
+                item = item,
+                selectedRoute = currentRoute,
                 onClick = { onItemClicked(item.route, navController) },
-                icon = {
-                    Image(
-                        painter = painterResource(item.activeIcon),
-                        contentDescription = stringResource(item.name),
-                        modifier = Modifier.size(55.dp),
-                        colorFilter = ColorFilter.tint(color),
-                    )
-                }
+                modifier = Modifier
+                    .weight(1f, fill = true)
+                    .fillMaxHeight(),
             )
         }
+    }
+}
+
+@Composable
+fun BottomNavItem(item: NavigationItem, selectedRoute: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    val isSelected = selectedRoute == item.route
+    val icon = if (isSelected) item.activeIcon else item.inactiveIcon
+    val color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier.clickable { onClick.invoke() }
+    ) {
+        Image(
+            painter = painterResource(icon),
+            contentDescription = null,
+            modifier = Modifier.size(25.sdp),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(color = color)
+        )
+
+        Spacer(modifier = Modifier.height(5.sdp))
+
+        Text(
+            text = stringResource(item.name),
+            color = color,
+            fontSize = 12.ssp,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -94,14 +117,9 @@ private val bottomNavItems = listOf(
     ),
 )
 
-@Preview(showBackground = true, showSystemUi = true)
+@Preview(showSystemUi = true)
 @Composable
 fun PreviewBottomBar() {
     val navController = rememberNavController()
-
-    MyApplicationTheme {
-        Scaffold(
-            bottomBar = { BottomNav(navController) },
-        ) { innerPadding -> NavGraph(navController, innerPadding) }
-    }
+    BottomNav(navController)
 }

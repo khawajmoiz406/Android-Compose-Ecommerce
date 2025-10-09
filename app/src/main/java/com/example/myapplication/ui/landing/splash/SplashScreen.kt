@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.R
 import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.utils.Constants
@@ -27,10 +27,11 @@ import com.example.myapplication.utils.components.SvgImage
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen() {
     val lifecycleOwner = LocalLifecycleOwner.current
+    val navController = LocalParentNavController.current
 
-    LaunchedEffect(lifecycleOwner) { handleSplash(navController) }
+    LaunchedEffect(lifecycleOwner) { navController?.let { handleSplash(it) } }
 
     Box(
         modifier = Modifier
@@ -68,6 +69,5 @@ private suspend fun handleSplash(navController: NavController) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewSplashScreen() {
-    val navController = rememberNavController()
-    SplashScreen(navController)
+    SplashScreen()
 }

@@ -7,12 +7,18 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.NavGraph
 import com.example.myapplication.utils.SnackbarUtils
 import com.example.myapplication.utils.theme.MyApplicationTheme
+
+// Global CompositionLocal for parent navigation
+val LocalParentNavController = compositionLocalOf<NavController?> { null }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,9 +37,11 @@ fun MainScreen() {
     SnackbarUtils.init(snackbarHostState, scope)
 
     MyApplicationTheme {
-        Scaffold(
-            snackbarHost = { SnackbarUtils.CustomSnackbarHost(snackbarHostState) },
-            content = { innerPadding -> NavGraph(navController, innerPadding) }
-        )
+        CompositionLocalProvider(value = LocalParentNavController provides navController) {
+            Scaffold(
+                snackbarHost = { SnackbarUtils.CustomSnackbarHost(snackbarHostState) },
+                content = { innerPadding -> NavGraph(navController, innerPadding) }
+            )
+        }
     }
 }

@@ -19,9 +19,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
 import com.example.myapplication.di.createRetrofit
@@ -34,10 +33,12 @@ import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsUseCase
 import com.example.myapplication.utils.components.ItemProduct
 import com.example.myapplication.utils.components.SwipeRefresh
+import ir.kaaveh.sdpcompose.sdp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinViewModel()) {
+fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
+    val parentNavController = LocalParentNavController.current
     val uiState = viewModel.uiState.collectAsState()
     val products = viewModel.products.collectAsState()
 
@@ -52,20 +53,25 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = koinView
         onRefresh = { viewModel.getProducts(fromSwipe = true) }
     ) {
         if (uiState.value.error.isNotEmpty()) Box(
-            modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
             contentAlignment = Alignment.Center,
             content = { Text(text = uiState.value.error) }
         )
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(horizontal = 10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            contentPadding = PaddingValues(10.sdp),
+            verticalArrangement = Arrangement.spacedBy(10.sdp),
+            horizontalArrangement = Arrangement.spacedBy(10.sdp),
             modifier = Modifier.fillMaxHeight()
         ) {
             items(products.value) { item ->
-                ItemProduct(item = item, onClick = { handleItemClicked(navController = navController, item.id) })
+                ItemProduct(
+                    item = item,
+                    onClick = { parentNavController?.let { handleItemClicked(it, item.id) } },
+                )
             }
         }
     }
@@ -83,9 +89,7 @@ private fun handleItemClicked(navController: NavController, productId: Int?) {
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PreviewHomeScreen() {
-    val navController = rememberNavController()
     HomeScreen(
-        navController,
         HomeViewModel(
             GetProductsUseCase(
                 HomeRemoteRepoImpl(

@@ -1,6 +1,8 @@
 package com.example.myapplication.utils.components
 
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,7 +29,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,6 +43,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
     Column(
         modifier = Modifier
             .clip(RoundedCornerShape(15.dp))
+            .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(15.dp))
             .height(200.dp)
             .clickable { onClick?.invoke() }
     ) {
@@ -50,6 +53,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.6f)
+                .background(MaterialTheme.colorScheme.background)
                 .clip(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)),
         )
 
@@ -57,7 +61,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(0.4f)
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.onBackground)
         ) {
             Column(modifier = Modifier.padding(horizontal = 10.dp)) {
                 Spacer(Modifier.height(10.dp))
@@ -66,9 +70,9 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
                     text = item.title ?: "",
                     fontSize = 13.sp,
                     lineHeight = 13.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.background,
                     fontWeight = FontWeight.Medium,
-                    maxLines = 2,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
 
@@ -78,7 +82,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
                     text = "$${item.price}",
                     fontSize = 16.sp,
                     lineHeight = 16.sp,
-                    color = Color.Black,
+                    color = MaterialTheme.colorScheme.background,
                     fontWeight = FontWeight.SemiBold,
                 )
 
@@ -89,7 +93,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
                         text = "${stringResource(R.string.brand)}: ${item.brand?.trim()}",
                         fontSize = 10.sp,
                         lineHeight = 10.sp,
-                        color = Color.Black,
+                        color = MaterialTheme.colorScheme.background,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -111,7 +115,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
                             text = "${item.rating}",
                             fontSize = 10.sp,
                             lineHeight = 10.sp,
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.background,
                         )
                     }
                 }
@@ -120,7 +124,7 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
     }
 }
 
-@Preview(showBackground = true, device = Devices.PIXEL_7)
+@Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewItemProduct() {
     ItemProduct(
