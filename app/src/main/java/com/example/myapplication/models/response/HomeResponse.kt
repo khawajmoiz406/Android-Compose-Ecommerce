@@ -5,6 +5,6 @@ import com.example.myapplication.models.response.product.Product
 import java.io.Serializable
 
 data class HomeResponse(
-    var products: MutableList<Product>?,
+    var products: List<Product>?,
     var categories: List<Category>?
 ) : Serializable

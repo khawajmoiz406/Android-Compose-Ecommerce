@@ -36,7 +36,9 @@ class HomeViewModel(private val productsUseCase: GetProductsUseCase, private val
         productsUseCase.invoke(Unit)
             .onSuccess { data ->
                 updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false))
-                homeResponse.update { it?.apply { products?.addAll(data?.products ?: emptyList()) } }
+                homeResponse.update { home ->
+                    home?.apply { products = (products ?: emptyList()) + (data?.products ?: emptyList()) }
+                }
             }
             .onFailure { error ->
                 val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }

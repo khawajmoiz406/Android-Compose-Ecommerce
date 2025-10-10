@@ -3,23 +3,31 @@ package com.example.myapplication.ui.dashboard.home.presentation
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.myapplication.LocalParentNavController
@@ -36,14 +44,18 @@ import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
 import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsUseCase
+import com.example.myapplication.ui.dashboard.home.presentation.components.HeadingRow
+import com.example.myapplication.ui.dashboard.home.presentation.components.ItemCategory
 import com.example.myapplication.utils.components.ItemProduct
 import com.example.myapplication.utils.components.NoData
 import com.example.myapplication.utils.components.SwipeRefresh
 import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
+    val selectedCategory = remember { mutableIntStateOf(0) }
     val parentNavController = LocalParentNavController.current
     val homeData = viewModel.homeResponse.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
@@ -58,28 +70,58 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
         isRefreshing = uiState.value.isRefreshing,
         onRefresh = { viewModel.getProducts(fromSwipe = true) }
     ) {
-
-        if(!homeData.value?.categories.isNullOrEmpty()) LazyRow {
-            items(homeData.value!!.categories!!) {
-
-            }
-        }
-
         when {
             uiState.value.error.isNotEmpty() -> NoData(message = uiState.value.error)
             homeData.value?.products.isNullOrEmpty() -> NoData(message = stringResource(R.string.no_products))
             else -> LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(10.sdp),
                 verticalArrangement = Arrangement.spacedBy(10.sdp),
                 horizontalArrangement = Arrangement.spacedBy(10.sdp),
                 modifier = Modifier.fillMaxHeight()
             ) {
-                items(homeData.value!!.products!!) { item ->
+                if (!homeData.value?.categories.isNullOrEmpty())
+                    item(span = { GridItemSpan(2) }) {
+                        Column {
+                            Spacer(Modifier.height(10.sdp))
+
+                            HeadingRow(heading = stringResource(R.string.categories))
+
+                            Spacer(Modifier.height(10.sdp))
+
+                            LazyRow {
+                                itemsIndexed(homeData.value!!.categories!!) { index, item ->
+                                    ItemCategory(
+                                        category = item,
+                                        index = index,
+                                        selectedIndex = selectedCategory.intValue
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                item(span = { GridItemSpan(2) }) {
+                    Spacer(Modifier.height(10.sdp))
+
+                    Text(
+                        fontSize = 14.ssp,
+                        fontWeight = FontWeight.SemiBold,
+                        text = stringResource(R.string.products),
+                        color = MaterialTheme.colorScheme.onBackground,
+                        modifier = Modifier.padding(horizontal = 10.sdp)
+                    )
+                }
+
+                itemsIndexed(homeData.value!!.products!!) { index, item ->
                     ItemProduct(
                         item = item,
+                        index = index,
                         onClick = { parentNavController?.let { handleItemClicked(it, item.id) } },
                     )
+                }
+
+                item(span = { GridItemSpan(2) }) {
+                    Spacer(Modifier.height(10.sdp))
                 }
             }
         }

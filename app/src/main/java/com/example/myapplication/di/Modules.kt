@@ -6,6 +6,7 @@ import com.example.myapplication.ui.auth.login.domain.LoginUseCase
 import com.example.myapplication.ui.auth.login.presentation.LoginViewModel
 import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepo
 import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
+import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.HomeViewModel
 import org.koin.android.ext.koin.androidContext
@@ -26,6 +27,7 @@ val loginModule = module {
 
 val homeModule = module {
     single<HomeRemoteRepo> { HomeRemoteRepoImpl(androidContext(), get()) }
+    single { GetHomeUseCase(get()) }
     single { GetProductsUseCase(get()) }
-    viewModel { HomeViewModel(get()) }
+    viewModel { HomeViewModel(get(), get()) }
 }

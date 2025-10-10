@@ -5,5 +5,5 @@ import java.io.Serializable
 data class Category(
     val slug: String,
     val name: String,
-    val icon: String
+    var icon: String
 ) : Serializable

@@ -22,5 +22,8 @@
     <string name="brand">Brand</string>
     <string name="in_stock">In Stock</string>
     <string name="no_products">No products found</string>
+    <string name="categories">Categories</string>
+    <string name="see_all">See all</string>
+    <string name="products">Products</string>
 
 </resources>

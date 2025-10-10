@@ -24,9 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,6 +39,7 @@ import com.example.myapplication.BuildConfig
 import com.example.myapplication.R
 import com.example.myapplication.models.helper.NavigationItem
 import com.example.myapplication.navigation.Destinations
+import ir.kaaveh.sdpcompose.sdp
 
 @Composable
 fun Drawer(navController: NavController) {
@@ -87,11 +88,11 @@ fun Drawer(navController: NavController) {
 @Composable
 fun DrawerItem(item: NavigationItem, selectedRoute: String, onClick: () -> Unit) {
     val isSelected = selectedRoute == item.route
-    val icon = if (isSelected) item.activeIcon else item.inactiveIcon
     val color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
     val bgColor = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
 
     Box(
+        contentAlignment = Alignment.Center,
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
@@ -101,12 +102,12 @@ fun DrawerItem(item: NavigationItem, selectedRoute: String, onClick: () -> Unit)
             .clickable { onClick.invoke() }
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Image(
-                painter = painterResource(icon),
-                contentDescription = null,
-                modifier = Modifier.size(50.dp),
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.tint(color = color)
+            Spacer(modifier = Modifier.width(10.dp))
+
+            SvgImage(
+                asset = item.icon,
+                modifier = Modifier.size(20.sdp),
+                color = color
             )
 
             Spacer(modifier = Modifier.width(10.dp))
@@ -116,6 +117,7 @@ fun DrawerItem(item: NavigationItem, selectedRoute: String, onClick: () -> Unit)
                 color = color,
                 fontSize = 15.sp,
                 maxLines = 1,
+                fontWeight = FontWeight.Medium,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.weight(1f, fill = true)
             )
@@ -135,26 +137,22 @@ private val drawerItemsList = listOf(
     NavigationItem(
         name = R.string.dashboard,
         route = Destinations.Dashboard.route,
-        activeIcon = R.drawable.ic_launcher_background,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "home",
     ),
     NavigationItem(
         name = R.string.about_us,
         route = Destinations.AboutUs.route,
-        activeIcon = R.drawable.ic_launcher_background,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "about_us",
     ),
     NavigationItem(
         name = R.string.privacy_policy,
         route = Destinations.PrivacyPolicy.route,
-        activeIcon = R.drawable.ic_launcher_background,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "privacy_policy",
     ),
     NavigationItem(
         name = R.string.settings,
         route = Destinations.Settings.route,
-        activeIcon = R.drawable.ic_launcher_background,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "settings",
     )
 )
 

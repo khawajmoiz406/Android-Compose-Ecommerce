@@ -37,14 +37,18 @@ import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
 import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.Review
+import ir.kaaveh.sdpcompose.sdp
 
 @Composable
-fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
+fun ItemProduct(item: Product, index: Int ,onClick: (() -> Unit)? = null) {
+    val startItem = index % 2 == 0
+
     Column(
         modifier = Modifier
+            .height(200.dp)
+            .padding(start = if (startItem) 10.sdp else 0.sdp, end = if (!startItem) 10.sdp else 0.sdp)
             .clip(RoundedCornerShape(15.dp))
             .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(15.dp))
-            .height(200.dp)
             .clickable { onClick?.invoke() }
     ) {
         NetworkImage(
@@ -128,7 +132,8 @@ fun ItemProduct(item: Product, onClick: (() -> Unit)? = null) {
 @Composable
 fun PreviewItemProduct() {
     ItemProduct(
-        Product(
+        index = 0,
+        item = Product(
             id = 1,
             title = "Essence Mascara Lash Princess",
             description = "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",

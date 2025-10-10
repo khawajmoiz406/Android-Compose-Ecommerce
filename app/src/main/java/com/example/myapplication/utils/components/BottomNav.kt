@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
@@ -38,10 +39,10 @@ fun BottomNav(navController: NavController) {
     val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        containerColor = MaterialTheme.colorScheme.primary,
         modifier = Modifier
             .fillMaxWidth()
-            .height(75.sdp)
+            .height(65.sdp)
             .navigationBarsPadding()
     ) {
         bottomNavItems.map { item ->
@@ -60,29 +61,25 @@ fun BottomNav(navController: NavController) {
 @Composable
 fun BottomNavItem(item: NavigationItem, selectedRoute: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val isSelected = selectedRoute == item.route
-    val icon = if (isSelected) item.activeIcon else item.inactiveIcon
-    val color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onBackground
+    val color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
         modifier = modifier.clickable { onClick.invoke() }
     ) {
-        Image(
-            painter = painterResource(icon),
-            contentDescription = null,
-            modifier = Modifier.size(25.sdp),
-            contentScale = ContentScale.Crop,
-            colorFilter = ColorFilter.tint(color = color)
+        SvgImage(
+            asset = item.icon,
+            modifier = Modifier.size(16.sdp),
+            color = color
         )
-
-        Spacer(modifier = Modifier.height(5.sdp))
 
         Text(
             text = stringResource(item.name),
             color = color,
-            fontSize = 12.ssp,
+            fontSize = 11.ssp,
             maxLines = 1,
+            fontWeight = FontWeight.Medium,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -100,20 +97,17 @@ private val bottomNavItems = listOf(
     NavigationItem(
         name = R.string.home,
         route = Destinations.Home.route,
-        activeIcon = R.drawable.ic_launcher_foreground,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "home",
     ),
     NavigationItem(
         name = R.string.favourites,
         route = Destinations.Favourites.route,
-        activeIcon = R.drawable.ic_launcher_foreground,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "heart",
     ),
     NavigationItem(
         name = R.string.profile,
         route = Destinations.Profile.route,
-        activeIcon = R.drawable.ic_launcher_foreground,
-        inactiveIcon = R.drawable.ic_launcher_foreground
+        icon = "user",
     ),
 )
 
