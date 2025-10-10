@@ -2,15 +2,16 @@ package com.example.myapplication.utils.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -21,6 +22,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,74 +34,92 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
 import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.Review
 import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
 
 @Composable
-fun ItemProduct(item: Product, index: Int ,onClick: (() -> Unit)? = null) {
+fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null) {
     val startItem = index % 2 == 0
+    val isFavourite = remember { mutableStateOf(item.isFavourite ?: false) }
 
-    Column(
-        modifier = Modifier
-            .height(200.dp)
-            .padding(start = if (startItem) 10.sdp else 0.sdp, end = if (!startItem) 10.sdp else 0.sdp)
-            .clip(RoundedCornerShape(15.dp))
-            .border(width = 1.dp, color = MaterialTheme.colorScheme.onBackground, shape = RoundedCornerShape(15.dp))
-            .clickable { onClick?.invoke() }
-    ) {
-        NetworkImage(
-            imageUrl = item.thumbnail ?: "",
-            contentScale = ContentScale.Fit,
+    Column(modifier = Modifier
+        .height(220.sdp)
+        .padding(start = if (startItem) 10.sdp else 0.sdp, end = if (!startItem) 10.sdp else 0.sdp)
+        .clip(RoundedCornerShape(15.sdp))
+        .clickable { onClick?.invoke() }) {
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.6f)
-                .background(MaterialTheme.colorScheme.background)
-                .clip(RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp)),
-        )
+                .weight(0.65f)
+                .clip(RoundedCornerShape(15.sdp))
+                .background(MaterialTheme.colorScheme.surfaceDim)
+        ) {
+            NetworkImage(
+                imageUrl = item.thumbnail ?: "",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(28.sdp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-8).sdp, y = 8.sdp)
+                    .clip(RoundedCornerShape(10.sdp))
+                    .background(MaterialTheme.colorScheme.background)
+                    .clickable { toggleFav(isFavourite, item) }
+            ) {
+                SvgImage(
+                    asset = if (isFavourite.value) "fav_filled" else "fav_outline",
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(18.sdp)
+                )
+            }
+        }
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(0.4f)
-                .background(MaterialTheme.colorScheme.onBackground)
+                .weight(0.35f)
         ) {
-            Column(modifier = Modifier.padding(horizontal = 10.dp)) {
-                Spacer(Modifier.height(10.dp))
+            Column(modifier = Modifier.padding(horizontal = 10.sdp)) {
+                Spacer(Modifier.height(10.sdp))
 
                 Text(
                     text = item.title ?: "",
-                    fontSize = 13.sp,
-                    lineHeight = 13.sp,
-                    color = MaterialTheme.colorScheme.background,
+                    fontSize = 11.ssp,
+                    lineHeight = 11.ssp,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                Spacer(Modifier.height(5.dp))
+                Spacer(Modifier.height(5.sdp))
 
                 Text(
                     text = "$${item.price}",
-                    fontSize = 16.sp,
-                    lineHeight = 16.sp,
-                    color = MaterialTheme.colorScheme.background,
+                    fontSize = 14.ssp,
+                    lineHeight = 14.ssp,
+                    color = MaterialTheme.colorScheme.onBackground,
                     fontWeight = FontWeight.SemiBold,
                 )
 
-                Spacer(Modifier.height(5.dp))
+                Spacer(Modifier.height(5.sdp))
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "${stringResource(R.string.brand)}: ${item.brand?.trim()}",
-                        fontSize = 10.sp,
-                        lineHeight = 10.sp,
-                        color = MaterialTheme.colorScheme.background,
+                        text = "${stringResource(R.string.brand)}: ${item.brand?.trim() ?: stringResource(R.string.no_set)}",
+                        fontSize = 9.ssp,
+                        lineHeight = 9.ssp,
+                        color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -109,23 +131,28 @@ fun ItemProduct(item: Product, index: Int ,onClick: (() -> Unit)? = null) {
                             imageVector = Icons.Default.Star,
                             contentDescription = null,
                             tint = Color.Yellow,
-                            modifier = Modifier.size(12.dp)
+                            modifier = Modifier.size(12.sdp)
                         )
 
-                        Spacer(Modifier.width(5.dp))
+                        Spacer(Modifier.width(5.sdp))
 
 
                         Text(
                             text = "${item.rating}",
-                            fontSize = 10.sp,
-                            lineHeight = 10.sp,
-                            color = MaterialTheme.colorScheme.background,
+                            fontSize = 9.ssp,
+                            lineHeight = 9.ssp,
+                            color = MaterialTheme.colorScheme.onBackground,
                         )
                     }
                 }
             }
         }
     }
+}
+
+private fun toggleFav(state: MutableState<Boolean>, item: Product) {
+    state.value = !state.value
+    item.isFavourite = state.value
 }
 
 @Preview(showBackground = true, uiMode = UI_MODE_NIGHT_YES)

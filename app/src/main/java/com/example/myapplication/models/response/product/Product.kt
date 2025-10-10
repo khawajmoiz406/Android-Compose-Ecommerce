@@ -24,5 +24,6 @@ data class Product(
     val thumbnail: String?,
     val title: String?,
     val warrantyInformation: String?,
-    val weight: Int?
+    val weight: Int?,
+    var isFavourite: Boolean? = false
 ) : Serializable
