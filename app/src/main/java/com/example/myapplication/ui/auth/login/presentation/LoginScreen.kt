@@ -42,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.R
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
@@ -50,6 +49,7 @@ import com.example.myapplication.di.createRetrofit
 import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.ui.auth.login.data.LoginRemoteRepoImpl
 import com.example.myapplication.ui.auth.login.domain.LoginUseCase
+import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.utils.SnackbarUtils
 import org.koin.androidx.compose.koinViewModel
 

@@ -13,10 +13,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -30,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.R
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
@@ -46,6 +45,8 @@ import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.components.HeadingRow
 import com.example.myapplication.ui.dashboard.home.presentation.components.ItemCategory
+import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.utils.AppCompositionLocals.LocalTopAppBarScrollBehavior
 import com.example.myapplication.utils.components.ItemProduct
 import com.example.myapplication.utils.components.NoData
 import com.example.myapplication.utils.components.SwipeRefresh
@@ -53,10 +54,12 @@ import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val selectedCategory = remember { mutableIntStateOf(0) }
     val parentNavController = LocalParentNavController.current
+    val scrollBehavior = LocalTopAppBarScrollBehavior.current
     val homeData = viewModel.homeResponse.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
 
@@ -68,7 +71,8 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
     SwipeRefresh(
         isRefreshing = uiState.value.isRefreshing,
-        onRefresh = { viewModel.getProducts(fromSwipe = true) }
+        onRefresh = { viewModel.getProducts(fromSwipe = true) },
+        parentNestedScrollConnection = scrollBehavior?.nestedScrollConnection
     ) {
         when {
             uiState.value.error.isNotEmpty() -> NoData(message = uiState.value.error)
@@ -93,7 +97,8 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                                     ItemCategory(
                                         category = item,
                                         index = index,
-                                        selectedIndex = selectedCategory.intValue
+                                        selectedIndex = selectedCategory.intValue,
+                                        onItemClick = { selectedCategory.intValue = index }
                                     )
                                 }
                             }

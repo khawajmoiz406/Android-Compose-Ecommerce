@@ -8,6 +8,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 
 @Composable
 fun NoData(message: String, scrollable: Boolean = true, imageAsset: String = "") {
@@ -17,6 +18,6 @@ fun NoData(message: String, scrollable: Boolean = true, imageAsset: String = "")
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,
-        content = { Text(text = message) }
+        content = { Text(text = message, textAlign = TextAlign.Center) }
     )
 }

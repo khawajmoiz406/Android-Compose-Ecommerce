@@ -1,10 +1,8 @@
 package com.example.myapplication.utils.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -17,9 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -27,9 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.R
 import com.example.myapplication.models.helper.NavigationItem
-import com.example.myapplication.navigation.Destinations
+import com.example.myapplication.utils.Constants.BOTTOM_NAV_ITEMS
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
@@ -45,7 +39,7 @@ fun BottomNav(navController: NavController) {
             .height(65.sdp)
             .navigationBarsPadding()
     ) {
-        bottomNavItems.map { item ->
+        BOTTOM_NAV_ITEMS.map { item ->
             BottomNavItem(
                 item = item,
                 selectedRoute = currentRoute,
@@ -92,24 +86,6 @@ private fun onItemClicked(route: String, navController: NavController) {
         restoreState = true
     }
 }
-
-private val bottomNavItems = listOf(
-    NavigationItem(
-        name = R.string.home,
-        route = Destinations.Home.route,
-        icon = "home",
-    ),
-    NavigationItem(
-        name = R.string.favourites,
-        route = Destinations.Favourites.route,
-        icon = "heart",
-    ),
-    NavigationItem(
-        name = R.string.profile,
-        route = Destinations.Profile.route,
-        icon = "user",
-    ),
-)
 
 @Preview(showSystemUi = true)
 @Composable

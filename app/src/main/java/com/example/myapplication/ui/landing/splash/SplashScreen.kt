@@ -19,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
-import com.example.myapplication.LocalParentNavController
 import com.example.myapplication.R
 import com.example.myapplication.navigation.Destinations
+import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.utils.Constants
 import com.example.myapplication.utils.components.SvgImage
 import kotlinx.coroutines.delay

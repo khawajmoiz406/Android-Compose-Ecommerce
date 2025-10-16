@@ -6,9 +6,14 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Velocity
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -16,6 +21,7 @@ fun SwipeRefresh(
     isRefreshing: Boolean,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    parentNestedScrollConnection: NestedScrollConnection? = null,
     content: @Composable () -> Unit
 ) {
     val pullToRefreshState = rememberPullToRefreshState()
@@ -36,7 +42,47 @@ fun SwipeRefresh(
         }
     }
 
-    Box(modifier = modifier.nestedScroll(pullToRefreshState.nestedScrollConnection)) {
+    // Chain the scroll connections
+    val nestedScrollConnection = remember(parentNestedScrollConnection) {
+        if (parentNestedScrollConnection != null) {
+            object : NestedScrollConnection {
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    val consumedByPullToRefresh =
+                        pullToRefreshState.nestedScrollConnection.onPreScroll(available, source)
+                    val remaining = available - consumedByPullToRefresh
+                    val consumedByParent = parentNestedScrollConnection.onPreScroll(remaining, source)
+                    return consumedByPullToRefresh + consumedByParent
+                }
+
+                override fun onPostScroll(consumed: Offset, available: Offset, source: NestedScrollSource): Offset {
+                    val consumedByParent = parentNestedScrollConnection.onPostScroll(consumed, available, source)
+                    val remaining = available - consumedByParent
+                    val consumedByPullToRefresh =
+                        pullToRefreshState.nestedScrollConnection.onPostScroll(consumed, remaining, source)
+                    return consumedByParent + consumedByPullToRefresh
+                }
+
+                override suspend fun onPreFling(available: Velocity): Velocity {
+                    val consumedByPullToRefresh = pullToRefreshState.nestedScrollConnection.onPreFling(available)
+                    val remaining = available - consumedByPullToRefresh
+                    val consumedByParent = parentNestedScrollConnection.onPreFling(remaining)
+                    return consumedByPullToRefresh + consumedByParent
+                }
+
+                override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+                    val consumedByParent = parentNestedScrollConnection.onPostFling(consumed, available)
+                    val remaining = available - consumedByParent
+                    val consumedByPullToRefresh =
+                        pullToRefreshState.nestedScrollConnection.onPostFling(consumed, remaining)
+                    return consumedByParent + consumedByPullToRefresh
+                }
+            }
+        } else {
+            pullToRefreshState.nestedScrollConnection
+        }
+    }
+
+    Box(modifier = modifier.nestedScroll(nestedScrollConnection)) {
         content()
 
         if (pullToRefreshState.progress > 0f || pullToRefreshState.isRefreshing)

@@ -1,5 +1,9 @@
 package com.example.myapplication.utils
 
+import com.example.myapplication.R
+import com.example.myapplication.models.helper.NavigationItem
+import com.example.myapplication.navigation.Destinations
+
 object Constants {
     const val SPLASH_DELAY = 1500L //In Milliseconds
     const val TOKEN_TIMEOUT = 30 //In Minutes
@@ -29,5 +33,25 @@ object Constants {
         "womens-jewellery" to "jewellery",
         "womens-shoes" to "heel",
         "womens-watches" to "watch"
+    )
+
+    val BOTTOM_NAV_ITEMS = listOf(
+        NavigationItem(
+            name = R.string.home,
+            route = Destinations.Home.route,
+            icon = "home",
+            showToolbar = true,
+        ),
+        NavigationItem(
+            name = R.string.favourites,
+            route = Destinations.Favourites.route,
+            icon = "heart",
+            showToolbar = true,
+        ),
+        NavigationItem(
+            name = R.string.profile,
+            route = Destinations.Profile.route,
+            icon = "user",
+        ),
     )
 }
