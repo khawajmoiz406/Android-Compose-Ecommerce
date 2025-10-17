@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -71,8 +72,8 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
     SwipeRefresh(
         isRefreshing = uiState.value.isRefreshing,
-        onRefresh = { viewModel.getProducts(fromSwipe = true) },
-        parentNestedScrollConnection = scrollBehavior?.nestedScrollConnection
+        onRefresh = { viewModel.getHome(fromSwipe = true) },
+        scrollBehavior = scrollBehavior
     ) {
         when {
             uiState.value.error.isNotEmpty() -> NoData(message = uiState.value.error)

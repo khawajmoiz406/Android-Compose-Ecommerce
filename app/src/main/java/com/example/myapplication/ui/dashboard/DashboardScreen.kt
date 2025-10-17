@@ -1,5 +1,6 @@
 package com.example.myapplication.ui.dashboard
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -12,6 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -27,6 +30,7 @@ import com.example.myapplication.utils.components.Drawer
 @Composable
 fun DashboardScreen() {
     val navController = rememberNavController()
+    val focusManager = LocalFocusManager.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
@@ -40,7 +44,9 @@ fun DashboardScreen() {
             containerColor = MaterialTheme.colorScheme.surface,
             topBar = { if (showToolbar) DashboardToolbar(drawerState, scrollBehavior) },
             bottomBar = { BottomNav(navController) },
-            modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            modifier = Modifier
+                .nestedScroll(scrollBehavior.nestedScrollConnection)
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) { innerPadding ->
             CompositionLocalProvider(LocalTopAppBarScrollBehavior provides scrollBehavior) {
                 NavHost(

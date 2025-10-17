@@ -26,5 +26,6 @@
     <string name="see_all">See all</string>
     <string name="products">Products</string>
     <string name="no_set">N/A</string>
+    <string name="search_product">Search products...</string>
 
 </resources>

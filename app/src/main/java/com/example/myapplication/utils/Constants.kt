@@ -9,6 +9,7 @@ object Constants {
     const val TOKEN_TIMEOUT = 30 //In Minutes
 
     val CATEGORIES_ICON_MAP = mapOf(
+        "all" to "home",
         "beauty" to "beauty",
         "fragrances" to "fragrance",
         "furniture" to "furniture",
