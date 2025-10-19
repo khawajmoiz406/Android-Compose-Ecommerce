@@ -49,7 +49,7 @@ fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null) {
 
     Column(modifier = Modifier
         .height(220.sdp)
-        .padding(start = if (startItem) 10.sdp else 0.sdp, end = if (!startItem) 10.sdp else 0.sdp)
+        .padding(start = if (startItem) 0.sdp else 5.sdp, end = if (startItem) 5.sdp else 0.sdp)
         .clip(RoundedCornerShape(15.sdp))
         .clickable { onClick?.invoke() }) {
         Box(

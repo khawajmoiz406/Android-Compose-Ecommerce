@@ -1,7 +1,6 @@
 package com.example.myapplication.utils.components
 
 import android.annotation.SuppressLint
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -35,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
@@ -43,7 +43,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Dp
 import com.example.myapplication.R
+import com.example.myapplication.utils.AppCompositionLocals.LocalSearchController
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -60,19 +62,14 @@ fun DashboardToolbar(
     val toolbarHeight = 80.sdp
     val minHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx() }
     val searchBarHeightPx = remember { mutableIntStateOf(0) }
-    val maxHeightPx = minHeightPx + searchBarHeightPx.intValue
+    var maxHeightPx = minHeightPx + searchBarHeightPx.intValue
     val heightOffset = scrollBehavior.state.heightOffset
 
     LaunchedEffect(searchBarHeightPx) {
         if (searchBarHeightPx.intValue > 0) {
             scrollBehavior.state.heightOffsetLimit = -searchBarHeightPx.intValue.toFloat()
+            maxHeightPx = minHeightPx + searchBarHeightPx.intValue
         }
-    }
-
-    val currentHeightPx = if (searchBarHeightPx.intValue > 0) {
-        (minHeightPx + searchBarHeightPx.intValue + heightOffset.toInt()).coerceIn(minHeightPx, maxHeightPx)
-    } else {
-        minHeightPx + searchBarHeightPx.intValue
     }
 
     val collapseProgress = if (searchBarHeightPx.intValue > 0) {
@@ -81,18 +78,16 @@ fun DashboardToolbar(
         0f
     }
 
-    val easedProgress = FastOutSlowInEasing.transform(collapseProgress)
-    val opacity = (1f - (easedProgress * 2f)).coerceIn(0f, 1f)
+    val opacity = (1f - (collapseProgress * 2f)).coerceIn(0f, 1f)
 
     Layout(
-        modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.primary,
-                shape = RoundedCornerShape(bottomEnd = 8.sdp, bottomStart = 8.sdp)
-            ),
+        modifier = Modifier.background(
+            color = MaterialTheme.colorScheme.primary,
+            shape = RoundedCornerShape(bottomEnd = 8.sdp, bottomStart = 8.sdp)
+        ),
         content = {
             Box(
-                content = { Toolbar(drawerState) },
+                content = { Toolbar(drawerState, toolbarHeight) },
                 modifier = Modifier
                     .height(toolbarHeight)
                     .fillMaxWidth()
@@ -113,7 +108,7 @@ fun DashboardToolbar(
             searchBarHeightPx.intValue = searchBarPlaceable.height
         }
 
-        val finalHeight = maxOf(toolbarPlaceable.height, currentHeightPx)
+        val finalHeight = maxOf(toolbarPlaceable.height, (maxHeightPx + heightOffset).toInt())
 
         layout(constraints.maxWidth, finalHeight) {
             toolbarPlaceable.place(0, 0)
@@ -123,10 +118,16 @@ fun DashboardToolbar(
 }
 
 @Composable
-private fun Toolbar(drawerState: DrawerState) {
+private fun Toolbar(drawerState: DrawerState, height: Dp) {
     val scope = rememberCoroutineScope()
+    val statusBarHeight = WindowInsets.systemBars.asPaddingValues().calculateTopPadding()
 
-    Box(modifier = Modifier.padding(top = WindowInsets.systemBars.asPaddingValues().calculateTopPadding())) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(top = statusBarHeight)
+            .height(height)
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 contentAlignment = Alignment.Center,
@@ -173,14 +174,24 @@ private fun Toolbar(drawerState: DrawerState) {
 private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterClicked: (() -> Unit)? = null) {
     val focusManager = LocalFocusManager.current
     val search = remember { mutableStateOf("") }
+    val searchController = LocalSearchController.current
+
+    rememberDebounce(
+        value = search.value,
+        onDebounce = {
+            searchController?.str?.value = it
+            onSearchTextChanged?.invoke(it)
+        }
+    )
 
     Row(
-        modifier = Modifier.padding(start = 8.sdp, end = 10.sdp, bottom = 10.sdp),
+        modifier = Modifier.padding(start = 6.sdp, end = 6.sdp, bottom = 10.sdp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         BasicTextField(
             singleLine = true,
             value = search.value,
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.onSurface),
             keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Done),
             keyboardActions = KeyboardActions { focusManager.clearFocus() },
             modifier = Modifier
@@ -223,7 +234,7 @@ private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterC
             }
         )
 
-        Spacer(Modifier.width(10.sdp))
+        Spacer(Modifier.width(6.sdp))
 
         Box(
             contentAlignment = Alignment.Center,

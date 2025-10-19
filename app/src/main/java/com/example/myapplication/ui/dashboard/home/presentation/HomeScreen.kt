@@ -1,28 +1,28 @@
 package com.example.myapplication.ui.dashboard.home.presentation
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,13 +43,16 @@ import com.example.myapplication.models.response.product.Review
 import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
 import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
-import com.example.myapplication.ui.dashboard.home.domain.GetProductsUseCase
+import com.example.myapplication.ui.dashboard.home.domain.GetProductsByCategoryUseCase
+import com.example.myapplication.ui.dashboard.home.domain.SearchProductUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.components.HeadingRow
 import com.example.myapplication.ui.dashboard.home.presentation.components.ItemCategory
 import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.utils.AppCompositionLocals.LocalSearchController
 import com.example.myapplication.utils.AppCompositionLocals.LocalTopAppBarScrollBehavior
 import com.example.myapplication.utils.components.ItemProduct
 import com.example.myapplication.utils.components.NoData
+import com.example.myapplication.utils.components.ProgressBar
 import com.example.myapplication.utils.components.SwipeRefresh
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -58,11 +61,29 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
+    val firstTime = remember { mutableStateOf(true) }
     val selectedCategory = remember { mutableIntStateOf(0) }
     val parentNavController = LocalParentNavController.current
     val scrollBehavior = LocalTopAppBarScrollBehavior.current
     val homeData = viewModel.homeResponse.collectAsState()
+    val searchController = LocalSearchController.current
     val uiState = viewModel.uiState.collectAsState()
+
+    LaunchedEffect(searchController?.str?.value) {
+        if (firstTime.value) {
+            firstTime.value = false
+            return@LaunchedEffect
+        }
+
+        if (searchController != null) {
+            selectedCategory.intValue = 0
+            if (searchController.str.value.isBlank()) {
+                viewModel.getProductsByCategory("all")
+            } else {
+                viewModel.searchProduct(searchController.str.value)
+            }
+        }
+    }
 
     if (homeData.value == null && uiState.value.isLoading) return Box(
         modifier = Modifier.fillMaxSize(),
@@ -72,62 +93,93 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
     SwipeRefresh(
         isRefreshing = uiState.value.isRefreshing,
-        onRefresh = { viewModel.getHome(fromSwipe = true) },
-        scrollBehavior = scrollBehavior
+        scrollBehavior = scrollBehavior,
+        onRefresh = {
+            viewModel.getProductsByCategory(
+                category = homeData.value?.categories?.get(selectedCategory.intValue)?.slug ?: "all",
+                fromSwipe = true
+            )
+        }
     ) {
-        when {
-            uiState.value.error.isNotEmpty() -> NoData(message = uiState.value.error)
-            homeData.value?.products.isNullOrEmpty() -> NoData(message = stringResource(R.string.no_products))
-            else -> LazyVerticalGrid(
-                columns = GridCells.Fixed(2),
-                verticalArrangement = Arrangement.spacedBy(10.sdp),
-                horizontalArrangement = Arrangement.spacedBy(10.sdp),
-                modifier = Modifier.fillMaxHeight()
-            ) {
-                if (!homeData.value?.categories.isNullOrEmpty())
-                    item(span = { GridItemSpan(2) }) {
-                        Column {
-                            Spacer(Modifier.height(10.sdp))
+        LazyColumn(modifier = Modifier.fillMaxHeight()) {
+            if (!homeData.value?.categories.isNullOrEmpty())
+                item {
+                    Column {
+                        Spacer(Modifier.height(10.sdp))
 
-                            HeadingRow(heading = stringResource(R.string.categories))
+                        HeadingRow(heading = stringResource(R.string.categories))
 
-                            Spacer(Modifier.height(10.sdp))
+                        Spacer(Modifier.height(10.sdp))
 
-                            LazyRow {
-                                itemsIndexed(homeData.value!!.categories!!) { index, item ->
-                                    ItemCategory(
-                                        category = item,
-                                        index = index,
-                                        selectedIndex = selectedCategory.intValue,
-                                        onItemClick = { selectedCategory.intValue = index }
-                                    )
-                                }
+                        LazyRow {
+                            itemsIndexed(homeData.value!!.categories!!) { index, item ->
+                                ItemCategory(
+                                    category = item,
+                                    index = index,
+                                    selectedIndex = selectedCategory.intValue,
+                                    onItemClick = {
+                                        viewModel.getProductsByCategory(item.slug)
+                                        selectedCategory.intValue = index
+                                    }
+                                )
                             }
                         }
                     }
-
-                item(span = { GridItemSpan(2) }) {
-                    Spacer(Modifier.height(10.sdp))
-
-                    Text(
-                        fontSize = 14.ssp,
-                        fontWeight = FontWeight.SemiBold,
-                        text = stringResource(R.string.products),
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(horizontal = 10.sdp)
-                    )
                 }
 
-                itemsIndexed(homeData.value!!.products!!) { index, item ->
-                    ItemProduct(
-                        item = item,
-                        index = index,
-                        onClick = { parentNavController?.let { handleItemClicked(it, item.id) } },
-                    )
+            item {
+                Spacer(Modifier.height(10.sdp))
+
+                Text(
+                    fontSize = 14.ssp,
+                    fontWeight = FontWeight.SemiBold,
+                    text = stringResource(R.string.products),
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(horizontal = 10.sdp)
+                )
+            }
+
+            when {
+                uiState.value.isLoading -> item {
+                    Box(Modifier.fillParentMaxHeight(0.65f)) {
+                        ProgressBar()
+                    }
                 }
 
-                item(span = { GridItemSpan(2) }) {
-                    Spacer(Modifier.height(10.sdp))
+                uiState.value.error.isNotEmpty() -> item {
+                    Box(Modifier.fillParentMaxHeight(0.65f)) {
+                        NoData(message = uiState.value.error, scrollable = false)
+                    }
+                }
+
+                homeData.value?.products.isNullOrEmpty() -> item {
+                    Box(Modifier.fillParentMaxHeight(0.65f)) {
+                        NoData(message = stringResource(R.string.no_products), scrollable = false)
+                    }
+                }
+
+                else -> itemsIndexed(homeData.value!!.products!!.chunked(2)) { rowIndex, rowItems ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = if (rowIndex == 0) 10.sdp else 0.sdp, bottom = 10.sdp)
+                    ) {
+                        Spacer(Modifier.width(10.sdp))
+
+                        repeat(2) { i ->
+                            val item = if (i < rowItems.size) rowItems[i] else null
+                            Box(modifier = Modifier.weight(1f)) {
+                                if (item != null)
+                                    ItemProduct(
+                                        item = item,
+                                        index = i,
+                                        onClick = { parentNavController?.let { handleItemClicked(it, item.id) } }
+                                    )
+                            }
+                        }
+
+                        Spacer(Modifier.width(10.sdp))
+                    }
                 }
             }
         }
@@ -148,13 +200,19 @@ private fun handleItemClicked(navController: NavController, productId: Int?) {
 fun PreviewHomeScreen() {
     HomeScreen(
         HomeViewModel(
-            GetProductsUseCase(
+            GetHomeUseCase(
                 HomeRemoteRepoImpl(
                     LocalContext.current,
                     createApiService(createRetrofit(createOkHttpClient()))
                 )
             ),
-            GetHomeUseCase(
+            SearchProductUseCase(
+                HomeRemoteRepoImpl(
+                    LocalContext.current,
+                    createApiService(createRetrofit(createOkHttpClient()))
+                )
+            ),
+            GetProductsByCategoryUseCase(
                 HomeRemoteRepoImpl(
                     LocalContext.current,
                     createApiService(createRetrofit(createOkHttpClient()))
