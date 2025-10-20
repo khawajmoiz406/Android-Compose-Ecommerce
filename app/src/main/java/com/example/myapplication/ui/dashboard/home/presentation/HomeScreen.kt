@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -162,10 +161,13 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(top = if (rowIndex == 0) 10.sdp else 0.sdp, bottom = 10.sdp)
+                            .padding(
+                                top = if (rowIndex == 0) 10.sdp else 0.sdp,
+                                bottom = 10.sdp,
+                                start = 10.sdp,
+                                end = 10.sdp
+                            )
                     ) {
-                        Spacer(Modifier.width(10.sdp))
-
                         repeat(2) { i ->
                             val item = if (i < rowItems.size) rowItems[i] else null
                             Box(modifier = Modifier.weight(1f)) {
@@ -177,8 +179,6 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                                     )
                             }
                         }
-
-                        Spacer(Modifier.width(10.sdp))
                     }
                 }
             }
