@@ -85,8 +85,8 @@ fun DashboardToolbar(
         modifier = Modifier.background(
             color = MaterialTheme.colorScheme.primary,
             shape = RoundedCornerShape(
-                bottomEnd = if (searchBarHeightPx.intValue > 0) 8.sdp else 0.sdp,
-                bottomStart = if (searchBarHeightPx.intValue > 0) 8.sdp else 0.sdp
+                bottomEnd = if (searchBarHeightPx.intValue > 0) 12.sdp else 0.sdp,
+                bottomStart = if (searchBarHeightPx.intValue > 0) 12.sdp else 0.sdp
             )
         ),
         content = {
@@ -129,7 +129,7 @@ private fun Toolbar(drawerState: DrawerState) {
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.padding(top = 40.sdp, bottom = 10.sdp)
+        modifier = Modifier.padding(top = 40.sdp, bottom = 12.sdp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -148,8 +148,8 @@ private fun Toolbar(drawerState: DrawerState) {
 
             Text(
                 text = stringResource(R.string.app_name),
-                fontSize = 14.ssp,
-                lineHeight = 14.ssp,
+                fontSize = 15.ssp,
+                lineHeight = 15.ssp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.weight(1f),
@@ -190,7 +190,7 @@ private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterC
     Column(
         modifier = Modifier.background(
             color = MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(bottomEnd = 8.sdp, bottomStart = 8.sdp)
+            shape = RoundedCornerShape(bottomEnd = 12.sdp, bottomStart = 12.sdp)
         )
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -238,6 +238,21 @@ private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterC
                             innerTextField()
                         }
 
+                        Spacer(Modifier.width(8.sdp))
+
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(18.sdp)
+                                .clip(CircleShape)
+                                .clickable { }
+                        ) {
+                            SvgImage(
+                                asset = "voice",
+                                color = MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.size(16.sdp)
+                            )
+                        }
                     }
                 }
             )
@@ -263,6 +278,6 @@ private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterC
             Spacer(Modifier.width(6.sdp))
         }
 
-        Spacer(Modifier.height(10.sdp))
+        Spacer(Modifier.height(12.sdp))
     }
 }
