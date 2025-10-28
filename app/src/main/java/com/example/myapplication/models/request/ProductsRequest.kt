@@ -11,7 +11,7 @@ data class ProductsRequest(
     override fun toMap() = hashMapOf<String, Any>(
         "order" to order.value,
         "sortBy" to sortBy.value,
-    ).also { if (search.isNotEmpty()) it["q"] to search }
+    ).also { if (search.isNotEmpty()) it["q"] = search }
 
     fun getPath(): String {
         var path = ""
