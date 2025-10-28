@@ -4,21 +4,15 @@ import android.content.Context
 import com.example.myapplication.R
 import com.example.myapplication.base.BaseRemoteRepo
 import com.example.myapplication.core.remote.ApiService
+import com.example.myapplication.models.request.ProductsRequest
 import com.example.myapplication.models.response.HomeResponse
 import com.example.myapplication.models.response.category.Category
 import com.example.myapplication.models.response.product.ProductsResponse
 
 class HomeRemoteRepoImpl(private val context: Context, private val apis: ApiService) : HomeRemoteRepo,
     BaseRemoteRepo(context) {
-    override suspend fun searchProduct(str: String): Result<ProductsResponse?> {
-        return fetch { apis.getAllProducts(path = "search", map = hashMapOf("q" to str)) }
-    }
-
-    override suspend fun getProductsByCategory(category: String): Result<ProductsResponse?> {
-        return fetch {
-            if (category == "all") apis.getAllProducts()
-            else apis.getAllProducts(path = "category/${category}")
-        }
+    override suspend fun getProducts(request: ProductsRequest): Result<ProductsResponse?> {
+        return fetch { apis.getAllProducts(path = request.getPath(), map = request.toMap()) }
     }
 
     override suspend fun getHome(): Result<HomeResponse?> {

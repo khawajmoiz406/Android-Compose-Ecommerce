@@ -41,7 +41,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import com.example.myapplication.R
-import com.example.myapplication.utils.AppCompositionLocals.LocalSearchController
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -177,14 +176,10 @@ private fun Toolbar(drawerState: DrawerState) {
 private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterClicked: (() -> Unit)? = null) {
     val focusManager = LocalFocusManager.current
     val search = remember { mutableStateOf("") }
-    val searchController = LocalSearchController.current
 
     rememberDebounce(
         value = search.value,
-        onDebounce = {
-            searchController?.str?.value = it
-            onSearchTextChanged?.invoke(it)
-        }
+        onDebounce = { onSearchTextChanged?.invoke(it) }
     )
 
     Column(

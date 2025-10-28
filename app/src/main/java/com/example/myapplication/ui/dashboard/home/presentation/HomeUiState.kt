@@ -6,5 +6,6 @@ import androidx.compose.runtime.Immutable
 data class HomeUiState(
     val error: String = "",
     val isLoading: Boolean = false,
-    val isRefreshing: Boolean = false
+    val isRefreshing: Boolean = false,
+    val firstApiCalled: Boolean = false,
 )

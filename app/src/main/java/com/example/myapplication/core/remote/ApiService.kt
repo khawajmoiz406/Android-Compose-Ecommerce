@@ -18,7 +18,7 @@ interface ApiService {
     @GET("${EndPoints.PRODUCTS}/{path}")
     suspend fun getAllProducts(
         @Path("path", encoded = true) path: String = "",
-        @QueryMap map: HashMap<String, String>? = hashMapOf()
+        @QueryMap map: HashMap<String, Any>? = hashMapOf()
     ): Response<ProductsResponse?>
 
     @GET(EndPoints.CATEGORIES)

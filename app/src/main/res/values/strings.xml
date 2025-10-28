@@ -28,5 +28,10 @@
     <string name="no_set">N/A</string>
     <string name="search_product">Search products...</string>
     <string name="all">All</string>
+    <string name="apply_filters">Apply Filters</string>
+    <string name="filters_msg">Apply filter to products listing</string>
+    <string name="sort_order">Sort Order</string>
+    <string name="arrange_by">Arrange By</string>
+    <string name="default_filters">Default Filters</string>
 
 </resources>
