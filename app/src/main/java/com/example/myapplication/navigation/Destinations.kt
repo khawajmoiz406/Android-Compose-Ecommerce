@@ -1,5 +1,8 @@
 package com.example.myapplication.navigation
 
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+
 sealed class Destinations(val route: String) {
     //Landing routes
     data object LandingGraph: Destinations("landing_graph")
@@ -27,5 +30,6 @@ sealed class Destinations(val route: String) {
     //Other routes
     data object ProductDetail : Destinations("product_detail/{id}") {
         fun createRoute(id: Int) = "product_detail/$id"
+        val arguments = listOf(navArgument("id") { type = NavType.IntType })
     }
 }

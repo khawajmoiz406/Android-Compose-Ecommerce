@@ -9,6 +9,10 @@ import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
 import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsByCategoryUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.HomeViewModel
+import com.example.myapplication.ui.product_detail.data.ProductDetailRemoteRepo
+import com.example.myapplication.ui.product_detail.data.ProductDetailRemoteRepoImpl
+import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
+import com.example.myapplication.ui.product_detail.presentation.ProductDetailViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -30,4 +34,10 @@ val homeModule = module {
     single { GetHomeUseCase(get()) }
     single { GetProductsByCategoryUseCase(get()) }
     viewModel { HomeViewModel(get(), get()) }
+}
+
+val productDetailModule = module {
+    single<ProductDetailRemoteRepo> { ProductDetailRemoteRepoImpl(androidContext(), get()) }
+    single { GetProductDetailUseCase(get()) }
+    viewModel { ProductDetailViewModel(get()) }
 }

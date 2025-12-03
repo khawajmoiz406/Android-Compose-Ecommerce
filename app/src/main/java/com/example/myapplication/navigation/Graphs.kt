@@ -7,6 +7,7 @@ import com.example.myapplication.ui.auth.login.presentation.LoginScreen
 import com.example.myapplication.ui.dashboard.DashboardScreen
 import com.example.myapplication.ui.dashboard.home.presentation.HomeScreen
 import com.example.myapplication.ui.landing.splash.SplashScreen
+import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen
 
 fun NavGraphBuilder.landingGraph() = navigation(
     route = Destinations.LandingGraph.route,
@@ -41,4 +42,7 @@ fun NavGraphBuilder.drawerGraph() = navigation(
     composable(Destinations.AboutUs.route) {}
     composable(Destinations.PrivacyPolicy.route) {}
     composable(Destinations.Settings.route) {}
+    composable(Destinations.ProductDetail.route, Destinations.ProductDetail.arguments) { bse ->
+        ProductDetailScreen(productId = bse.arguments?.getInt("id")!!)
+    }
 }

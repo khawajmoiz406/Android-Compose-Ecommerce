@@ -2,6 +2,7 @@ package com.example.myapplication.core.remote
 
 import com.example.myapplication.models.response.User
 import com.example.myapplication.models.response.category.Category
+import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.ProductsResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -23,4 +24,7 @@ interface ApiService {
 
     @GET(EndPoints.CATEGORIES)
     suspend fun getCategories(): Response<List<Category>?>
+
+    @GET("${EndPoints.PRODUCTS}/{id}")
+    suspend fun getProductDetail(@Path("id", encoded = true) id: String = ""): Response<Product?>
 }
