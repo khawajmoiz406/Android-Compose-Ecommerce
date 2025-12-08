@@ -182,12 +182,7 @@ private fun SearchBar(onSearchTextChanged: ((String) -> Unit)? = null, onFilterC
         onDebounce = { onSearchTextChanged?.invoke(it) }
     )
 
-    Column(
-        modifier = Modifier.background(
-            color = MaterialTheme.colorScheme.primary,
-            shape = RoundedCornerShape(bottomEnd = 12.sdp, bottomStart = 12.sdp)
-        )
-    ) {
+    Column {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(Modifier.width(6.sdp))
 

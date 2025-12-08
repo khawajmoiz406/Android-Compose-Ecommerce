@@ -106,7 +106,7 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
             scrollBehavior = scrollBehavior,
             onRefresh = { onRefresh(viewModel, homeData.value, selectedCategory.intValue) },
             modifier = Modifier
-                .padding(innerPadding)
+                .padding(top = innerPadding.calculateTopPadding())
                 .fillMaxSize(),
         ) {
             LazyColumn(modifier = Modifier.fillMaxHeight()) {
