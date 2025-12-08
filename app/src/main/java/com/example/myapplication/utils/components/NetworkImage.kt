@@ -20,11 +20,12 @@ fun NetworkImage(
     contentDescription: String? = null,
     contentScale: ContentScale = ContentScale.Fit,
     animateOnLoad: Boolean = true,
+    showShimmerWhenLoading: Boolean = true,
 ) {
     var isLoading by remember { mutableStateOf(true) }
 
     Box(modifier = modifier) {
-        if (isLoading) {
+        if (isLoading && showShimmerWhenLoading) {
             ShimmerBox(modifier = modifier.fillMaxSize())
         }
 

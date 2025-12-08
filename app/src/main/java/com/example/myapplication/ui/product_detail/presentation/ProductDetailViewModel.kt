@@ -13,7 +13,7 @@ class ProductDetailViewModel(private val detailUseCase: GetProductDetailUseCase)
     BaseViewModel<ProductDetailUiState, Unit>(ProductDetailUiState()) {
     val product: MutableStateFlow<Product?> = MutableStateFlow(null)
 
-    private fun getProductDetail(id: String) = viewModelScope.launch {
+    fun getProductDetail(id: String) = viewModelScope.launch {
         updateUiState(uiState.value.copy(isLoading = true))
         detailUseCase.invoke(id)
             .onSuccess { data ->
