@@ -2,38 +2,40 @@ package com.example.myapplication.ui.product_detail.presentation.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.models.response.product.Dimensions
@@ -47,110 +49,116 @@ import ir.kaaveh.sdpcompose.sdp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailTopBar(scrollBehavior: TopAppBarScrollBehavior, product: Product, onBackPressed: () -> Unit) {
-    val expandedAppBarHeight = 200.dp
-    val scrollState = scrollBehavior.state
-    val headerTranslation = (expandedAppBarHeight / 2)
-    val appBarExpanded = remember { derivedStateOf { scrollState.collapsedFraction < 0.9f } }
+    val collapsedAppBarHeightPx = remember { mutableIntStateOf(0) }
+    val expandedAppBarHeightPx = remember { mutableIntStateOf(0) }
+    var maxHeightPx = collapsedAppBarHeightPx.intValue + expandedAppBarHeightPx.intValue
+    val heightOffset = scrollBehavior.state.heightOffset
 
-    Column(
+    LaunchedEffect(collapsedAppBarHeightPx) {
+        if (collapsedAppBarHeightPx.intValue > 0) {
+            scrollBehavior.state.heightOffsetLimit = -collapsedAppBarHeightPx.intValue.toFloat()
+            maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
+            Log.i("TOP BAR:", "$maxHeightPx")
+        }
+    }
+
+    LaunchedEffect(expandedAppBarHeightPx) {
+        if (expandedAppBarHeightPx.intValue > 0) {
+            maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
+        }
+    }
+
+    Layout(
         modifier = Modifier
-            .fillMaxSize()
-            .zIndex(0f)
-    ) {
-        CollapsedAppBar(onBackPressed)
-        ExpandedAppBar(scrollBehavior, appBarExpanded.value, headerTranslation, product)
+//            .background(color = MaterialTheme.colorScheme.primary)
+            .zIndex(0f),
+        content = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                content = { CollapsedAppBar(onBackPressed) }
+            )
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                content = { ExpandedAppBar(product) }
+            )
+        }
+    ) { measurables, constraints ->
+        val collapsedPlaceable = measurables[0].measure(constraints)
+        val expandedPlaceable = measurables[1].measure(constraints)
+
+        if (collapsedAppBarHeightPx.intValue == 0 && collapsedPlaceable.height > 0) {
+            collapsedAppBarHeightPx.intValue = collapsedPlaceable.height
+        }
+
+        if (expandedAppBarHeightPx.intValue == 0 && expandedPlaceable.height > 0) {
+            expandedAppBarHeightPx.intValue = expandedPlaceable.height
+        }
+
+        val finalHeight = maxOf(collapsedPlaceable.height, (maxHeightPx + heightOffset).toInt())
+
+        layout(constraints.maxWidth, finalHeight) {
+            collapsedPlaceable.place(0, 0)
+            expandedPlaceable.place(0, collapsedPlaceable.height)
+        }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CollapsedAppBar(onBackPressed: () -> Unit) {
-    TopAppBar(
-        title = {},
-        navigationIcon = {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onSurface)
-                    .size(35.sdp)
-                    .clickable { onBackPressed() },
-            ) {
-                SvgImage(
-                    asset = "back",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.sdp)
-                )
-            }
-        },
-        actions = {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.onSurface)
-                    .size(35.sdp)
-                    .clickable { onBackPressed() },
-            ) {
-                SvgImage(
-                    asset = "back",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.sdp)
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Transparent,
-            navigationIconContentColor = MaterialTheme.colorScheme.onTertiary
-        )
-    )
+    Row(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues()).background(Color.Red)) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.onSurface)
+                .size(35.sdp)
+                .clickable { onBackPressed() },
+        ) {
+            SvgImage(
+                asset = "back",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.sdp)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.onSurface)
+                .size(35.sdp)
+                .clickable { onBackPressed() },
+        ) {
+            SvgImage(
+                asset = "back",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(20.sdp)
+            )
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ExpandedAppBar(
-    scrollBehavior: TopAppBarScrollBehavior,
-    visible: Boolean,
-    headerTranslation: Dp,
-    product: Product
-) {
+private fun ExpandedAppBar(product: Product) {
     val pagerState = rememberPagerState { product.images?.size ?: 0 }
-
-    TopAppBar(
-        scrollBehavior = scrollBehavior,
-        windowInsets = WindowInsets(0),
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            scrolledContainerColor = Color.Transparent
-        ),
-        title = {
-            AnimatedVisibility(
-                visible = visible,
-                enter = fadeIn(animationSpec = tween()),
-                exit = fadeOut(animationSpec = tween()),
-                modifier = Modifier
-                    .height(250.dp)
-                    .graphicsLayer {
-                        translationY = scrollBehavior.state.collapsedFraction * headerTranslation.toPx()
-                    },
-            ) {
-                HorizontalPager(
-                    state = pagerState,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp)
-                ) { page ->
-                    NetworkImage(
-                        showShimmerWhenLoading = false,
-                        imageUrl = product.images?.get(page) ?: "",
-                        contentScale = ContentScale.Fit,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-        },
-    )
+    HorizontalPager(
+        state = pagerState,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+    ) { page ->
+        NetworkImage(
+            showShimmerWhenLoading = false,
+            imageUrl = product.images?.get(page) ?: "",
+            contentScale = ContentScale.Fit,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
