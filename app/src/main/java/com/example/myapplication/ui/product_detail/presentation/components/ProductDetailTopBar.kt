@@ -2,22 +2,16 @@ package com.example.myapplication.ui.product_detail.presentation.components
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBars
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -28,15 +22,14 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
@@ -56,26 +49,25 @@ fun ProductDetailTopBar(scrollBehavior: TopAppBarScrollBehavior, product: Produc
 
     LaunchedEffect(collapsedAppBarHeightPx) {
         if (collapsedAppBarHeightPx.intValue > 0) {
-            scrollBehavior.state.heightOffsetLimit = -collapsedAppBarHeightPx.intValue.toFloat()
             maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
-            Log.i("TOP BAR:", "$maxHeightPx")
         }
     }
 
     LaunchedEffect(expandedAppBarHeightPx) {
         if (expandedAppBarHeightPx.intValue > 0) {
+            scrollBehavior.state.heightOffsetLimit = -expandedAppBarHeightPx.intValue.toFloat()
             maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
         }
     }
 
     Layout(
         modifier = Modifier
-//            .background(color = MaterialTheme.colorScheme.primary)
+            .background(color = MaterialTheme.colorScheme.primary)
             .zIndex(0f),
         content = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                content = { CollapsedAppBar(onBackPressed) }
+                content = { CollapsedAppBar(product, onBackPressed) }
             )
 
             Box(
@@ -106,8 +98,10 @@ fun ProductDetailTopBar(scrollBehavior: TopAppBarScrollBehavior, product: Produc
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CollapsedAppBar(onBackPressed: () -> Unit) {
-    Row(modifier = Modifier.padding(WindowInsets.statusBars.asPaddingValues()).background(Color.Red)) {
+private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit) {
+    val isFavourite = remember { mutableStateOf(product.isFavourite ?: false) }
+
+    Row(modifier = Modifier.padding(top = 40.sdp, bottom = 12.sdp, start = 10.sdp, end = 10.sdp)) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -134,7 +128,7 @@ private fun CollapsedAppBar(onBackPressed: () -> Unit) {
                 .clickable { onBackPressed() },
         ) {
             SvgImage(
-                asset = "back",
+                asset = if (isFavourite.value) "fav_filled" else "fav_outline",
                 color = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.sdp)
             )
@@ -150,7 +144,8 @@ private fun ExpandedAppBar(product: Product) {
         state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .padding(bottom = 10.sdp)
+            .height(200.sdp)
     ) { page ->
         NetworkImage(
             showShimmerWhenLoading = false,

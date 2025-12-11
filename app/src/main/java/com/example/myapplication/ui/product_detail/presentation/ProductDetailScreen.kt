@@ -22,16 +22,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.ui.product_detail.presentation.components.ProductDetailTopBar
 import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.utils.ComposableUtils.topShadowScope
+import ir.kaaveh.sdpcompose.sdp
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,46 +77,22 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
             LazyColumn(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .drawBehind {
-                        val shadowColor = Color.Black.copy(alpha = 0.25f)
-                        val paint = Paint()
-                            .asFrameworkPaint()
-                            .apply {
-                                color = android.graphics.Color.TRANSPARENT
-                                setShadowLayer(
-                                    4.dp.toPx(), // shadow blur
-                                    0f, // shadow offset x
-                                    (-1).dp.toPx(), // shadow offset y
-                                    shadowColor.toArgb() // shadow color
-                                )
-                            }
-
-                        drawIntoCanvas {
-                            it.nativeCanvas.drawRoundRect(
-                                0f,
-                                0f,
-                                size.width,
-                                size.height / 2,
-                                16.dp.toPx(),
-                                16.dp.toPx(),
-                                paint
-                            )
-                        }
-                    }
+                    .drawBehind { topShadowScope(topStartCorner = 16.dp, topEndCorner = 16.dp) }
                     .background(
                         color = MaterialTheme.colorScheme.surface,
                         shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
                     )
             ) {
                 items(100) { index ->
-                    Box(
+                    if (index == 0) Spacer(modifier = Modifier.height(10.sdp))
+                    Text(
+                        "$index",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(20.dp)
-                            .background(Color.Black.copy(0.5f)),
-                        content = { Text("$index", modifier = Modifier.fillMaxSize()) }
+                            .padding(horizontal = 10.sdp)
+                            .height(20.sdp)
                     )
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(10.sdp))
                 }
             }
         }
