@@ -33,5 +33,9 @@
     <string name="sort_order">Sort Order</string>
     <string name="arrange_by">Arrange By</string>
     <string name="default_filters">Default Filters</string>
+    <string name="info">Info</string>
+    <string name="warranty">Warranty</string>
+    <string name="reviews">Reviews</string>
+    <string name="dimension">Dimension</string>
 
 </resources>
