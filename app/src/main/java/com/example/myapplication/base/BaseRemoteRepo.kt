@@ -1,29 +1,29 @@
 package com.example.myapplication.base
 
 import android.content.Context
+import com.example.myapplication.config.utils.NetworkUtils
 import com.example.myapplication.core.remote.ApiException
 import com.example.myapplication.models.helper.ErrorResponse
-import com.example.myapplication.utils.NetworkUtils
 import com.google.gson.Gson
 import retrofit2.Response
 
 open class BaseRemoteRepo(private val context: Context) {
     val headers = hashMapOf("Content-Type" to "application/json")
 
-    suspend fun <T> fetch(addToken: Boolean = true, apiFunction: suspend () -> Response<T>): Result<T> {
+    suspend fun <T> fetch(addToken: Boolean = true, apiFunction: suspend () -> Response<T>): T {
         try {
             if (!NetworkUtils.isNetworkAvailable(context))
-                return Result.failure(ApiException.NetworkException(context))
+                throw ApiException.NetworkException(context)
 
             val response = apiFunction.invoke()
 
             if (response.isSuccessful && response.body() != null)
-                return Result.success(response.body()!!)
+                return response.body()!!
 
-            return Result.failure(createHttpError(response))
+            throw createHttpError(response)
 
         } catch (ex: Exception) {
-            return Result.failure(ex)
+            throw ex
         }
     }
 

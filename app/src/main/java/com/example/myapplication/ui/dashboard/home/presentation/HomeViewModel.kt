@@ -24,39 +24,45 @@ class HomeViewModel(
 
     private fun getHome() = viewModelScope.launch {
         updateUiState(uiState.value.copy(isLoading = true))
-        homeUseCase.invoke(Unit)
-            .onSuccess { data ->
+        homeUseCase.invoke(Unit).collect { result ->
+            if (result.isSuccess) {
+                val data = result.getOrNull()
                 homeResponse.update { data }
                 updateUiState(uiState.value.copy(isLoading = false))
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
+            } else {
+                val error = result.exceptionOrNull()
+                val errorStr = if (error is ApiException) error.error else error?.localizedMessage ?: ""
                 updateUiState(uiState.value.copy(isLoading = false, error = errorStr))
             }
+        }
     }
 
     fun getProductsByCategory(category: String, fromSwipe: Boolean = false) = viewModelScope.launch {
         updateUiState(uiState.value.copy(isLoading = !fromSwipe, isRefreshing = fromSwipe))
-        productsUseCase.invoke(filters.copy(category = category).also { filters = it })
-            .onSuccess { data ->
+        productsUseCase.invoke(filters.copy(category = category).also { filters = it }).collect { result ->
+            if (result.isSuccess) {
+                val data = result.getOrNull()
                 homeResponse.update { home -> home?.apply { products = (data?.products ?: emptyList()) } }
                 updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false))
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
+            } else {
+                val error = result.exceptionOrNull()
+                val errorStr = if (error is ApiException) error.error else error?.localizedMessage ?: ""
                 updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false, error = errorStr))
             }
+        }
     }
 
     fun searchProduct(str: String) = viewModelScope.launch {
-        productsUseCase.invoke(filters.copy(search = str).also { filters = it })
-            .onSuccess { data ->
+        productsUseCase.invoke(filters.copy(search = str).also { filters = it }).collect { result ->
+            if (result.isSuccess) {
+                val data = result.getOrNull()
                 homeResponse.update { home -> home?.copy(products = (data?.products ?: emptyList())) }
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
+            } else {
+                val error = result.exceptionOrNull()
+                val errorStr = error.let { if (it is ApiException) it.error else it?.localizedMessage ?: "" }
                 updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false, error = errorStr))
             }
+        }
     }
 
     fun filterProduct(request: ProductsRequest) = viewModelScope.launch {
@@ -64,13 +70,16 @@ class HomeViewModel(
         homeResponse.update { home -> home?.copy(products = emptyList()) }
 
         productsUseCase.invoke(filters.copy(order = request.order, sortBy = request.sortBy).also { filters = it })
-            .onSuccess { data ->
-                updateUiState(uiState.value.copy(isLoading = false))
-                homeResponse.update { home -> home?.copy(products = (data?.products ?: emptyList())) }
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
-                updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false, error = errorStr))
+            .collect { result ->
+                if (result.isSuccess) {
+                    val data = result.getOrNull()
+                    updateUiState(uiState.value.copy(isLoading = false))
+                    homeResponse.update { home -> home?.copy(products = (data?.products ?: emptyList())) }
+                } else {
+                    val error = result.exceptionOrNull()
+                    val errorStr = error.let { if (it is ApiException) it.error else it?.localizedMessage ?: "" }
+                    updateUiState(uiState.value.copy(isLoading = false, isRefreshing = false, error = errorStr))
+                }
             }
     }
 }

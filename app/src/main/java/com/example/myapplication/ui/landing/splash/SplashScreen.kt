@@ -20,10 +20,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.config.utils.Constants
 import com.example.myapplication.navigation.Destinations
-import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
-import com.example.myapplication.utils.Constants
-import com.example.myapplication.utils.components.SvgImage
 import kotlinx.coroutines.delay
 
 @Composable
@@ -59,6 +59,8 @@ fun SplashScreen() {
 }
 
 private suspend fun handleSplash(navController: NavController) {
+//    val user = EncryptedSharedPref.getInstance(navController.context).getModel(object : TypeToken<User>() {})
+//    val route = if (user == null) Destinations.AuthGraph.route else Destinations.DrawerGraph.route
     delay(Constants.SPLASH_DELAY)
     navController.navigate(Destinations.AuthGraph.route) {
         popUpTo(Destinations.Splash.route) { inclusive = true }

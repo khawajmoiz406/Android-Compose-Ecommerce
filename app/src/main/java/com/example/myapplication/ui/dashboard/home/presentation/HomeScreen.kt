@@ -37,9 +37,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.config.components.DashboardToolbar
+import com.example.myapplication.config.components.HomeFilters
+import com.example.myapplication.config.components.ItemProduct
+import com.example.myapplication.config.components.NoData
+import com.example.myapplication.config.components.ProgressBar
+import com.example.myapplication.config.components.SwipeRefresh
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
 import com.example.myapplication.di.createRetrofit
+import com.example.myapplication.di.createRoomDatabase
 import com.example.myapplication.models.response.HomeResponse
 import com.example.myapplication.models.response.category.Category
 import com.example.myapplication.models.response.product.Dimensions
@@ -47,19 +56,13 @@ import com.example.myapplication.models.response.product.Meta
 import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.Review
 import com.example.myapplication.navigation.Destinations
-import com.example.myapplication.ui.dashboard.home.data.HomeRemoteRepoImpl
+import com.example.myapplication.ui.dashboard.home.data.HomeRepositoryImpl
+import com.example.myapplication.ui.dashboard.home.data.local.HomeLocalRepoImpl
+import com.example.myapplication.ui.dashboard.home.data.remote.HomeRemoteRepoImpl
 import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsByCategoryUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.components.HeadingRow
 import com.example.myapplication.ui.dashboard.home.presentation.components.ItemCategory
-import com.example.myapplication.utils.AppCompositionLocals.LocalDrawerStateController
-import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
-import com.example.myapplication.utils.components.DashboardToolbar
-import com.example.myapplication.utils.components.HomeFilters
-import com.example.myapplication.utils.components.ItemProduct
-import com.example.myapplication.utils.components.NoData
-import com.example.myapplication.utils.components.ProgressBar
-import com.example.myapplication.utils.components.SwipeRefresh
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -243,15 +246,25 @@ fun PreviewHomeScreen() {
     HomeScreen(
         HomeViewModel(
             GetHomeUseCase(
-                HomeRemoteRepoImpl(
-                    LocalContext.current,
-                    createApiService(createRetrofit(createOkHttpClient()))
+                HomeRepositoryImpl(
+                    HomeRemoteRepoImpl(
+                        LocalContext.current,
+                        createApiService(createRetrofit(createOkHttpClient()))
+                    ),
+                    HomeLocalRepoImpl(
+                        createRoomDatabase(LocalContext.current)
+                    )
                 )
             ),
             GetProductsByCategoryUseCase(
-                HomeRemoteRepoImpl(
-                    LocalContext.current,
-                    createApiService(createRetrofit(createOkHttpClient()))
+                HomeRepositoryImpl(
+                    HomeRemoteRepoImpl(
+                        LocalContext.current,
+                        createApiService(createRetrofit(createOkHttpClient()))
+                    ),
+                    HomeLocalRepoImpl(
+                        createRoomDatabase(LocalContext.current)
+                    )
                 )
             ),
         ).apply {
@@ -312,6 +325,7 @@ fun PreviewHomeScreen() {
                         images = listOf(
                             "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
                         ),
+                        isFavourite = false,
                         thumbnail = "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
                     ),
                     Product(
@@ -369,6 +383,7 @@ fun PreviewHomeScreen() {
                         images = listOf(
                             "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
                         ),
+                        isFavourite = false,
                         thumbnail = "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
                     ),
                     Product(
@@ -426,6 +441,7 @@ fun PreviewHomeScreen() {
                         images = listOf(
                             "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
                         ),
+                        isFavourite = false,
                         thumbnail = "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
                     ),
                 ),

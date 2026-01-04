@@ -18,8 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import com.example.myapplication.models.response.category.Category
-import com.example.myapplication.utils.Constants
-import com.example.myapplication.utils.components.SvgImage
+import com.example.myapplication.config.utils.Constants
+import com.example.myapplication.config.components.SvgImage
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 

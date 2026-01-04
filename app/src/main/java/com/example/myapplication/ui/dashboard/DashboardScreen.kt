@@ -25,10 +25,10 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.models.helper.SearchController
 import com.example.myapplication.navigation.Destinations
 import com.example.myapplication.navigation.bottomNavGraph
-import com.example.myapplication.utils.AppCompositionLocals.LocalDrawerStateController
-import com.example.myapplication.utils.components.BottomNav
-import com.example.myapplication.utils.components.Drawer
-import com.example.myapplication.utils.components.HomeFilters
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
+import com.example.myapplication.config.components.BottomNav
+import com.example.myapplication.config.components.Drawer
+import com.example.myapplication.config.components.HomeFilters
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
