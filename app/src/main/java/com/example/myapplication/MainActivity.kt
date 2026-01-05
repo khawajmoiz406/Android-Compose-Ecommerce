@@ -14,9 +14,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.navigation.NavGraph
-import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
-import com.example.myapplication.utils.SnackbarUtils
-import com.example.myapplication.utils.theme.MyApplicationTheme
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.config.utils.SnackbarUtils
+import com.example.myapplication.config.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

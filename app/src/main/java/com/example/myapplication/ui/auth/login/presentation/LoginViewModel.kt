@@ -14,15 +14,17 @@ class LoginViewModel(private val loginUseCase: LoginUseCase) :
         updateUiState(uiState.value.copy(isLoading = true))
         val request = LoginRequest(uiState.value.email, uiState.value.password)
 
-        loginUseCase.invoke(request)
-            .onSuccess { data ->
+        loginUseCase.invoke(request).collect { result ->
+            if (result.isSuccess) {
+                val data = result.getOrNull()
                 updateUiState(uiState.value.copy(isLoading = false))
-                events.emit(LoginEvents.OnLoginSuccess(data))
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
+                events.emit(LoginEvents.OnLoginSuccess(data!!))
+            } else {
+                val error = result.exceptionOrNull()
+                val errorStr = if (error is ApiException) error.error else error?.localizedMessage ?: ""
                 updateUiState(uiState.value.copy(isLoading = false, error = errorStr))
                 events.emit(LoginEvents.OnLoginFailed(errorStr))
             }
+        }
     }
 }

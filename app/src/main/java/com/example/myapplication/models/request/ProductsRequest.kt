@@ -24,13 +24,13 @@ data class ProductsRequest(
 }
 
 sealed class Order(val value: String) {
-    object Ascending : Order("asc")
-    object Descending : Order("desc")
+    data object Ascending : Order("asc")
+    data object Descending : Order("desc")
 }
 
 sealed class SortArrangement(val value: String) {
-    object Title : SortArrangement("title")
-    object Price : SortArrangement("price")
-    object Rating : SortArrangement("rating")
-    object Brand : SortArrangement("brand")
+    data object Title : SortArrangement("title")
+    data object Price : SortArrangement("price")
+    data object Rating : SortArrangement("rating")
+    data object Brand : SortArrangement("brand")
 }

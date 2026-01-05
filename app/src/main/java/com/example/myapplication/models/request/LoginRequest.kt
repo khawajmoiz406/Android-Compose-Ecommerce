@@ -1,7 +1,7 @@
 package com.example.myapplication.models.request
 
 import com.example.myapplication.base.BaseRequest
-import com.example.myapplication.utils.Constants
+import com.example.myapplication.config.utils.Constants
 
 data class LoginRequest(
     val email: String,
