@@ -17,6 +17,9 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProducts(products: List<Product>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertProduct(product: Product)
+
     @RawQuery(observedEntities = [Product::class])
     suspend fun getAllProducts(query: SupportSQLiteQuery): List<Product>
 

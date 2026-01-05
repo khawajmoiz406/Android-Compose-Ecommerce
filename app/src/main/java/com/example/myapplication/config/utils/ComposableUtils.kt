@@ -1,4 +1,4 @@
-package com.example.myapplication.utils
+package com.example.myapplication.config.utils
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint

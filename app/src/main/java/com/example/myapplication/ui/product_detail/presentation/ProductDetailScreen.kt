@@ -39,18 +39,21 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.R
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
 import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
 import com.example.myapplication.di.createRetrofit
+import com.example.myapplication.di.createRoomDatabase
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
 import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.Review
-import com.example.myapplication.ui.product_detail.data.ProductDetailRemoteRepoImpl
+import com.example.myapplication.ui.product_detail.data.ProductDetailRepositoryImpl
+import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepoImpl
+import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepoImpl
 import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.components.ProductDetailTopBar
-import com.example.myapplication.utils.AppCompositionLocals.LocalParentNavController
-import com.example.myapplication.utils.ComposableUtils.topShadowScope
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -177,9 +180,14 @@ private fun ProductDetailPreview() {
     ProductDetailScreen(
         -1, ProductDetailViewModel(
             GetProductDetailUseCase(
-                ProductDetailRemoteRepoImpl(
-                    context,
-                    createApiService(createRetrofit(createOkHttpClient()))
+                ProductDetailRepositoryImpl(
+                    ProductDetailRemoteRepoImpl(
+                        context,
+                        createApiService(createRetrofit(createOkHttpClient()))
+                    ),
+                    ProductDetailLocalRepoImpl(
+                        createRoomDatabase(context)
+                    )
                 )
             )
         ).apply {
@@ -241,6 +249,7 @@ private fun ProductDetailPreview() {
                     "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp",
                     "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
                 ),
+                isFavourite = false,
                 thumbnail = "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
             )
         }

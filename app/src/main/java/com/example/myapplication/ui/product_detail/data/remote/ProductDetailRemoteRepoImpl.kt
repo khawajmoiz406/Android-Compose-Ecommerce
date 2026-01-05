@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.product_detail.data
+package com.example.myapplication.ui.product_detail.data.remote
 
 import android.content.Context
 import com.example.myapplication.base.BaseRemoteRepo
@@ -7,7 +7,7 @@ import com.example.myapplication.models.response.product.Product
 
 class ProductDetailRemoteRepoImpl(context: Context, private val apis: ApiService) : ProductDetailRemoteRepo,
     BaseRemoteRepo(context) {
-    override suspend fun getProductDetail(productId: String): Result<Product?> {
+    override suspend fun getProductDetail(productId: String): Product? {
         return fetch { apis.getProductDetail(id = productId) }
     }
 }

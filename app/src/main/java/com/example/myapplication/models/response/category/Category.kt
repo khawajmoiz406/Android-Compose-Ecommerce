@@ -10,10 +10,7 @@ import java.io.Serializable
 
 @Entity(tableName = DatabaseConfig.CATEGORY)
 data class Category(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id")
-    val id: Int? = null,
-
+    @PrimaryKey
     @ColumnInfo(name = "slug")
     @SerializedName("slug")
     val slug: String,

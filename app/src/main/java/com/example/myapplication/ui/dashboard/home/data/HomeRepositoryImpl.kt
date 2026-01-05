@@ -14,22 +14,22 @@ class HomeRepositoryImpl(
     private val localRepo: HomeLocalRepo
 ) : HomeRepository {
     override suspend fun getHome(): Flow<Result<HomeResponse?>> = flow {
-        // Load local data
-        val localCategories = localRepo.getCategories()
-        val localProducts = localRepo.getProducts()
-
-        // Cache favourite product IDs
-        val favProductIds = localProducts
-            .filter { it.isFavourite == true }
-            .map { it.id }
-            .toSet()
-
-        // Emit local data if available
-        if (localCategories.isNotEmpty() && localProducts.isNotEmpty()) {
-            emit(Result.success(HomeResponse(localProducts, localCategories)))
-        }
-
         try {
+            // Load local data
+            val localCategories = localRepo.getCategories()
+            val localProducts = localRepo.getProducts()
+
+            // Cache favourite product IDs
+            val favProductIds = localProducts
+                .filter { it.isFavourite == true }
+                .map { it.id }
+                .toSet()
+
+            // Emit local data if available
+            if (localCategories.isNotEmpty() && localProducts.isNotEmpty()) {
+                emit(Result.success(HomeResponse(localProducts, localCategories)))
+            }
+
             // Fetch remote data
             val remoteCategories = remoteRepo.getCategories()
             val remoteProductsResponse = remoteRepo.getProducts()
@@ -50,9 +50,9 @@ class HomeRepositoryImpl(
     }
 
     override suspend fun getProducts(request: ProductsRequest): Flow<Result<ProductsResponse?>> = flow {
-        val products = remoteRepo.getProducts(request)
-
         try {
+            val products = remoteRepo.getProducts(request)
+
             emit(Result.success(products))
         } catch (ex: ApiException) {
             emit(Result.failure(ex))

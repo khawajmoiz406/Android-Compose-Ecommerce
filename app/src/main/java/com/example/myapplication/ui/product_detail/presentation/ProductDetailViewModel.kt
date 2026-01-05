@@ -15,14 +15,16 @@ class ProductDetailViewModel(private val detailUseCase: GetProductDetailUseCase)
 
     fun getProductDetail(id: String) = viewModelScope.launch {
         updateUiState(uiState.value.copy(isLoading = true))
-        detailUseCase.invoke(id)
-            .onSuccess { data ->
+        detailUseCase.invoke(id).collect { result ->
+            if (result.isSuccess) {
+                val data = result.getOrNull()
                 product.update { data }
                 updateUiState(uiState.value.copy(isLoading = false))
-            }
-            .onFailure { error ->
-                val errorStr = error.let { if (it is ApiException) it.error else it.localizedMessage ?: "" }
+            } else {
+                val error = result.exceptionOrNull()
+                val errorStr = error.let { if (it is ApiException) it.error else it?.localizedMessage ?: "" }
                 updateUiState(uiState.value.copy(isLoading = false, error = errorStr))
             }
+        }
     }
 }

@@ -33,9 +33,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.zIndex
+import com.example.myapplication.config.components.NetworkImage
+import com.example.myapplication.config.components.SvgImage
 import com.example.myapplication.models.response.product.Product
-import com.example.myapplication.utils.components.NetworkImage
-import com.example.myapplication.utils.components.SvgImage
 import ir.kaaveh.sdpcompose.sdp
 import kotlinx.coroutines.launch
 

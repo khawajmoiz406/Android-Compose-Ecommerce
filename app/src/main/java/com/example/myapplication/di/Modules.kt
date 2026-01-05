@@ -17,8 +17,12 @@ import com.example.myapplication.ui.dashboard.home.data.remote.HomeRemoteRepoImp
 import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
 import com.example.myapplication.ui.dashboard.home.domain.GetProductsByCategoryUseCase
 import com.example.myapplication.ui.dashboard.home.presentation.HomeViewModel
-import com.example.myapplication.ui.product_detail.data.ProductDetailRemoteRepo
-import com.example.myapplication.ui.product_detail.data.ProductDetailRemoteRepoImpl
+import com.example.myapplication.ui.product_detail.data.ProductDetailRepository
+import com.example.myapplication.ui.product_detail.data.ProductDetailRepositoryImpl
+import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepo
+import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepoImpl
+import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepo
+import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepoImpl
 import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailViewModel
 import org.koin.android.ext.koin.androidContext
@@ -54,7 +58,9 @@ val homeModule = module {
 }
 
 val productDetailModule = module {
+    single<ProductDetailLocalRepo> { ProductDetailLocalRepoImpl(get()) }
     single<ProductDetailRemoteRepo> { ProductDetailRemoteRepoImpl(androidContext(), get()) }
+    single<ProductDetailRepository> { ProductDetailRepositoryImpl(get(), get()) }
     single { GetProductDetailUseCase(get()) }
     viewModel { ProductDetailViewModel(get()) }
 }
