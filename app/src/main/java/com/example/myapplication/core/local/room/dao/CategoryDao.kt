@@ -13,5 +13,5 @@ interface CategoryDao {
     suspend fun insertCategories(categories: List<Category>)
 
     @Query("SELECT * FROM ${DatabaseConfig.CATEGORY}")
-    suspend fun getAllCategories(): List<Category>?
+    suspend fun getAllCategories(): List<Category>
 }

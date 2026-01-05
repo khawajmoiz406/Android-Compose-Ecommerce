@@ -20,8 +20,8 @@ data class Category(
 
     @ColumnInfo(name = "name")
     @SerializedName("name")
-    val name: String,
-
+    val name: String
+) : Serializable {
     @Ignore
     var icon: String = ""
-) : Serializable
+}

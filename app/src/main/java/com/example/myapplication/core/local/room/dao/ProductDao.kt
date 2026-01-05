@@ -18,7 +18,7 @@ interface ProductDao {
     suspend fun insertProducts(products: List<Product>)
 
     @RawQuery(observedEntities = [Product::class])
-    suspend fun getAllProducts(query: SupportSQLiteQuery): List<Product>?
+    suspend fun getAllProducts(query: SupportSQLiteQuery): List<Product>
 
     @Query("SELECT * FROM ${DatabaseConfig.PRODUCT} WHERE id = :id")
     suspend fun getProductById(id: Int): Product?
@@ -29,7 +29,7 @@ interface ProductDao {
     @Query("UPDATE ${DatabaseConfig.PRODUCT} SET isFavourite = NOT isFavourite WHERE id = :id")
     suspend fun toggleFavourite(id: Int)
 
-    suspend fun getProductsDynamically(arrangement: SortArrangement? = null, sort: Order? = null): List<Product>? {
+    suspend fun getProductsDynamically(arrangement: SortArrangement? = null, sort: Order? = null): List<Product> {
         val sortBy = arrangement?.value
         val order = sort?.value ?: "ASC"
 

@@ -14,11 +14,11 @@ class HomeLocalRepoImpl(private val database: AppDatabase) : HomeLocalRepo {
         return database.getCategoryDao().insertCategories(categories)
     }
 
-    override suspend fun getCategories(): List<Category>? {
+    override suspend fun getCategories(): List<Category> {
         return database.getCategoryDao().getAllCategories()
     }
 
-    override suspend fun getProducts(request: ProductsRequest?): List<Product>? {
+    override suspend fun getProducts(request: ProductsRequest?): List<Product> {
         return database.getProductDao().getProductsDynamically(request?.sortBy, request?.order)
     }
 }

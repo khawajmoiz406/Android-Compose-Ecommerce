@@ -6,6 +6,7 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import androidx.core.content.edit
 
 @Suppress("DEPRECATION")
 class EncryptedSharedPref private constructor(context: Context) {
@@ -35,10 +36,10 @@ class EncryptedSharedPref private constructor(context: Context) {
     fun <T> putModel(value: T?, typeToken: TypeToken<T>) {
         val key = typeToken.type.toString()
         if (value == null) {
-            prefs.edit().remove(key).apply()
+            prefs.edit { remove(key) }
         } else {
             val json = Gson().toJson(value)
-            prefs.edit().putString(key, json).apply()
+            prefs.edit { putString(key, json) }
         }
     }
 
@@ -49,10 +50,10 @@ class EncryptedSharedPref private constructor(context: Context) {
     }
 
     fun removeModel(typeToken: TypeToken<*>) {
-        prefs.edit().remove(typeToken.type.toString()).apply()
+        prefs.edit { remove(typeToken.type.toString()) }
     }
 
     fun clearAll() {
-        prefs.edit().clear().apply()
+        prefs.edit { clear() }
     }
 }

@@ -20,13 +20,12 @@ class HomeRepositoryImpl(
 
         // Cache favourite product IDs
         val favProductIds = localProducts
-            ?.filter { it.isFavourite == true }
-            ?.map { it.id }
-            ?.toSet()
-            .orEmpty()
+            .filter { it.isFavourite == true }
+            .map { it.id }
+            .toSet()
 
         // Emit local data if available
-        if (!localCategories.isNullOrEmpty() && !localProducts.isNullOrEmpty()) {
+        if (localCategories.isNotEmpty() && localProducts.isNotEmpty()) {
             emit(Result.success(HomeResponse(localProducts, localCategories)))
         }
 

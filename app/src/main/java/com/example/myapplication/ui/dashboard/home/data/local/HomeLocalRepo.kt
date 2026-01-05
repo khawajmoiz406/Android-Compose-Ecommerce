@@ -7,6 +7,6 @@ import com.example.myapplication.models.response.product.Product
 interface HomeLocalRepo {
     suspend fun saveProducts(products: List<Product>)
     suspend fun saveCategories(categories: List<Category>)
-    suspend fun getCategories(): List<Category>?
-    suspend fun getProducts(request: ProductsRequest? = null): List<Product>?
+    suspend fun getCategories(): List<Category>
+    suspend fun getProducts(request: ProductsRequest? = null): List<Product>
 }

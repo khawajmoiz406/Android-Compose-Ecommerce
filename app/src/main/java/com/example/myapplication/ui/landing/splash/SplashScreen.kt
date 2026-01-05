@@ -23,7 +23,10 @@ import com.example.myapplication.R
 import com.example.myapplication.config.components.SvgImage
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.Constants
+import com.example.myapplication.core.local.pref.EncryptedSharedPref
+import com.example.myapplication.models.response.User
 import com.example.myapplication.navigation.Destinations
+import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 
 @Composable
@@ -59,10 +62,10 @@ fun SplashScreen() {
 }
 
 private suspend fun handleSplash(navController: NavController) {
-//    val user = EncryptedSharedPref.getInstance(navController.context).getModel(object : TypeToken<User>() {})
-//    val route = if (user == null) Destinations.AuthGraph.route else Destinations.DrawerGraph.route
+    val user = EncryptedSharedPref.getInstance(navController.context).getModel(object : TypeToken<User>() {})
+    val route = if (user == null) Destinations.AuthGraph.route else Destinations.DrawerGraph.route
     delay(Constants.SPLASH_DELAY)
-    navController.navigate(Destinations.AuthGraph.route) {
+    navController.navigate(route) {
         popUpTo(Destinations.Splash.route) { inclusive = true }
         launchSingleTop = true
     }

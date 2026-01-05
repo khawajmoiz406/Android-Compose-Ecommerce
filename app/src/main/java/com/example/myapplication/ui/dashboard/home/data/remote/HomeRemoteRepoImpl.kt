@@ -14,7 +14,7 @@ class HomeRemoteRepoImpl(private val context: Context, private val apis: ApiServ
         val categoryResult = fetch { apis.getCategories() }
 
         return categoryResult?.toMutableList()?.also {
-            it.add(0, Category(name = "all", slug = context.getString(R.string.all)))
+            it.add(0, Category(slug = "all", name = context.getString(R.string.all)))
         }
     }
 
