@@ -9,6 +9,8 @@ A modern Android e-commerce application built with **Jetpack Compose** demonstra
 <p align="center">
   <img src="screenshots/home-demo.gif" width="270" alt="Home Flow"/>
   &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/detail-demo.gif" width="270" alt="Product Detail Flow"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="screenshots/login-screen.png" width="270" alt="Login Screen"/>
 </p>
 
@@ -305,12 +307,16 @@ compileSdk = 35
 <p align="center">
   <img src="screenshots/home-demo.gif" width="270" alt="Home Flow"/>
   &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="screenshots/detail-demo.gif" width="270" alt="Product Detail Flow"/>
+  &nbsp;&nbsp;&nbsp;&nbsp;
   <img src="screenshots/login-screen.png" width="270" alt="Login Screen"/>
 </p>
 
 <p align="center">
   <b>Home Flow</b>
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <b>Product Detail</b>
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <b>Login Screen</b>
 </p>
 
