@@ -5,12 +5,15 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -19,8 +22,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -35,10 +38,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.R
+import com.example.myapplication.config.theme.Blue
+import com.example.myapplication.config.theme.Green
+import com.example.myapplication.config.theme.Orange
+import com.example.myapplication.config.theme.Pink
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
 import com.example.myapplication.di.createApiService
@@ -53,12 +61,20 @@ import com.example.myapplication.ui.product_detail.data.ProductDetailRepositoryI
 import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepoImpl
 import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepoImpl
 import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
+import com.example.myapplication.ui.product_detail.presentation.components.DimensionView
+import com.example.myapplication.ui.product_detail.presentation.components.InfoView
 import com.example.myapplication.ui.product_detail.presentation.components.ProductDetailTopBar
+import com.example.myapplication.ui.product_detail.presentation.components.ReviewBar
+import com.example.myapplication.ui.product_detail.presentation.components.ReviewsView
+import com.example.myapplication.ui.product_detail.presentation.components.RoundedCard
+import com.example.myapplication.ui.product_detail.presentation.components.RoundedText
+import com.example.myapplication.ui.product_detail.presentation.components.WarrantyView
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
+@SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koinViewModel()) {
@@ -67,7 +83,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
     val uiState = viewModel.uiState.collectAsState()
     val navController = LocalParentNavController.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val tabs = listOf(R.string.info, R.string.warranty, R.string.reviews, R.string.dimension)
+    val tabs = listOf(R.string.info, R.string.warranty, R.string.dimension, R.string.reviews)
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
 
     LaunchedEffect(productId) {
@@ -109,47 +125,178 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
             LazyColumn(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .drawBehind { topShadowScope(topStartCorner = 16.dp, topEndCorner = 16.dp) }
+                    .drawBehind { topShadowScope(topStartCorner = 25.dp, topEndCorner = 25.dp) }
                     .background(
                         color = MaterialTheme.colorScheme.surface,
-                        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                        shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
                     )
             ) {
                 item {
-                    Column(modifier = Modifier.padding(horizontal = 8.sdp, vertical = 10.sdp)) {
-                        Text(
-                            text = product.value?.title ?: "",
-                            fontSize = 14.ssp,
-                            lineHeight = 14.ssp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.SemiBold,
-                        )
+                    Column(modifier = Modifier.padding(horizontal = 12.sdp)) {
+
+                        Spacer(modifier = Modifier.height(15.sdp))
+
+                        Row {
+                            RoundedText(
+                                bold = true,
+                                text = product.value?.brand ?: "",
+                                textColor = MaterialTheme.colorScheme.primary,
+                                backgroundColor = MaterialTheme.colorScheme.surfaceDim
+                            )
+
+                            if (product.value?.tags?.isNotEmpty() == true) {
+                                Spacer(modifier = Modifier.width(5.sdp))
+
+                                product.value?.tags?.map { tag ->
+                                    RoundedText(
+                                        text = "#${tag}",
+                                        textColor = MaterialTheme.colorScheme.onSurface,
+                                        backgroundColor = MaterialTheme.colorScheme.surfaceDim
+                                    )
+
+                                    Spacer(modifier = Modifier.width(5.sdp))
+                                }
+                            }
+                        }
 
                         Spacer(modifier = Modifier.height(10.sdp))
 
                         Text(
-                            text = product.value?.description ?: "",
-                            fontSize = 11.ssp,
-                            lineHeight = 11.ssp,
+                            text = product.value?.title ?: "",
+                            fontSize = 18.ssp,
+                            lineHeight = 18.ssp,
                             color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Bold,
                         )
+
+                        Spacer(modifier = Modifier.height(10.sdp))
+
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+
+                            ReviewBar(rating = product.value?.rating?.toFloat() ?: 0f)
+
+                            Spacer(modifier = Modifier.width(5.sdp))
+
+                            Text(
+                                text = product.value?.rating.toString(),
+                                fontSize = 14.ssp,
+                                lineHeight = 14.ssp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Spacer(modifier = Modifier.width(5.sdp))
+
+                            Text(
+                                text = "(${product.value?.reviews?.size ?: 0} ${stringResource(R.string.reviews).lowercase()})",
+                                fontSize = 10.ssp,
+                                lineHeight = 10.ssp,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(15.sdp))
+
+                        Row(verticalAlignment = Alignment.Bottom) {
+                            Text(
+                                text = "$${product.value?.price.toString()}",
+                                fontSize = 23.ssp,
+                                lineHeight = 23.ssp,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontWeight = FontWeight.Black,
+                            )
+
+                            Spacer(modifier = Modifier.width(5.sdp))
+
+                            Text(
+                                text = "$${String.format("%.2f", product.value?.getPriceBeforeDiscount())}",
+                                fontSize = 14.ssp,
+                                lineHeight = 14.ssp,
+                                fontWeight = FontWeight.Medium,
+                                textDecoration = TextDecoration.LineThrough,
+                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(15.sdp))
+
+                        Column {
+                            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                                RoundedCard(
+                                    icon = "truck",
+                                    foregroundColor = Blue,
+                                    heading = stringResource(R.string.shipping),
+                                    value = product.value?.shippingInformation?.replace("Ships in", "") ?: "",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                )
+
+                                Spacer(Modifier.width(8.sdp))
+
+                                RoundedCard(
+                                    icon = "rotate",
+                                    foregroundColor = Green,
+                                    heading = stringResource(R.string.returns),
+                                    value = product.value?.returnPolicy ?: "",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                )
+                            }
+
+                            Spacer(Modifier.height(8.sdp))
+
+                            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+                                RoundedCard(
+                                    icon = "shield",
+                                    foregroundColor = Pink,
+                                    heading = stringResource(R.string.warranty),
+                                    value = product.value?.warrantyInformation ?: "",
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                )
+
+                                Spacer(Modifier.width(8.sdp))
+
+                                RoundedCard(
+                                    icon = "box",
+                                    foregroundColor = Orange,
+                                    heading = stringResource(R.string.stock),
+                                    value = stringResource(R.string.stock_left).replace(
+                                        "@value",
+                                        product.value?.stock?.toString() ?: ""
+                                    ),
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .fillMaxHeight(),
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(15.sdp))
                     }
                 }
 
                 stickyHeader {
-                    TabRow(containerColor = Color.Transparent, selectedTabIndex = pagerState.currentPage) {
+                    ScrollableTabRow(
+                        containerColor = Color.Transparent,
+                        selectedTabIndex = pagerState.currentPage,
+                        edgePadding = 0.dp
+                    ) {
                         tabs.forEachIndexed { index, title ->
+                            val selected = pagerState.currentPage == index
+
                             Tab(
-                                selected = pagerState.currentPage == index,
+                                selected = selected,
                                 onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                                unselectedContentColor = MaterialTheme.colorScheme.onBackground,
+                                unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                                 text = {
                                     Text(
-                                        fontSize = 11.ssp,
-                                        lineHeight = 11.ssp,
+                                        fontSize = 12.ssp,
+                                        lineHeight = 12.ssp,
                                         text = stringResource(title),
-                                        fontWeight = FontWeight.Medium,
                                     )
                                 }
                             )
@@ -158,11 +305,12 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                 }
 
                 item {
-                    HorizontalPager(state = pagerState, modifier = Modifier.fillParentMaxHeight()) { page ->
+                    HorizontalPager(state = pagerState) { page ->
                         when (page) {
-                            0 -> Box { }
-                            1 -> Box { }
-                            2 -> Box { }
+                            0 -> InfoView(product.value!!)
+                            1 -> WarrantyView(product.value!!)
+                            2 -> DimensionView(product.value!!)
+                            3 -> ReviewsView(viewModel)
                         }
                     }
                 }

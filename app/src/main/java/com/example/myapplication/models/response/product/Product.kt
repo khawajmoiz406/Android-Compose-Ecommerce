@@ -105,6 +105,10 @@ data class Product(
     var isFavourite: Boolean?
 ) : Serializable {
 
+    fun getPriceBeforeDiscount(): Double {
+        val discountPrice = ((discountPercentage ?: 1.0) / 100) * (price ?: 0.0)
+        return ((price ?: 0.0) + discountPrice)
+    }
 }
 
 object ProductConverters {

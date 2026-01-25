@@ -36,6 +36,17 @@
     <string name="info">Info</string>
     <string name="warranty">Warranty</string>
     <string name="reviews">Reviews</string>
-    <string name="dimension">Dimension</string>
+    <string name="dimension">Dimensions</string>
+    <string name="shipping">Shipping</string>
+    <string name="returns">Return</string>
+    <string name="stock">Stock</string>
+    <string name="stock_left">Only @value left</string>
+    <string name="product_overview">Product Overview</string>
+    <string name="category">Category</string>
+    <string name="min_orders">Min. Order</string>
+    <string name="units">\@value Units</string>
+    <string name="sku">SKU</string>
+    <string name="barcode">Barcode</string>
+    <string name="discount_off">-@value% OFF</string>
 
 </resources>
