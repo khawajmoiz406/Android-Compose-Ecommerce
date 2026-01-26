@@ -48,5 +48,8 @@
     <string name="sku">SKU</string>
     <string name="barcode">Barcode</string>
     <string name="discount_off">-@value% OFF</string>
+    <string name="reviews_msg">Based on verified purchase</string>
+    <string name="out_of_five">out of 5</string>
+    <string name="write_a_review">Write a Review</string>
 
 </resources>

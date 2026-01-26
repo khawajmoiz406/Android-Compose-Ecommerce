@@ -283,7 +283,11 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                     ScrollableTabRow(
                         containerColor = Color.Transparent,
                         selectedTabIndex = pagerState.currentPage,
-                        edgePadding = 0.dp
+                        edgePadding = 0.dp,
+                        modifier = Modifier.background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
+                        )
                     ) {
                         tabs.forEachIndexed { index, title ->
                             val selected = pagerState.currentPage == index
@@ -310,7 +314,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                             0 -> InfoView(product.value!!)
                             1 -> WarrantyView(product.value!!)
                             2 -> DimensionView(product.value!!)
-                            3 -> ReviewsView(viewModel)
+                            3 -> ReviewsView(product.value!!)
                         }
                     }
                 }
