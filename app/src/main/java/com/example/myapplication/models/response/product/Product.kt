@@ -109,6 +109,10 @@ data class Product(
         val discountPrice = ((discountPercentage ?: 1.0) / 100) * (price ?: 0.0)
         return ((price ?: 0.0) + discountPrice)
     }
+
+    fun calculateVolume(): Double {
+        return (dimensions?.height ?: 1.0) * (dimensions?.width ?: 1.0) * (dimensions?.depth ?: 1.0)
+    }
 }
 
 object ProductConverters {

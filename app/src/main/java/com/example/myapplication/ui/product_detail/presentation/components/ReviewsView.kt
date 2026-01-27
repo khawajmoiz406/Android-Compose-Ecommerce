@@ -39,112 +39,126 @@ import ir.kaaveh.sdpcompose.ssp
 
 @Composable
 fun ReviewsView(product: Product) {
+    Column(Modifier.padding(10.sdp)) {
+
+        RatingComposable(product)
+
+        Spacer(Modifier.height(10.sdp))
+
+        ButtonComposable()
+
+        Spacer(Modifier.height(10.sdp))
+
+        ReviewsComposable(product)
+    }
+}
+
+@Composable
+private fun RatingComposable(product: Product) {
     Column(
-        Modifier
-            .background(MaterialTheme.colorScheme.surface)
+        modifier = Modifier
+            .background(Yellow.copy(alpha = 0.1f), shape = RoundedCornerShape(10.sdp))
             .padding(10.sdp)
     ) {
-        Column(
-            modifier = Modifier
-                .background(Yellow.copy(alpha = 0.1f), shape = RoundedCornerShape(10.sdp))
-                .padding(10.sdp)
-        ) {
-            Row {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = product.rating?.toString() ?: "",
-                        fontSize = 26.ssp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-
-                    ReviewBar(
-                        rating = product.rating?.toFloat() ?: 0f,
-                        starSize = 12.sdp,
-                        spacing = 2.sdp
-                    )
-
-                    Text(
-                        text = stringResource(R.string.out_of_five),
-                        fontSize = 9.ssp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-
-                Spacer(Modifier.width(10.sdp))
-
-                Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        SvgImage(
-                            asset = "users",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            modifier = Modifier.size(10.sdp, 10.sdp)
-                        )
-
-                        Spacer(Modifier.width(5.sdp))
-
-                        Text(
-                            text = "${product.reviews?.size} ${stringResource(R.string.reviews).lowercase()}",
-                            fontSize = 10.ssp,
-                            fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface,
-                        )
-                    }
-
-                    Text(
-                        text = stringResource(R.string.reviews_msg),
-                        fontSize = 9.ssp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-
-            Spacer(Modifier.height(10.sdp))
-
-            repeat(5) { index ->
-                val reverseIndex = 4 - index
-
-                ItemRating(
-                    index = reverseIndex,
-                    count = product.reviews?.size,
-                    value = product.reviews?.count { it.rating == (reverseIndex + 1) },
+        Row {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = product.rating?.toString() ?: "",
+                    fontSize = 26.ssp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                if (index < 4) Spacer(Modifier.height(5.sdp))
+                ReviewBar(
+                    rating = product.rating?.toFloat() ?: 0f,
+                    starSize = 12.sdp,
+                    spacing = 2.sdp
+                )
+
+                Spacer(Modifier.height(5.sdp))
+
+                Text(
+                    text = stringResource(R.string.out_of_five),
+                    fontSize = 9.ssp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+            }
+
+            Spacer(Modifier.width(10.sdp))
+
+            Column {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    SvgImage(
+                        asset = "users",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(10.sdp, 10.sdp)
+                    )
+
+                    Spacer(Modifier.width(5.sdp))
+
+                    Text(
+                        text = "${product.reviews?.size} ${stringResource(R.string.reviews).lowercase()}",
+                        fontSize = 10.ssp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+
+                Text(
+                    text = stringResource(R.string.reviews_msg),
+                    fontSize = 9.ssp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
         }
 
         Spacer(Modifier.height(10.sdp))
 
-        Button(
-            onClick = { },
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(5.sdp)
-        ) {
-            SvgImage(
-                asset = "star_hollow",
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(11.sdp, 11.sdp)
+        repeat(5) { index ->
+            val reverseIndex = 4 - index
+
+            ItemRating(
+                index = reverseIndex,
+                count = product.reviews?.size,
+                value = product.reviews?.count { it.rating == (reverseIndex + 1) },
             )
 
-            Spacer(Modifier.width(5.sdp))
-
-            Text(
-                text = stringResource(R.string.write_a_review),
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.height(14.sdp)
-            )
+            if (index < 4) Spacer(Modifier.height(5.sdp))
         }
+    }
+}
 
-        Spacer(Modifier.height(10.sdp))
+@Composable
+private fun ButtonComposable() {
+    Button(
+        onClick = { },
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(5.sdp)
+    ) {
+        SvgImage(
+            asset = "star_hollow",
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.size(11.sdp, 11.sdp)
+        )
 
-        product.reviews?.mapIndexed { index, review ->
-            ItemReview(review)
+        Spacer(Modifier.width(5.sdp))
 
-            if (index < (product.reviews.size - 1)) Spacer(Modifier.height(10.sdp))
-        }
+        Text(
+            text = stringResource(R.string.write_a_review),
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.height(14.sdp)
+        )
+    }
+}
+
+@Composable
+private fun ReviewsComposable(product: Product) {
+    product.reviews?.mapIndexed { index, review ->
+        ItemReview(review)
+
+        if (index < (product.reviews.size - 1)) Spacer(Modifier.height(10.sdp))
     }
 }
 
@@ -241,7 +255,7 @@ private fun ItemReview(review: Review) {
             Box(
                 modifier = Modifier
                     .background(Yellow.copy(alpha = 0.1f), shape = RoundedCornerShape(10.sdp))
-                    .padding(horizontal = 5.sdp, vertical = 3.sdp)
+                    .padding(horizontal = 7.sdp, vertical = 3.sdp)
             ) {
                 ReviewBar(
                     rating = review.rating?.toFloat() ?: 0f,

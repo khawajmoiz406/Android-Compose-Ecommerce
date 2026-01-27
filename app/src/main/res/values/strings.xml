@@ -51,5 +51,18 @@
     <string name="reviews_msg">Based on verified purchase</string>
     <string name="out_of_five">out of 5</string>
     <string name="write_a_review">Write a Review</string>
+    <string name="coverage_includes">Coverage Includes</string>
+    <string name="coverage_first">Manufacturing defects in materials and workmanship</string>
+    <string name="coverage_second">Product performance as described</string>
+    <string name="coverage_third">Quality and safety standards compliance</string>
+    <string name="return_policy">Return Policy</string>
+    <string name="width">Width</string>
+    <string name="centimeter_inches">\@value cm</string>
+    <string name="oz_gram">\@value oz</string>
+    <string name="height">Height</string>
+    <string name="depth">Depth</string>
+    <string name="weight">Weight</string>
+    <string name="total_volume">Total Volume</string>
+    <string name="dimension_info_msg">Actual shipping box may be larger to accommodate protective packaging.</string>
 
 </resources>

@@ -2,6 +2,10 @@ package com.example.myapplication.ui.product_detail.presentation
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,20 +19,21 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,9 +73,9 @@ import com.example.myapplication.ui.product_detail.presentation.components.Revie
 import com.example.myapplication.ui.product_detail.presentation.components.ReviewsView
 import com.example.myapplication.ui.product_detail.presentation.components.RoundedCard
 import com.example.myapplication.ui.product_detail.presentation.components.RoundedText
-import com.example.myapplication.ui.product_detail.presentation.components.WarrantyView
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -83,8 +88,8 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
     val uiState = viewModel.uiState.collectAsState()
     val navController = LocalParentNavController.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    val tabs = listOf(R.string.info, R.string.warranty, R.string.dimension, R.string.reviews)
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { tabs.size })
+    val tabs = listOf(R.string.info, R.string.dimension, R.string.reviews)
+    val selectedTab = remember { mutableIntStateOf(0) }
 
     LaunchedEffect(productId) {
         if (viewModel.product.value == null) viewModel.getProductDetail(productId.toString())
@@ -131,194 +136,213 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                         shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
                     )
             ) {
-                item {
-                    Column(modifier = Modifier.padding(horizontal = 12.sdp)) {
-
-                        Spacer(modifier = Modifier.height(15.sdp))
-
-                        Row {
-                            RoundedText(
-                                bold = true,
-                                text = product.value?.brand ?: "",
-                                textColor = MaterialTheme.colorScheme.primary,
-                                backgroundColor = MaterialTheme.colorScheme.surfaceDim
-                            )
-
-                            if (product.value?.tags?.isNotEmpty() == true) {
-                                Spacer(modifier = Modifier.width(5.sdp))
-
-                                product.value?.tags?.map { tag ->
-                                    RoundedText(
-                                        text = "#${tag}",
-                                        textColor = MaterialTheme.colorScheme.onSurface,
-                                        backgroundColor = MaterialTheme.colorScheme.surfaceDim
-                                    )
-
-                                    Spacer(modifier = Modifier.width(5.sdp))
-                                }
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(10.sdp))
-
-                        Text(
-                            text = product.value?.title ?: "",
-                            fontSize = 18.ssp,
-                            lineHeight = 18.ssp,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontWeight = FontWeight.Bold,
-                        )
-
-                        Spacer(modifier = Modifier.height(10.sdp))
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-
-                            ReviewBar(rating = product.value?.rating?.toFloat() ?: 0f)
-
-                            Spacer(modifier = Modifier.width(5.sdp))
-
-                            Text(
-                                text = product.value?.rating.toString(),
-                                fontSize = 14.ssp,
-                                lineHeight = 14.ssp,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontWeight = FontWeight.SemiBold,
-                            )
-
-                            Spacer(modifier = Modifier.width(5.sdp))
-
-                            Text(
-                                text = "(${product.value?.reviews?.size ?: 0} ${stringResource(R.string.reviews).lowercase()})",
-                                fontSize = 10.ssp,
-                                lineHeight = 10.ssp,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(15.sdp))
-
-                        Row(verticalAlignment = Alignment.Bottom) {
-                            Text(
-                                text = "$${product.value?.price.toString()}",
-                                fontSize = 23.ssp,
-                                lineHeight = 23.ssp,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                fontWeight = FontWeight.Black,
-                            )
-
-                            Spacer(modifier = Modifier.width(5.sdp))
-
-                            Text(
-                                text = "$${String.format("%.2f", product.value?.getPriceBeforeDiscount())}",
-                                fontSize = 14.ssp,
-                                lineHeight = 14.ssp,
-                                fontWeight = FontWeight.Medium,
-                                textDecoration = TextDecoration.LineThrough,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
-                            )
-                        }
-
-                        Spacer(modifier = Modifier.height(15.sdp))
-
-                        Column {
-                            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-                                RoundedCard(
-                                    icon = "truck",
-                                    foregroundColor = Blue,
-                                    heading = stringResource(R.string.shipping),
-                                    value = product.value?.shippingInformation?.replace("Ships in", "") ?: "",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                )
-
-                                Spacer(Modifier.width(8.sdp))
-
-                                RoundedCard(
-                                    icon = "rotate",
-                                    foregroundColor = Green,
-                                    heading = stringResource(R.string.returns),
-                                    value = product.value?.returnPolicy ?: "",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                )
-                            }
-
-                            Spacer(Modifier.height(8.sdp))
-
-                            Row(modifier = Modifier.height(IntrinsicSize.Min)) {
-                                RoundedCard(
-                                    icon = "shield",
-                                    foregroundColor = Pink,
-                                    heading = stringResource(R.string.warranty),
-                                    value = product.value?.warrantyInformation ?: "",
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                )
-
-                                Spacer(Modifier.width(8.sdp))
-
-                                RoundedCard(
-                                    icon = "box",
-                                    foregroundColor = Orange,
-                                    heading = stringResource(R.string.stock),
-                                    value = stringResource(R.string.stock_left).replace(
-                                        "@value",
-                                        product.value?.stock?.toString() ?: ""
-                                    ),
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .fillMaxHeight(),
-                                )
-                            }
-                        }
-
-                        Spacer(modifier = Modifier.height(15.sdp))
-                    }
+                item(key = "product_detail_content") {
+                    ProductDetailContent(product = product.value!!)
                 }
 
-                stickyHeader {
-                    ScrollableTabRow(
-                        containerColor = Color.Transparent,
-                        selectedTabIndex = pagerState.currentPage,
-                        edgePadding = 0.dp,
-                        modifier = Modifier.background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
-                        )
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            val selected = pagerState.currentPage == index
-
-                            Tab(
-                                selected = selected,
-                                onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
-                                unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                                text = {
-                                    Text(
-                                        fontSize = 12.ssp,
-                                        lineHeight = 12.ssp,
-                                        text = stringResource(title),
-                                    )
-                                }
-                            )
-                        }
-                    }
+                stickyHeader(key = "tabs_header") {
+                    ProductTabs(tabs = tabs, selected = selectedTab, scope = scope)
                 }
 
-                item {
-                    HorizontalPager(state = pagerState) { page ->
+                item(key = "product_pager") {
+                    AnimatedContent(
+                        label = "page_transition",
+                        targetState = selectedTab.intValue,
+                        transitionSpec = {
+                            slideInHorizontally(
+                                initialOffsetX = { if (targetState > initialState) it else -it }
+                            ) togetherWith slideOutHorizontally(
+                                targetOffsetX = { if (targetState > initialState) -it else it }
+                            )
+                        }
+                    ) { page ->
                         when (page) {
                             0 -> InfoView(product.value!!)
-                            1 -> WarrantyView(product.value!!)
-                            2 -> DimensionView(product.value!!)
-                            3 -> ReviewsView(product.value!!)
+                            1 -> DimensionView(product.value!!)
+                            2 -> ReviewsView(product.value!!)
                         }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ProductDetailContent(product: Product) {
+    Column(modifier = Modifier.padding(horizontal = 12.sdp)) {
+        Spacer(modifier = Modifier.height(15.sdp))
+
+        Row {
+            RoundedText(
+                bold = true,
+                text = product.brand ?: "",
+                textColor = MaterialTheme.colorScheme.primary,
+                backgroundColor = MaterialTheme.colorScheme.surfaceDim
+            )
+
+            product.tags?.takeIf { it.isNotEmpty() }?.let { tags ->
+                Spacer(modifier = Modifier.width(5.sdp))
+
+                tags.forEach { tag ->
+                    RoundedText(
+                        text = "#$tag",
+                        textColor = MaterialTheme.colorScheme.onSurface,
+                        backgroundColor = MaterialTheme.colorScheme.surfaceDim
+                    )
+                    Spacer(modifier = Modifier.width(5.sdp))
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.sdp))
+
+        Text(
+            text = product.title ?: "",
+            fontSize = 18.ssp,
+            lineHeight = 18.ssp,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Bold,
+        )
+
+        Spacer(modifier = Modifier.height(10.sdp))
+
+        ProductRatingRow(product = product)
+
+        Spacer(modifier = Modifier.height(15.sdp))
+
+        ProductPriceRow(product = product)
+
+        Spacer(modifier = Modifier.height(15.sdp))
+
+        ProductInfoCards(product = product)
+
+        Spacer(modifier = Modifier.height(15.sdp))
+    }
+}
+
+@Composable
+private fun ProductRatingRow(product: Product) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        ReviewBar(rating = product.rating?.toFloat() ?: 0f)
+        Spacer(modifier = Modifier.width(5.sdp))
+        Text(
+            text = product.rating.toString(),
+            fontSize = 14.ssp,
+            lineHeight = 14.ssp,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Spacer(modifier = Modifier.width(5.sdp))
+        Text(
+            text = "(${product.reviews?.size ?: 0} ${stringResource(R.string.reviews).lowercase()})",
+            fontSize = 10.ssp,
+            lineHeight = 10.ssp,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+        )
+    }
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+private fun ProductPriceRow(product: Product) {
+    Row(verticalAlignment = Alignment.Bottom) {
+        Text(
+            text = "$${product.price}",
+            fontSize = 23.ssp,
+            lineHeight = 23.ssp,
+            color = MaterialTheme.colorScheme.onBackground,
+            fontWeight = FontWeight.Black,
+        )
+        Spacer(modifier = Modifier.width(5.sdp))
+        Text(
+            text = "$${String.format("%.2f", product.getPriceBeforeDiscount())}",
+            fontSize = 14.ssp,
+            lineHeight = 14.ssp,
+            fontWeight = FontWeight.Medium,
+            textDecoration = TextDecoration.LineThrough,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+        )
+    }
+}
+
+@Composable
+private fun ProductInfoCards(product: Product) {
+    Column {
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            RoundedCard(
+                icon = "truck",
+                foregroundColor = Blue,
+                heading = stringResource(R.string.shipping),
+                value = product.shippingInformation?.replace("Ships in", "") ?: "",
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+            Spacer(Modifier.width(8.sdp))
+            RoundedCard(
+                icon = "rotate",
+                foregroundColor = Green,
+                heading = stringResource(R.string.returns),
+                value = product.returnPolicy ?: "",
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+        }
+
+        Spacer(Modifier.height(8.sdp))
+
+        Row(modifier = Modifier.height(IntrinsicSize.Min)) {
+            RoundedCard(
+                icon = "shield",
+                foregroundColor = Pink,
+                heading = stringResource(R.string.warranty),
+                value = product.warrantyInformation ?: "",
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+            Spacer(Modifier.width(8.sdp))
+            RoundedCard(
+                icon = "box",
+                foregroundColor = Orange,
+                heading = stringResource(R.string.stock),
+                value = stringResource(R.string.stock_left).replace(
+                    "@value",
+                    product.stock?.toString() ?: ""
+                ),
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+            )
+        }
+    }
+}
+
+@Composable
+private fun ProductTabs(tabs: List<Int>, selected: MutableIntState, scope: CoroutineScope) {
+    TabRow(
+        containerColor = Color.Transparent,
+        selectedTabIndex = selected.intValue,
+        modifier = Modifier.background(
+            color = MaterialTheme.colorScheme.surface,
+            shape = RoundedCornerShape(topStart = 25.dp, topEnd = 25.dp)
+        )
+    ) {
+        tabs.forEachIndexed { index, title ->
+            Tab(
+                selected = selected.intValue == index,
+                onClick = { scope.launch { selected.intValue = index } },
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                text = {
+                    Text(
+                        fontSize = 12.ssp,
+                        lineHeight = 12.ssp,
+                        text = stringResource(title),
+                    )
+                }
+            )
         }
     }
 }
