@@ -6,6 +6,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -159,7 +160,7 @@ private fun ExpandedAppBar(product: Product) {
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { product.images?.size ?: 0 })
 
-    Box {
+    Column {
         HorizontalPager(
             state = pagerState,
             modifier = Modifier
@@ -177,9 +178,8 @@ private fun ExpandedAppBar(product: Product) {
 
         Box(
             modifier = Modifier
-                .align(alignment = Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 10.sdp, vertical = 12.sdp)
+                .padding(horizontal = 10.sdp, vertical = 10.sdp)
         ) {
             if (product.discountPercentage != null) {
                 Text(
@@ -192,7 +192,7 @@ private fun ExpandedAppBar(product: Product) {
                     ),
                     modifier = Modifier
                         .background(color = Color.Red, shape = RoundedCornerShape(15.sdp))
-                        .padding(horizontal = 8.sdp, vertical = 2.sdp)
+                        .padding(horizontal = 8.sdp, vertical = 4.sdp)
                 )
             }
 
@@ -229,7 +229,7 @@ private fun ExpandedAppBar(product: Product) {
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
                         .background(color = Orange, shape = RoundedCornerShape(15.sdp))
-                        .padding(horizontal = 8.sdp, vertical = 2.sdp)
+                        .padding(horizontal = 8.sdp, vertical = 4.sdp)
                         .align(Alignment.CenterEnd)
                 )
             }

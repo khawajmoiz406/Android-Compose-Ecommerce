@@ -64,5 +64,21 @@
     <string name="weight">Weight</string>
     <string name="total_volume">Total Volume</string>
     <string name="dimension_info_msg">Actual shipping box may be larger to accommodate protective packaging.</string>
+    <string name="write_a_review_msg">Write a review for this product</string>
+    <string name="your_rating">Your Rating</string>
+    <string name="poor">Poor</string>
+    <string name="below_average">Below Average</string>
+    <string name="average">Average</string>
+    <string name="good">Good</string>
+    <string name="excellent">Excellent</string>
+    <string name="enter_you_name">Enter you name</string>
+    <string name="share_your_experience">Share your experience with this product</string>
+    <string name="your_name">Your Name</string>
+    <string name="your_review">Your Review</string>
+    <string name="submit_review">Submit Review</string>
+    <string name="review_guidelines">Review Guidelines</string>
+    <string name="review_guidelines_msg">Please share honest feedback about your experience. Reviews help other customers make informed decisions.</string>
+    <string name="verified_purchase">Verified purchase</string>
+    <string name="add_to_cart">Add To Cart</string>
 
 </resources>

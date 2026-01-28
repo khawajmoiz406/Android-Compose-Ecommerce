@@ -104,6 +104,7 @@ data class Product(
     @ColumnInfo(name = "isFavourite")
     var isFavourite: Boolean?
 ) : Serializable {
+    fun calculateTotal(quantity: Int) = (price ?: 0.0) * quantity
 
     fun getPriceBeforeDiscount(): Double {
         val discountPrice = ((discountPercentage ?: 1.0) / 100) * (price ?: 0.0)

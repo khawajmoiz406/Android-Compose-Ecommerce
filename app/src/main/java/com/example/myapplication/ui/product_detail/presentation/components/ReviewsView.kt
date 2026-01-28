@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,10 +17,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
@@ -29,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.theme.Green
 import com.example.myapplication.config.theme.Yellow
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
@@ -36,20 +43,34 @@ import com.example.myapplication.models.response.product.Product
 import com.example.myapplication.models.response.product.Review
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
+import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReviewsView(product: Product) {
+    val scope = rememberCoroutineScope()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
     Column(Modifier.padding(10.sdp)) {
 
         RatingComposable(product)
 
         Spacer(Modifier.height(10.sdp))
 
-        ButtonComposable()
+        ButtonComposable { scope.launch { bottomSheetState.show() } }
 
         Spacer(Modifier.height(10.sdp))
 
         ReviewsComposable(product)
+
+        if (bottomSheetState.isVisible || bottomSheetState.currentValue != SheetValue.Hidden) {
+            ModalBottomSheet(
+                sheetState = bottomSheetState,
+                windowInsets = WindowInsets(0),
+                onDismissRequest = { scope.launch { bottomSheetState.hide() } },
+                content = { AddReview(product) { _, _, _ -> scope.launch { bottomSheetState.hide() } } }
+            )
+        }
     }
 }
 
@@ -129,9 +150,9 @@ private fun RatingComposable(product: Product) {
 }
 
 @Composable
-private fun ButtonComposable() {
+private fun ButtonComposable(onAddClicked: () -> Unit) {
     Button(
-        onClick = { },
+        onClick = { onAddClicked.invoke() },
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(5.sdp)
     ) {
@@ -280,6 +301,25 @@ private fun ItemReview(review: Review) {
                 )
                 .padding(10.sdp)
         )
+
+        Spacer(Modifier.height(10.sdp))
+
+        Row(verticalAlignment = Alignment.CenterVertically,) {
+            SvgImage(
+                asset = "check_circle",
+                color = Green,
+                modifier = Modifier.size(11.sdp, 11.sdp)
+            )
+
+            Spacer(Modifier.width(5.sdp))
+
+            Text(
+                text = stringResource(R.string.verified_purchase),
+                fontSize = 9.ssp,
+                lineHeight = 9.ssp,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
     }
 
 }

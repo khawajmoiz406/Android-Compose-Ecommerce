@@ -35,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.R
+import com.example.myapplication.config.theme.Yellow
 import com.example.myapplication.models.response.product.Dimensions
 import com.example.myapplication.models.response.product.Meta
 import com.example.myapplication.models.response.product.Product
@@ -127,15 +128,13 @@ fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null) {
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End,
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.Star,
-                            contentDescription = null,
-                            tint = Color.Yellow,
-                            modifier = Modifier.size(12.sdp)
+                        SvgImage(
+                            asset = "star_filled",
+                            color = Yellow,
+                            modifier = Modifier.size(11.sdp)
                         )
 
                         Spacer(Modifier.width(5.sdp))
-
 
                         Text(
                             text = "${item.rating}",
