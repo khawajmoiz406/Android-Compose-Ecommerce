@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 
 object ComposableUtils {
     fun DrawScope.topShadowScope(
-        shadowColor: Color = Color.Companion.Black.copy(alpha = 0.25f),
+        shadowColor: Color = Color.Black.copy(alpha = 0.25f),
         topStartCorner: Dp = 0.dp,
         topEndCorner: Dp = 0.dp
     ) {
