@@ -89,7 +89,7 @@ private fun DimensionsComposable(product: Product) {
 
         Spacer(Modifier.height(10.sdp))
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceDim)
+        HorizontalDivider()
 
         Spacer(Modifier.height(10.sdp))
 
@@ -103,7 +103,7 @@ private fun DimensionsComposable(product: Product) {
 
         Spacer(Modifier.height(10.sdp))
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceDim)
+        HorizontalDivider()
 
         Spacer(Modifier.height(10.sdp))
 
@@ -117,7 +117,7 @@ private fun DimensionsComposable(product: Product) {
 
         Spacer(Modifier.height(10.sdp))
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceDim)
+        HorizontalDivider()
 
         Spacer(Modifier.height(10.sdp))
 

@@ -232,7 +232,7 @@ private fun ItemReview(review: Review) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .border(width = 1.sdp, MaterialTheme.colorScheme.surfaceDim, shape = RoundedCornerShape(10.sdp))
+            .border(width = 1.sdp, MaterialTheme.colorScheme.outline, shape = RoundedCornerShape(10.sdp))
             .padding(10.sdp)
     ) {
         Row {

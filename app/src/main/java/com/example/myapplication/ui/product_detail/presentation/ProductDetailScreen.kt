@@ -38,6 +38,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.MutableIntState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -106,7 +107,9 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val tabs = listOf(R.string.info, R.string.dimension, R.string.reviews)
     val selectedTab = remember { mutableIntStateOf(0) }
+    val total = remember { mutableDoubleStateOf(0.0) }
     val addToCartVisible = remember { mutableStateOf(true) }
+    val quantity = remember { mutableIntStateOf(product.value?.minimumOrderQuantity ?: 0) }
 
     LaunchedEffect(productId) {
         if (viewModel.product.value == null) viewModel.getProductDetail(productId.toString())
@@ -199,7 +202,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                 modifier = Modifier.align(Alignment.BottomCenter),
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it }),
-                content = { CartContent(product) { _, _ -> } }
+                content = { CartContent(product, quantity, total) { } }
             )
         }
     }
@@ -388,11 +391,10 @@ private fun ProductTabs(tabs: List<Int>, selected: MutableIntState, scope: Corou
 @Composable
 private fun BoxScope.CartContent(
     product: State<Product?>,
-    onAddToCardClicked: (total: Double, quantity: Int) -> Unit
+    quantity: MutableIntState,
+    total: MutableDoubleState,
+    onAddToCardClicked: () -> Unit
 ) {
-    val total = remember { mutableDoubleStateOf(0.0) }
-    val quantity = remember { mutableIntStateOf(product.value?.minimumOrderQuantity ?: 0) }
-
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -468,7 +470,7 @@ private fun BoxScope.CartContent(
                 .weight(0.7f)
                 .height(45.sdp)
                 .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.sdp))
-                .clickable(onClick = { onAddToCardClicked.invoke(total.doubleValue, quantity.intValue) })
+                .clickable(onClick = { onAddToCardClicked.invoke() })
                 .padding(horizontal = 10.sdp)
         ) {
             SvgImage(
