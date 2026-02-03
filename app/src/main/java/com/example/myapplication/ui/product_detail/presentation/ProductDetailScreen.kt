@@ -12,6 +12,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
@@ -52,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -64,7 +66,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.R
-import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Blue
 import com.example.myapplication.config.theme.Green
 import com.example.myapplication.config.theme.Orange
@@ -75,14 +77,14 @@ import com.example.myapplication.di.createApiService
 import com.example.myapplication.di.createOkHttpClient
 import com.example.myapplication.di.createRetrofit
 import com.example.myapplication.di.createRoomDatabase
-import com.example.myapplication.models.response.product.Dimensions
-import com.example.myapplication.models.response.product.Meta
-import com.example.myapplication.models.response.product.Product
-import com.example.myapplication.models.response.product.Review
-import com.example.myapplication.ui.product_detail.data.ProductDetailRepositoryImpl
-import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepoImpl
-import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepoImpl
-import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
+import com.example.myapplication.core.model.Dimensions
+import com.example.myapplication.core.model.Meta
+import com.example.myapplication.core.model.Product
+import com.example.myapplication.core.model.Review
+import com.example.myapplication.ui.product_detail.data.repository.ProductDetailRepositoryImpl
+import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalDataSource
+import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteDataSource
+import com.example.myapplication.ui.product_detail.domain.usecase.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.components.DimensionView
 import com.example.myapplication.ui.product_detail.presentation.components.InfoView
 import com.example.myapplication.ui.product_detail.presentation.components.ProductDetailTopBar
@@ -108,15 +110,15 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
     val tabs = listOf(R.string.info, R.string.dimension, R.string.reviews)
     val selectedTab = remember { mutableIntStateOf(0) }
     val total = remember { mutableDoubleStateOf(0.0) }
+    val quantity = remember { mutableIntStateOf(0) }
     val addToCartVisible = remember { mutableStateOf(true) }
-    val quantity = remember { mutableIntStateOf(product.value?.minimumOrderQuantity ?: 0) }
 
     LaunchedEffect(productId) {
         if (viewModel.product.value == null) viewModel.getProductDetail(productId.toString())
     }
 
     // TODO: Add shimmer layout here
-    if (product.value == null || uiState.value.isLoading) return Box(
+    if ((product.value == null && uiState.value.isLoading) || product.value == null) return Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
         content = { CircularProgressIndicator() }
@@ -131,7 +133,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                 scrollBehavior = scrollBehavior,
                 product = product.value!!,
                 onBackPressed = { navController?.popBackStack() },
-                onFavToggle = { product.value?.isFavourite = it }
+                onFavToggle = { viewModel.toggleFav() }
             )
         }
     ) { innerPadding ->
@@ -202,7 +204,13 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                 modifier = Modifier.align(Alignment.BottomCenter),
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it }),
-                content = { CartContent(product, quantity, total) { } }
+                content = {
+                    CartContent(
+                        product, uiState, quantity, total,
+                        onAddToCardClicked = { viewModel.addProductToCart(product.value!!, quantity.intValue) },
+                        onRemoveFromCardClicked = { viewModel.removeProductFromCart(product.value!!.id!!) },
+                    )
+                }
             )
         }
     }
@@ -391,10 +399,18 @@ private fun ProductTabs(tabs: List<Int>, selected: MutableIntState, scope: Corou
 @Composable
 private fun BoxScope.CartContent(
     product: State<Product?>,
+    uiState: State<ProductDetailUiState>,
     quantity: MutableIntState,
     total: MutableDoubleState,
-    onAddToCardClicked: () -> Unit
+    onAddToCardClicked: () -> Unit,
+    onRemoveFromCardClicked: () -> Unit
 ) {
+    val addedIntoCart = product.value?.addedToCart == true
+    if (quantity.intValue == 0) {
+        quantity.intValue = product.value?.minimumOrderQuantity ?: 0
+        total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
+    }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -408,182 +424,116 @@ private fun BoxScope.CartContent(
             )
             .padding(horizontal = 5.sdp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .weight(0.3f)
-                .padding(horizontal = 3.sdp)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center,
+        if (!addedIntoCart) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .size(25.sdp)
-                    .clickable {
-                        if (quantity.intValue > (product.value?.minimumOrderQuantity ?: 0)) {
-                            quantity.intValue--
-                            total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
-                        }
-                    },
+                    .weight(0.3f)
+                    .padding(horizontal = 3.sdp)
             ) {
-                SvgImage(
-                    asset = "minus",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(13.sdp)
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .size(25.sdp)
+                        .clickable {
+                            if (quantity.intValue > (product.value?.minimumOrderQuantity ?: 0)) {
+                                quantity.intValue--
+                                total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
+                            }
+                        },
+                ) {
+                    SvgImage(
+                        asset = "minus",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(13.sdp)
+                    )
+                }
+
+                Text(
+                    text = quantity.intValue.toString(),
+                    fontSize = 11.ssp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f)
                 )
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .size(25.sdp)
+                        .clickable {
+                            if (quantity.intValue < (product.value?.stock ?: 0)) {
+                                quantity.intValue++
+                                total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
+                            }
+                        },
+                ) {
+                    SvgImage(
+                        asset = "plus",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(13.sdp)
+                    )
+                }
             }
 
-            Text(
-                text = quantity.intValue.toString(),
-                fontSize = 11.ssp,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
-            )
-
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                    .size(25.sdp)
-                    .clickable {
-                        if (quantity.intValue < (product.value?.stock ?: 0)) {
-                            quantity.intValue++
-                            total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
-                        }
-                    },
-            ) {
-                SvgImage(
-                    asset = "plus",
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(13.sdp)
-                )
-            }
+            Spacer(Modifier.width(5.sdp))
         }
 
-        Spacer(Modifier.width(5.sdp))
-
         Row(
+            horizontalArrangement = if(addedIntoCart) Arrangement.Center else Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
-                .weight(0.7f)
+                .weight(if (addedIntoCart) 1f else 0.7f)
                 .height(45.sdp)
-                .background(color = MaterialTheme.colorScheme.primary, shape = RoundedCornerShape(8.sdp))
-                .clickable(onClick = { onAddToCardClicked.invoke() })
+                .background(
+                    color = if (!addedIntoCart) MaterialTheme.colorScheme.primary else Red,
+                    shape = RoundedCornerShape(8.sdp)
+                )
+                .clickable(onClick = { if (addedIntoCart) onRemoveFromCardClicked.invoke() else onAddToCardClicked.invoke() })
                 .padding(horizontal = 10.sdp)
         ) {
-            SvgImage(
-                asset = "cart",
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.size(20.sdp)
-            )
 
-            Spacer(Modifier.width(8.sdp))
-
-            Column {
-                Text(
-                    text = stringResource(R.string.add_to_cart),
-                    fontSize = 10.ssp,
-                    color = MaterialTheme.colorScheme.surface,
+            when (uiState.value.isLoading) {
+                true -> CircularProgressIndicator(
+                    modifier = Modifier.size(20.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
                 )
 
-                Spacer(Modifier.height(1.sdp))
+                false -> {
+                    SvgImage(
+                        asset = if (addedIntoCart) "delete" else "cart",
+                        color = MaterialTheme.colorScheme.surface,
+                        modifier = Modifier.size(20.sdp)
+                    )
 
-                Text(
-                    text = "$${String.format("%.2f", total.doubleValue)}",
-                    fontSize = 15.ssp,
-                    softWrap = false,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.surface,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    Spacer(Modifier.width(8.sdp))
+
+                    Column {
+                        if (!addedIntoCart) {
+                            Text(
+                                text = stringResource(R.string.add_to_cart),
+                                fontSize = 10.ssp,
+                                color = MaterialTheme.colorScheme.surface,
+                            )
+
+                            Spacer(Modifier.height(1.sdp))
+                        }
+
+                        Text(
+                            text = if (addedIntoCart) stringResource(R.string.remove_from_cart)
+                            else "$${String.format("%.2f", total.doubleValue)}",
+                            fontSize = 15.ssp,
+                            softWrap = false,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.surface,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
             }
         }
     }
-}
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview(showSystemUi = true, uiMode = UI_MODE_NIGHT_YES)
-@Composable
-private fun ProductDetailPreview() {
-    val context = LocalContext.current
-
-    ProductDetailScreen(
-        -1, ProductDetailViewModel(
-            GetProductDetailUseCase(
-                ProductDetailRepositoryImpl(
-                    ProductDetailRemoteRepoImpl(
-                        context,
-                        createApiService(createRetrofit(createOkHttpClient()))
-                    ),
-                    ProductDetailLocalRepoImpl(
-                        createRoomDatabase(context)
-                    )
-                )
-            )
-        ).apply {
-            product.value = Product(
-                id = 1,
-                title = "Essence Mascara Lash Princess",
-                description = "The Essence Mascara Lash Princess is a popular mascara known for its volumizing and lengthening effects. Achieve dramatic lashes with this long-lasting and cruelty-free formula.",
-                category = "beauty",
-                price = 9.99,
-                discountPercentage = 10.48,
-                rating = 2.56,
-                stock = 99,
-                tags = listOf("beauty", "mascara"),
-                brand = "Essence",
-                sku = "BEA-ESS-ESS-001",
-                weight = 4,
-                dimensions = Dimensions(
-                    width = 15.14,
-                    height = 13.08,
-                    depth = 22.99
-                ),
-                warrantyInformation = "1 week warranty",
-                shippingInformation = "Ships in 3-5 business days",
-                availabilityStatus = "In Stock",
-                reviews = listOf(
-                    Review(
-                        rating = 3,
-                        comment = "Would not recommend!",
-                        date = "2025-04-30T09:41:02.053Z",
-                        reviewerName = "Eleanor Collins",
-                        reviewerEmail = "eleanor.collins@x.dummyjson.com"
-                    ),
-                    Review(
-                        rating = 4,
-                        comment = "Very satisfied!",
-                        date = "2025-04-30T09:41:02.053Z",
-                        reviewerName = "Lucas Gordon",
-                        reviewerEmail = "lucas.gordon@x.dummyjson.com"
-                    ),
-                    Review(
-                        rating = 5,
-                        comment = "Highly impressed!",
-                        date = "2025-04-30T09:41:02.053Z",
-                        reviewerName = "Eleanor Collins",
-                        reviewerEmail = "eleanor.collins@x.dummyjson.com"
-                    )
-                ),
-                returnPolicy = "No return policy",
-                minimumOrderQuantity = 48,
-                meta = Meta(
-                    createdAt = "2025-04-30T09:41:02.053Z",
-                    updatedAt = "2025-04-30T09:41:02.053Z",
-                    barcode = "5784719087687",
-                    qrCode = "https://cdn.dummyjson.com/public/qr-code.png"
-                ),
-                images = listOf(
-                    "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp",
-                    "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp",
-                    "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp",
-                    "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/1.webp"
-                ),
-                isFavourite = false,
-                thumbnail = "https://cdn.dummyjson.com/product-images/beauty/essence-mascara-lash-princess/thumbnail.webp"
-            )
-        }
-    )
 }

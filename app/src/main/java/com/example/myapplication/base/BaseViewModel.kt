@@ -1,6 +1,7 @@
 package com.example.myapplication.base
 
 import androidx.lifecycle.ViewModel
+import com.example.myapplication.core.remote.ApiException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,5 +12,9 @@ open class BaseViewModel<U, E>(initialState: U) : ViewModel() {
 
     fun updateUiState(newUiState: U) {
         uiState.update { newUiState }
+    }
+
+    fun Throwable?.toErrorString(): String {
+        return if (this is ApiException) this.error else this?.localizedMessage ?: ""
     }
 }

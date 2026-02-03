@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,17 +22,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
-import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Orange
 import com.example.myapplication.config.theme.Pink
-import com.example.myapplication.config.utils.cmToInches
-import com.example.myapplication.config.utils.ozToGrams
-import com.example.myapplication.models.response.product.Dimensions
-import com.example.myapplication.models.response.product.Meta
-import com.example.myapplication.models.response.product.Product
-import com.example.myapplication.models.response.product.Review
+import com.example.myapplication.config.utils.extension.cmToInches
+import com.example.myapplication.config.utils.extension.ozToGrams
+import com.example.myapplication.core.model.Dimensions
+import com.example.myapplication.core.model.Meta
+import com.example.myapplication.core.model.Product
+import com.example.myapplication.core.model.Review
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 

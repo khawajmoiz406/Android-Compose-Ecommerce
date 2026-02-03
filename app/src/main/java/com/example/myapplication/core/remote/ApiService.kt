@@ -1,9 +1,9 @@
 package com.example.myapplication.core.remote
 
-import com.example.myapplication.models.response.User
-import com.example.myapplication.models.response.category.Category
-import com.example.myapplication.models.response.product.Product
-import com.example.myapplication.models.response.product.ProductsResponse
+import com.example.myapplication.core.model.User
+import com.example.myapplication.core.model.Category
+import com.example.myapplication.core.model.Product
+import com.example.myapplication.core.model.ProductsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

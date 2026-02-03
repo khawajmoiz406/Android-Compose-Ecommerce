@@ -3,7 +3,8 @@ package com.example.myapplication.di
 val appModules = arrayListOf(
     localModule,
     networkModule,
-    loginModule,
+    authModule,
     homeModule,
-    productDetailModule
+    productDetailModule,
+    cartModule
 )

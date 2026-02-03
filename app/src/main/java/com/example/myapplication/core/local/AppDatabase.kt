@@ -1,0 +1,37 @@
+package com.example.myapplication.core.local
+
+import android.content.Context
+import androidx.room.Database
+import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
+import com.example.myapplication.core.local.converter.ProductConverters
+import com.example.myapplication.core.local.dao.CartDao
+import com.example.myapplication.core.local.dao.CategoryDao
+import com.example.myapplication.core.local.dao.ProductDao
+import com.example.myapplication.core.model.Category
+import com.example.myapplication.core.model.Product
+import com.example.myapplication.ui.cart.data.local.entity.CartItem
+
+@Database(
+    version = DatabaseConfig.DATABASE_VERSION,
+    exportSchema = DatabaseConfig.EXPORT_SCHEMA,
+    entities = [Product::class, Category::class, CartItem::class]
+)
+@TypeConverters(ProductConverters::class)
+abstract class AppDatabase : RoomDatabase() {
+    companion object {
+        @Volatile
+        private var INSTANCE: AppDatabase? = null
+
+        fun getInstance(context: Context): AppDatabase {
+            return INSTANCE ?: synchronized(this) {
+                Room.databaseBuilder(context, AppDatabase::class.java, DatabaseConfig.databaseName(context)).build()
+            }
+        }
+    }
+
+    abstract fun getProductDao(): ProductDao
+    abstract fun getCategoryDao(): CategoryDao
+    abstract fun getCartDao(): CartDao
+}

@@ -2,8 +2,8 @@ package com.example.myapplication.di
 
 import android.content.Context
 import com.example.myapplication.BuildConfig
-import com.example.myapplication.core.local.pref.EncryptedSharedPref
-import com.example.myapplication.core.local.room.AppDatabase
+import com.example.myapplication.core.pref.EncryptedSharedPref
+import com.example.myapplication.core.local.AppDatabase
 import com.example.myapplication.core.remote.ApiService
 import com.example.myapplication.core.remote.EndPoints
 import okhttp3.OkHttpClient

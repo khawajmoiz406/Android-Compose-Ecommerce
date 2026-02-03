@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.unit.Dp
-import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Yellow
 import ir.kaaveh.sdpcompose.sdp
 import kotlin.math.roundToInt

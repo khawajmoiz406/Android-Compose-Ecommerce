@@ -40,10 +40,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.zIndex
 import com.example.myapplication.R
-import com.example.myapplication.config.components.NetworkImage
-import com.example.myapplication.config.components.SvgImage
+import com.example.myapplication.config.components.image.NetworkImage
+import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Orange
-import com.example.myapplication.models.response.product.Product
+import com.example.myapplication.core.model.Product
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -121,13 +121,13 @@ private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit, onFavTo
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onSurface)
+                .background(MaterialTheme.colorScheme.surfaceDim)
                 .size(35.sdp)
                 .clickable { onBackPressed() },
         ) {
             SvgImage(
                 asset = "back",
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(20.sdp)
             )
         }
@@ -138,7 +138,7 @@ private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit, onFavTo
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.onSurface)
+                .background(MaterialTheme.colorScheme.surfaceDim)
                 .size(35.sdp)
                 .clickable {
                     isFavourite.value = !isFavourite.value
@@ -147,7 +147,7 @@ private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit, onFavTo
         ) {
             SvgImage(
                 asset = if (isFavourite.value) "fav_filled" else "fav_outline",
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(20.sdp)
             )
         }

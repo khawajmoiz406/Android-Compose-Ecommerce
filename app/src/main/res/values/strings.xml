@@ -80,5 +80,22 @@
     <string name="review_guidelines_msg">Please share honest feedback about your experience. Reviews help other customers make informed decisions.</string>
     <string name="verified_purchase">Verified purchase</string>
     <string name="add_to_cart">Add To Cart</string>
-
+    <string name="cart_is_empty">Your cart is empty!</string>
+    <string name="cart">Cart</string>
+    <string name="sub_total">Subtotal:</string>
+    <string name="delivery_fee">Delivery Fee:</string>
+    <string name="vat">VAT:</string>
+    <string name="discount">Discount:</string>
+    <string name="total_price">Total Price:</string>
+    <string name="platform_fee">Platform Fee:</string>
+    <string name="receipt">Receipt</string>
+    <string name="delivery_method">Delivery Method</string>
+    <string name="cash_on_delivery">Cash on Delivery</string>
+    <string name="credit_card">Credit / Debit Card</string>
+    <string name="wallet">Wallet</string>
+    <string name="payment_method">Payment Method</string>
+    <string name="checkout">Confirm &amp; Checkout</string>
+    <string name="total_heading">Total</string>
+    <string name="total_msg">(incl. tax &amp; fees)</string>
+    <string name="remove_from_cart">Remove From Cart</string>
 </resources>

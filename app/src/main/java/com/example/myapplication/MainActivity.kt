@@ -17,7 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.config.theme.MyApplicationTheme
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
-import com.example.myapplication.navigation.NavGraph
+import com.example.myapplication.config.navigation.NavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

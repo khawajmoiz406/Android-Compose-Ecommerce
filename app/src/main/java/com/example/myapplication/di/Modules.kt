@@ -1,29 +1,34 @@
 package com.example.myapplication.di
 
-import com.example.myapplication.ui.auth.login.data.LoginRepository
-import com.example.myapplication.ui.auth.login.data.LoginRepositoryImpl
-import com.example.myapplication.ui.auth.login.data.local.LoginLocalRepo
-import com.example.myapplication.ui.auth.login.data.local.LoginLocalRepoImpl
-import com.example.myapplication.ui.auth.login.data.remote.LoginRemoteRepo
-import com.example.myapplication.ui.auth.login.data.remote.LoginRemoteRepoImpl
-import com.example.myapplication.ui.auth.login.domain.LoginUseCase
-import com.example.myapplication.ui.auth.login.presentation.LoginViewModel
-import com.example.myapplication.ui.dashboard.home.data.HomeRepository
-import com.example.myapplication.ui.dashboard.home.data.HomeRepositoryImpl
-import com.example.myapplication.ui.dashboard.home.data.local.HomeLocalRepo
-import com.example.myapplication.ui.dashboard.home.data.local.HomeLocalRepoImpl
-import com.example.myapplication.ui.dashboard.home.data.remote.HomeRemoteRepo
-import com.example.myapplication.ui.dashboard.home.data.remote.HomeRemoteRepoImpl
-import com.example.myapplication.ui.dashboard.home.domain.GetHomeUseCase
-import com.example.myapplication.ui.dashboard.home.domain.GetProductsByCategoryUseCase
-import com.example.myapplication.ui.dashboard.home.presentation.HomeViewModel
-import com.example.myapplication.ui.product_detail.data.ProductDetailRepository
-import com.example.myapplication.ui.product_detail.data.ProductDetailRepositoryImpl
-import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepo
-import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalRepoImpl
-import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepo
-import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteRepoImpl
-import com.example.myapplication.ui.product_detail.domain.GetProductDetailUseCase
+import com.example.myapplication.core.shared.domain.repository.CartRepository
+import com.example.myapplication.core.shared.domain.usecase.AddToCartUseCase
+import com.example.myapplication.core.shared.domain.usecase.GetCartCountUseCase
+import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
+import com.example.myapplication.ui.auth.data.local.AuthLocalDataSource
+import com.example.myapplication.ui.auth.data.remote.AuthRemoteDataSource
+import com.example.myapplication.ui.auth.data.repository.AuthRepositoryImpl
+import com.example.myapplication.ui.auth.domain.repository.LoginRepository
+import com.example.myapplication.ui.auth.domain.usecase.LoginUseCase
+import com.example.myapplication.ui.auth.presentation.login.LoginViewModel
+import com.example.myapplication.ui.cart.data.local.CartLocalDataSource
+import com.example.myapplication.ui.cart.data.remote.CartRemoteDataSource
+import com.example.myapplication.ui.cart.data.repository.CartRepositoryImpl
+import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
+import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase
+import com.example.myapplication.ui.cart.presentation.CartViewModel
+import com.example.myapplication.ui.home.data.local.HomeLocalDataSource
+import com.example.myapplication.ui.home.data.remote.HomeRemoteDataSource
+import com.example.myapplication.ui.home.data.repository.HomeRepositoryImpl
+import com.example.myapplication.ui.home.domain.repository.HomeRepository
+import com.example.myapplication.ui.home.domain.usecase.GetHomeUseCase
+import com.example.myapplication.ui.home.domain.usecase.GetProductsByFiltersUseCase
+import com.example.myapplication.ui.home.domain.usecase.ObserverProductsFavouriteUseCase
+import com.example.myapplication.ui.home.presentation.HomeViewModel
+import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalDataSource
+import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteDataSource
+import com.example.myapplication.ui.product_detail.data.repository.ProductDetailRepositoryImpl
+import com.example.myapplication.ui.product_detail.domain.repository.ProductDetailRepository
+import com.example.myapplication.ui.product_detail.domain.usecase.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
@@ -40,27 +45,68 @@ val networkModule = module {
     single { createApiService(get()) }
 }
 
-val loginModule = module {
-    single<LoginLocalRepo> { LoginLocalRepoImpl(get()) }
-    single<LoginRemoteRepo> { LoginRemoteRepoImpl(androidContext(), get()) }
-    single<LoginRepository> { LoginRepositoryImpl(get(), get()) }
-    single { LoginUseCase(get()) }
-    viewModel { LoginViewModel(get()) }
+val authModule = module {
+    single { AuthLocalDataSource(get()) }
+    single { AuthRemoteDataSource(androidContext(), get()) }
+    single<LoginRepository> { AuthRepositoryImpl(get(), get()) }
+
+    factory { LoginUseCase(get()) }
+
+    viewModel { LoginViewModel(loginUseCase = get()) }
 }
 
 val homeModule = module {
-    single<HomeLocalRepo> { HomeLocalRepoImpl(get()) }
-    single<HomeRemoteRepo> { HomeRemoteRepoImpl(androidContext(), get()) }
+    single { HomeLocalDataSource(get()) }
+    single { HomeRemoteDataSource(androidContext(), get()) }
     single<HomeRepository> { HomeRepositoryImpl(get(), get()) }
-    single { GetHomeUseCase(get()) }
-    single { GetProductsByCategoryUseCase(get()) }
-    viewModel { HomeViewModel(get(), get()) }
+
+    factory { GetHomeUseCase(get()) }
+    factory { GetProductsByFiltersUseCase(get()) }
+    factory { ObserverProductsFavouriteUseCase(get()) }
+
+    viewModel {
+        HomeViewModel(
+            getCartCountUseCase = get(),
+            homeUseCase = get(),
+            getProductsByFiltersUseCase = get(),
+            observerProductsFavouriteUseCase = get()
+        )
+    }
 }
 
 val productDetailModule = module {
-    single<ProductDetailLocalRepo> { ProductDetailLocalRepoImpl(get()) }
-    single<ProductDetailRemoteRepo> { ProductDetailRemoteRepoImpl(androidContext(), get()) }
+    single { ProductDetailLocalDataSource(get()) }
+    single { ProductDetailRemoteDataSource(androidContext(), get()) }
     single<ProductDetailRepository> { ProductDetailRepositoryImpl(get(), get()) }
-    single { GetProductDetailUseCase(get()) }
-    viewModel { ProductDetailViewModel(get()) }
+
+    factory { GetProductDetailUseCase(get()) }
+
+    viewModel {
+        ProductDetailViewModel(
+            detailUseCase = get(),
+            addToCartUseCase = get(),
+            removeFromCartUseCase = get(),
+            toggleFavouriteUseCase = get()
+        )
+    }
+}
+
+val cartModule = module {
+    single { CartLocalDataSource(get()) }
+    single { CartRemoteDataSource(androidContext(), get()) }
+    single<CartRepository> { CartRepositoryImpl(get(), get()) }
+
+    factory { GetCartCountUseCase(get()) }
+    factory { AddToCartUseCase(get()) }
+    factory { GetCartUseCase(get()) }
+    factory { RemoveFromCartUseCase(get()) }
+    factory { UpdateQuantityUseCase(get()) }
+
+    viewModel {
+        CartViewModel(
+            getCartUseCase = get(),
+            removeFromCartUseCase = get(),
+            updateQuantityUseCase = get()
+        )
+    }
 }

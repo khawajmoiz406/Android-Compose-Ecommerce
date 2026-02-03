@@ -1,12 +1,15 @@
 package com.example.myapplication.config.utils
 
 import com.example.myapplication.R
-import com.example.myapplication.models.helper.NavigationItem
-import com.example.myapplication.navigation.Destinations
+import com.example.myapplication.core.model.NavigationItem
+import com.example.myapplication.config.navigation.Destinations
 
 object Constants {
     const val SPLASH_DELAY = 1500L //In Milliseconds
     const val TOKEN_TIMEOUT = 30 //In Minutes
+    const val PLATFORM_FEES = 2.0 //In dollars
+    const val DELIVERY_FEES = 10.0 //In dollars
+    const val VAT = 1.0 //In dollars
 
     val CATEGORIES_ICON_MAP = mapOf(
         "all" to "all_categories",
