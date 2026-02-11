@@ -62,7 +62,12 @@ class ProductDetailViewModel(
 
     }
 
-    fun toggleFav() {
-        product.update { it?.copy(isFavourite = !it.isFavourite) }
+    fun toggleFavourite() = viewModelScope.launch {
+        product.value?.let {
+            val result = toggleFavouriteUseCase.invoke(product.value!!.id!!)
+            if (result.isSuccess) {
+                product.update { it?.copy(isFavourite = !it.isFavourite) }
+            }
+        }
     }
 }

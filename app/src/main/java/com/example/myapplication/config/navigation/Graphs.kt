@@ -6,6 +6,7 @@ import androidx.navigation.compose.navigation
 import com.example.myapplication.ui.auth.presentation.login.LoginScreen
 import com.example.myapplication.ui.cart.presentation.CartScreen
 import com.example.myapplication.ui.dashboard.presentation.DashboardScreen
+import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
 import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen
@@ -31,7 +32,7 @@ fun NavGraphBuilder.bottomNavGraph() = navigation(
     startDestination = Destinations.Home.route
 ) {
     composable(Destinations.Home.route) { HomeScreen() }
-    composable(Destinations.Favourites.route) {}
+    composable(Destinations.Favourites.route) { FavouriteScreen() }
     composable(Destinations.Profile.route) {}
 }
 

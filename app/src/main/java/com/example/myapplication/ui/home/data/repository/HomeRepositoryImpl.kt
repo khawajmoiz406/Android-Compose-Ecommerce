@@ -9,6 +9,7 @@ import com.example.myapplication.ui.home.data.remote.HomeRemoteDataSource
 import com.example.myapplication.ui.home.data.remote.dto.HomeResponse
 import com.example.myapplication.ui.home.domain.repository.HomeRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flow
 
@@ -17,7 +18,7 @@ class HomeRepositoryImpl(
     private val localRepo: HomeLocalDataSource
 ) : HomeRepository {
     override fun observeFavoriteStatus(): Flow<List<ProductFavoriteStatus>?> {
-        return localRepo.observeFavoriteStatus()
+        return localRepo.observeFavoriteStatus().distinctUntilChanged()
     }
 
     override fun getHome(request: ProductsRequest): Flow<Result<HomeResponse?>> = flow {
@@ -49,7 +50,7 @@ class HomeRepositoryImpl(
             val remoteProducts = remoteProductsResponse?.products
 
             // Restore favourites and added to cart
-            remoteProducts?.onEach {
+            val updatedProducts = remoteProducts?.map {
                 it.copy(
                     isFavourite = it.id in favProductIds,
                     addedToCart = it.id in cartProductIds
@@ -58,10 +59,10 @@ class HomeRepositoryImpl(
 
             // Save to local database
             remoteCategories?.let { localRepo.saveCategories(it) }
-            remoteProducts?.let { localRepo.saveProducts(it) }
+            updatedProducts?.let { localRepo.saveProducts(it) }
 
             // Emit new data
-            emit(Result.success(HomeResponse(products = remoteProducts, categories = remoteCategories)))
+            emit(Result.success(HomeResponse(products = updatedProducts, categories = remoteCategories)))
         } catch (ex: ApiException) {
             emit(Result.failure(ex))
         }
@@ -88,7 +89,7 @@ class HomeRepositoryImpl(
         val remoteProducts = remoteProductsResponse?.products
 
         // Restore favourites and added to cart
-        remoteProducts?.onEach {
+        val updatedProducts = remoteProducts?.map {
             it.copy(
                 isFavourite = it.id in favProductIds,
                 addedToCart = it.id in cartProductIds
@@ -96,10 +97,10 @@ class HomeRepositoryImpl(
         }
 
         // Save to local database
-        remoteProducts?.let { localRepo.saveProducts(it) }
+        updatedProducts?.let { localRepo.saveProducts(it) }
 
         // return new data
-        Result.success(remoteProducts)
+        Result.success(updatedProducts)
     } catch (ex: ApiException) {
         Result.failure(ex)
     }

@@ -21,7 +21,10 @@ class ProductDetailRepositoryImpl(
             product?.let { emit(Result.success(it)) }
 
             // Fetch remote product detail
-            product = remoteRepo.getProductDetail(productId)?.copy(addedToCart = product?.addedToCart ?: false)
+            product = remoteRepo.getProductDetail(productId)?.copy(
+                addedToCart = product?.addedToCart ?: false,
+                isFavourite = product?.isFavourite ?: false
+            )
 
             // Save to local database if not null
             product?.let { localRepo.saveProduct(it) }

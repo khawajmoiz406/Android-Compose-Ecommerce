@@ -1,9 +1,11 @@
 package com.example.myapplication.di
 
 import com.example.myapplication.core.shared.domain.repository.CartRepository
+import com.example.myapplication.core.shared.domain.repository.FavouriteRepository
 import com.example.myapplication.core.shared.domain.usecase.AddToCartUseCase
 import com.example.myapplication.core.shared.domain.usecase.GetCartCountUseCase
 import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
+import com.example.myapplication.core.shared.domain.usecase.ToggleFavouriteUseCase
 import com.example.myapplication.ui.auth.data.local.AuthLocalDataSource
 import com.example.myapplication.ui.auth.data.remote.AuthRemoteDataSource
 import com.example.myapplication.ui.auth.data.repository.AuthRepositoryImpl
@@ -16,6 +18,11 @@ import com.example.myapplication.ui.cart.data.repository.CartRepositoryImpl
 import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase
 import com.example.myapplication.ui.cart.presentation.CartViewModel
+import com.example.myapplication.ui.favourite.data.local.FavouriteLocalDataSource
+import com.example.myapplication.ui.favourite.data.remote.FavouriteRemoteDataSource
+import com.example.myapplication.ui.favourite.data.repository.FavouriteRepositoryImpl
+import com.example.myapplication.ui.favourite.domain.usecase.GetAllFavouriteUseCase
+import com.example.myapplication.ui.favourite.presentation.FavouriteViewModel
 import com.example.myapplication.ui.home.data.local.HomeLocalDataSource
 import com.example.myapplication.ui.home.data.remote.HomeRemoteDataSource
 import com.example.myapplication.ui.home.data.repository.HomeRepositoryImpl
@@ -66,10 +73,27 @@ val homeModule = module {
 
     viewModel {
         HomeViewModel(
-            getCartCountUseCase = get(),
             homeUseCase = get(),
+            getCartCountUseCase = get(),
+            toggleFavouriteUseCase = get(),
             getProductsByFiltersUseCase = get(),
             observerProductsFavouriteUseCase = get()
+        )
+    }
+}
+
+val favouriteModule = module {
+    single { FavouriteLocalDataSource(get()) }
+    single { FavouriteRemoteDataSource(androidContext(), get()) }
+    single<FavouriteRepository> { FavouriteRepositoryImpl(get(), get()) }
+
+    factory { GetAllFavouriteUseCase(get()) }
+    factory { ToggleFavouriteUseCase(get()) }
+
+    viewModel {
+        FavouriteViewModel(
+            favouriteUseCase = get(),
+            toggleFavouriteUseCase = get(),
         )
     }
 }

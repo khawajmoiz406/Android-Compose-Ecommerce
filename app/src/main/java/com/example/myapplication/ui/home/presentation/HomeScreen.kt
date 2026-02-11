@@ -154,9 +154,14 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                         }
 
                         else -> itemsIndexed(products.value.chunked(2)) { index, items ->
-                            ProductsRow(index, items) { item ->
-                                parentNavController?.let { handleItemClicked(it, item.id) }
-                            }
+                            ProductsRow(
+                                rowIndex = index,
+                                rowItems = items,
+                                onFavClicked = { viewModel.toggleFavourite(it) },
+                                onProductsClick = { item ->
+                                    parentNavController?.let { handleItemClicked(it, item.id) }
+                                },
+                            )
                         }
                     }
                 }
@@ -179,7 +184,12 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 }
 
 @Composable
-private fun ProductsRow(rowIndex: Int, rowItems: List<Product>, onProductsClick: (Product) -> Unit) {
+private fun ProductsRow(
+    rowIndex: Int,
+    rowItems: List<Product>,
+    onProductsClick: (Product) -> Unit,
+    onFavClicked: (Product) -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -191,7 +201,11 @@ private fun ProductsRow(rowIndex: Int, rowItems: List<Product>, onProductsClick:
             val item = if (i < rowItems.size) rowItems[i] else null
             Box(modifier = Modifier.weight(1f)) {
                 if (item != null) ItemProduct(
-                    item = item, index = i, onClick = { onProductsClick.invoke(item) })
+                    item = item,
+                    index = i,
+                    onClick = { onProductsClick.invoke(item) },
+                    onFavClicked = { onFavClicked.invoke(item) },
+                )
             }
         }
     }

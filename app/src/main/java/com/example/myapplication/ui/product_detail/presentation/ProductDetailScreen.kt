@@ -133,7 +133,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                 scrollBehavior = scrollBehavior,
                 product = product.value!!,
                 onBackPressed = { navController?.popBackStack() },
-                onFavToggle = { viewModel.toggleFav() }
+                onFavToggle = { viewModel.toggleFavourite() }
             )
         }
     ) { innerPadding ->

@@ -101,10 +101,10 @@ data class Product(
     @SerializedName("weight")
     val weight: Int?,
 
-    @ColumnInfo(name = "isFavourite")
+    @ColumnInfo(name = "isFavourite", defaultValue = "0")
     val isFavourite: Boolean = false,
 
-    @ColumnInfo(name = "addedToCart")
+    @ColumnInfo(name = "addedToCart", defaultValue = "0")
     val addedToCart: Boolean = false
 ) : Serializable {
 

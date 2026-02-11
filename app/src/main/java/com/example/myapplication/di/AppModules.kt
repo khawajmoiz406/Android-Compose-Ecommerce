@@ -5,6 +5,7 @@ val appModules = arrayListOf(
     networkModule,
     authModule,
     homeModule,
+    favouriteModule,
     productDetailModule,
     cartModule
 )

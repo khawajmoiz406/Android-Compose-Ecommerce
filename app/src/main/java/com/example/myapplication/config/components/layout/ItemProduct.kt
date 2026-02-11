@@ -39,14 +39,15 @@ import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
 @Composable
-fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null) {
+fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null, onFavClicked: (() -> Unit)? = null) {
     val startItem = index % 2 == 0
 
-    Column(modifier = Modifier
-        .height(220.sdp)
-        .padding(start = if (startItem) 0.sdp else 5.sdp, end = if (startItem) 5.sdp else 0.sdp)
-        .clip(RoundedCornerShape(15.sdp))
-        .clickable { onClick?.invoke() }) {
+    Column(
+        modifier = Modifier
+            .height(220.sdp)
+            .padding(start = if (startItem) 0.sdp else 5.sdp, end = if (startItem) 5.sdp else 0.sdp)
+            .clip(RoundedCornerShape(15.sdp))
+            .clickable { onClick?.invoke() }) {
         Box(
             contentAlignment = Alignment.Center,
             modifier = Modifier
@@ -69,9 +70,10 @@ fun ItemProduct(item: Product, index: Int, onClick: (() -> Unit)? = null) {
                     .offset(x = (-8).sdp, y = 8.sdp)
                     .clip(RoundedCornerShape(10.sdp))
                     .background(MaterialTheme.colorScheme.background)
+                    .clickable { onFavClicked?.invoke() }
             ) {
                 SvgImage(
-                    asset = "fav_outline",
+                    asset = if (item.isFavourite) "fav_filled" else "fav_outline",
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(18.sdp)
                 )

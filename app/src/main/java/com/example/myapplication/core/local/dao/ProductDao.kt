@@ -22,6 +22,9 @@ interface ProductDao {
     @Query("SELECT id, isFavourite FROM ${DatabaseConfig.PRODUCT}")
     fun observeFavoriteStatus(): Flow<List<ProductFavoriteStatus>?>
 
+    @Query("SELECT * FROM ${DatabaseConfig.PRODUCT} WHERE isFavourite = 1")
+    fun getFavouriteProducts(): Flow<List<Product>?>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertProduct(product: Product)
 

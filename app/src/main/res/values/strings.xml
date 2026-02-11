@@ -98,4 +98,5 @@
     <string name="total_heading">Total</string>
     <string name="total_msg">(incl. tax &amp; fees)</string>
     <string name="remove_from_cart">Remove From Cart</string>
+    <string name="no_favourites_found">No Favourites Found</string>
 </resources>

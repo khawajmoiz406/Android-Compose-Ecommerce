@@ -6,6 +6,7 @@ import com.example.myapplication.core.model.Category
 import com.example.myapplication.core.model.Product
 import com.example.myapplication.core.shared.data.remote.dto.ProductsRequest
 import com.example.myapplication.core.shared.domain.usecase.GetCartCountUseCase
+import com.example.myapplication.core.shared.domain.usecase.ToggleFavouriteUseCase
 import com.example.myapplication.ui.home.domain.usecase.GetHomeUseCase
 import com.example.myapplication.ui.home.domain.usecase.GetProductsByFiltersUseCase
 import com.example.myapplication.ui.home.domain.usecase.ObserverProductsFavouriteUseCase
@@ -21,6 +22,7 @@ import kotlinx.coroutines.launch
 class HomeViewModel(
     getCartCountUseCase: GetCartCountUseCase,
     private val homeUseCase: GetHomeUseCase,
+    private val toggleFavouriteUseCase: ToggleFavouriteUseCase,
     private val getProductsByFiltersUseCase: GetProductsByFiltersUseCase,
     private val observerProductsFavouriteUseCase: ObserverProductsFavouriteUseCase,
 ) : BaseViewModel<HomeUiState, Unit>(HomeUiState()) {
@@ -40,7 +42,7 @@ class HomeViewModel(
 
     private fun observeFavoriteChanges() = viewModelScope.launch {
         observerProductsFavouriteUseCase.invoke(Unit).collect { favourites ->
-            val favouritesMap = favourites?.associate { it.id to it.isFavorite } ?: emptyMap()
+            val favouritesMap = favourites?.associate { it.id to it.isFavourite } ?: emptyMap()
             _products.value = _products.value.map { product ->
                 val newFavoriteStatus = favouritesMap[product.id] ?: product.isFavourite
                 if (newFavoriteStatus != product.isFavourite) return@map product.copy(isFavourite = newFavoriteStatus)
@@ -102,6 +104,15 @@ class HomeViewModel(
         } else {
             val errorStr = result.exceptionOrNull().toErrorString()
             updateUiState(uiState.value.copy(categoryProductsLoading = false, error = errorStr))
+        }
+    }
+
+    fun toggleFavourite(product: Product) = viewModelScope.launch {
+        val result = toggleFavouriteUseCase.invoke(product.id!!)
+        if (result.isSuccess) {
+            _products.update { list ->
+                list.map { if (it.id == product.id) it.copy(isFavourite = !it.isFavourite) else it }
+            }
         }
     }
 }

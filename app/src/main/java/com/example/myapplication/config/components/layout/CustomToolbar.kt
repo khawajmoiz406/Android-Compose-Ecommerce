@@ -23,7 +23,7 @@ import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
 @Composable
-fun CustomToolbar(title: String) {
+fun CustomToolbar(title: String, showBackButton: Boolean = true) {
     val navScope = LocalParentNavController.current
 
     Box(
@@ -34,20 +34,21 @@ fun CustomToolbar(title: String) {
             .background(MaterialTheme.colorScheme.primary)
             .padding(top = 25.sdp, bottom = 10.sdp, end = 10.sdp, start = 10.sdp)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceDim)
-                .size(32.sdp)
-                .clickable { navScope?.popBackStack() },
-        ) {
-            SvgImage(
-                asset = "back",
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.size(20.sdp)
-            )
-        }
+        if (showBackButton)
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceDim)
+                    .size(32.sdp)
+                    .clickable { navScope?.popBackStack() },
+            ) {
+                SvgImage(
+                    asset = "back",
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(20.sdp)
+                )
+            }
 
         Text(
             text = title,

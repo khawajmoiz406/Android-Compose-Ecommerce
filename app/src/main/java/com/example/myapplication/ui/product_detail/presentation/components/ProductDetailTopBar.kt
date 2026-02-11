@@ -27,7 +27,6 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -54,7 +53,7 @@ fun ProductDetailTopBar(
     scrollBehavior: TopAppBarScrollBehavior,
     product: Product,
     onBackPressed: () -> Unit,
-    onFavToggle: (Boolean) -> Unit
+    onFavToggle: () -> Unit
 ) {
     val collapsedAppBarHeightPx = remember { mutableIntStateOf(0) }
     val expandedAppBarHeightPx = remember { mutableIntStateOf(0) }
@@ -81,7 +80,7 @@ fun ProductDetailTopBar(
         content = {
             Box(
                 modifier = Modifier.fillMaxWidth(),
-                content = { CollapsedAppBar(product, onBackPressed, onFavToggle) }
+                content = { CollapsedAppBar(product.isFavourite, onBackPressed, onFavToggle) }
             )
 
             Box(
@@ -113,9 +112,7 @@ fun ProductDetailTopBar(
 @SuppressLint("DefaultLocale")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit, onFavToggle: (Boolean) -> Unit) {
-    val isFavourite = remember { mutableStateOf(product.isFavourite ?: false) }
-
+private fun CollapsedAppBar(isFavourite: Boolean, onBackPressed: () -> Unit, onFavClicked: () -> Unit) {
     Row(modifier = Modifier.padding(top = 40.sdp, bottom = 12.sdp, start = 10.sdp, end = 10.sdp)) {
         Box(
             contentAlignment = Alignment.Center,
@@ -140,13 +137,10 @@ private fun CollapsedAppBar(product: Product, onBackPressed: () -> Unit, onFavTo
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.surfaceDim)
                 .size(35.sdp)
-                .clickable {
-                    isFavourite.value = !isFavourite.value
-                    onFavToggle.invoke(isFavourite.value)
-                },
+                .clickable { onFavClicked.invoke() },
         ) {
             SvgImage(
-                asset = if (isFavourite.value) "fav_filled" else "fav_outline",
+                asset = if (isFavourite) "fav_filled" else "fav_outline",
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(20.sdp)
             )

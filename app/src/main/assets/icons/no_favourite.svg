@@ -1,0 +1,45 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Shopping Bag -->
+    <rect x="156" y="170" width="200" height="220" rx="20" stroke="black" stroke-width="6" fill="none" />
+
+    <!-- Handles -->
+    <path d="M200 170 C200 110, 312 110, 312 170" stroke="black" stroke-width="6" fill="none" />
+    <path d="M220 170 C220 130, 292 130, 292 170" stroke="black" stroke-width="6" fill="none" />
+
+    <!-- Eyes -->
+    <circle cx="220" cy="250" r="14" stroke="black" stroke-width="5" fill="none" />
+    <circle cx="292" cy="250" r="14" stroke="black" stroke-width="5" fill="none" />
+
+    <!-- Sad Mouth -->
+    <path d="M220 310 C240 285, 272 285, 292 310" stroke="black" stroke-width="6" fill="none" />
+
+    <!-- Broken Heart -->
+    <path d="M256 340
+           C230 315, 200 350, 256 380
+           C312 350, 282 315, 256 340 Z" stroke="black" stroke-width="5" fill="none" />
+    <line x1="256" y1="340" x2="256" y2="380" stroke="black" stroke-width="4" />
+
+    <!-- Small Broken Heart Left -->
+    <path d="M120 340
+           C105 325, 85 350, 120 370
+           C155 350, 135 325, 120 340 Z" stroke="black" stroke-width="4" fill="none" />
+    <line x1="120" y1="340" x2="120" y2="370" stroke="black" stroke-width="3" />
+
+    <!-- Empty Box -->
+    <rect x="70" y="260" width="70" height="50" stroke="black" stroke-width="4" fill="none" />
+    <line x1="70" y1="260" x2="105" y2="230" stroke="black" stroke-width="4" />
+    <line x1="140" y1="260" x2="105" y2="230" stroke="black" stroke-width="4" />
+
+    <!-- Paper Plane -->
+    <path d="M90 150 L150 130 L120 170 Z" stroke="black" stroke-width="4" fill="none" />
+
+    <!-- No Heart Symbol -->
+    <circle cx="400" cy="280" r="40" stroke="black" stroke-width="5" fill="none" />
+    <line x1="370" y1="250" x2="430" y2="310" stroke="black" stroke-width="5" />
+
+    <!-- Tiny Bird -->
+    <path d="M390 200 C400 190, 420 190, 430 200
+           C420 210, 400 210, 390 200 Z" stroke="black" stroke-width="3" fill="none" />
+
+</svg>
