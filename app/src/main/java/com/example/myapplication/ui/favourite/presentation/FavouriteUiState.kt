@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.favourite.presentation
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
-@Immutable
+@Stable
 data class FavouriteUiState(
     val error: String = "",
     val isRefreshing: Boolean = false,

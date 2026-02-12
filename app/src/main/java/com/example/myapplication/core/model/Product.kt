@@ -1,6 +1,6 @@
 package com.example.myapplication.core.model
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -9,7 +9,7 @@ import com.example.myapplication.core.local.DatabaseConfig
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
-@Immutable
+@Stable
 @Entity(tableName = DatabaseConfig.PRODUCT)
 data class Product(
     @PrimaryKey(autoGenerate = false)

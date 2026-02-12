@@ -17,11 +17,15 @@ class CartLocalDataSource(private val database: AppDatabase) {
     }
 
     suspend fun addToCart(cartItem: CartItem) {
-        return database.getCartDao().insertCartItem(cartItem)
+        database.getCartDao().insertCartItem(cartItem)
+        database.getProductDao().toggleCartValue(cartItem.productId)
+        return
     }
 
     suspend fun removeFromCart(productId: Int) {
-        return database.getCartDao().removeCartItem(productId)
+        database.getCartDao().removeCartItem(productId)
+        database.getProductDao().toggleCartValue(productId)
+        return
     }
 
     suspend fun updateQuantity(requestParams: UpdateCartItemRequest) {

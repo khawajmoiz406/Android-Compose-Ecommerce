@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.home.presentation
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
-@Immutable
+@Stable
 data class HomeUiState(
     val error: String = "",
     val mainLoading: Boolean = false,

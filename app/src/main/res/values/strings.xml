@@ -99,4 +99,6 @@
     <string name="total_msg">(incl. tax &amp; fees)</string>
     <string name="remove_from_cart">Remove From Cart</string>
     <string name="no_favourites_found">No Favourites Found</string>
+    <string name="in_cart">In Cart</string>
+    <string name="view_cart">View Cart</string>
 </resources>

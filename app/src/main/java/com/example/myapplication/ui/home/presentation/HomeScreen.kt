@@ -153,7 +153,10 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                             }
                         }
 
-                        else -> itemsIndexed(products.value.chunked(2)) { index, items ->
+                        else -> itemsIndexed(
+                            items = products.value.chunked(2),
+                            key = { _, items -> items.joinToString(separator = "-") { it.id.toString() } }
+                        ) { index, items ->
                             ProductsRow(
                                 rowIndex = index,
                                 rowItems = items,

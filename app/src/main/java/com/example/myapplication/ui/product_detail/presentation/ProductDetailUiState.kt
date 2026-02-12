@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.product_detail.presentation
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
-@Immutable
+@Stable
 data class ProductDetailUiState(
     val error: String = "",
     val isLoading: Boolean = false,

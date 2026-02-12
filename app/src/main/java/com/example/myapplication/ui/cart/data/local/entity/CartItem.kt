@@ -1,12 +1,12 @@
 package com.example.myapplication.ui.cart.data.local.entity
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myapplication.core.local.DatabaseConfig
 
-@Immutable
+@Stable
 @Entity(tableName = DatabaseConfig.CART)
 data class CartItem(
     @PrimaryKey(autoGenerate = false)

@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.auth.presentation.login
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
-@Immutable
+@Stable
 data class LoginUiState(
     val isLoading: Boolean = false,
     val error: String = "",

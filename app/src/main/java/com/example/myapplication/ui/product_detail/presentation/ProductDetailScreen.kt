@@ -1,7 +1,6 @@
 package com.example.myapplication.ui.product_detail.presentation
 
 import android.annotation.SuppressLint
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInHorizontally
@@ -18,6 +17,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,7 +41,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableDoubleState
 import androidx.compose.runtime.MutableIntState
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
@@ -57,12 +56,10 @@ import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.example.myapplication.R
@@ -73,18 +70,7 @@ import com.example.myapplication.config.theme.Orange
 import com.example.myapplication.config.theme.Pink
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
-import com.example.myapplication.di.createApiService
-import com.example.myapplication.di.createOkHttpClient
-import com.example.myapplication.di.createRetrofit
-import com.example.myapplication.di.createRoomDatabase
-import com.example.myapplication.core.model.Dimensions
-import com.example.myapplication.core.model.Meta
 import com.example.myapplication.core.model.Product
-import com.example.myapplication.core.model.Review
-import com.example.myapplication.ui.product_detail.data.repository.ProductDetailRepositoryImpl
-import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalDataSource
-import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteDataSource
-import com.example.myapplication.ui.product_detail.domain.usecase.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.components.DimensionView
 import com.example.myapplication.ui.product_detail.presentation.components.InfoView
 import com.example.myapplication.ui.product_detail.presentation.components.ProductDetailTopBar
@@ -111,7 +97,7 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
     val selectedTab = remember { mutableIntStateOf(0) }
     val total = remember { mutableDoubleStateOf(0.0) }
     val quantity = remember { mutableIntStateOf(0) }
-    val addToCartVisible = remember { mutableStateOf(true) }
+    val buttonOverlayVisibility = remember { mutableStateOf(true) }
 
     LaunchedEffect(productId) {
         if (viewModel.product.value == null) viewModel.getProductDetail(productId.toString())
@@ -162,8 +148,8 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
                         connection = remember {
                             object : NestedScrollConnection {
                                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                                    if (available.y < 0) addToCartVisible.value = false
-                                    else if (available.y > 0) addToCartVisible.value = true
+                                    if (available.y < 0) buttonOverlayVisibility.value = false
+                                    else if (available.y > 0) buttonOverlayVisibility.value = true
                                     return Offset.Zero
                                 }
                             }
@@ -200,15 +186,16 @@ fun ProductDetailScreen(productId: Int, viewModel: ProductDetailViewModel = koin
             }
 
             AnimatedVisibility(
-                visible = addToCartVisible.value,
+                visible = buttonOverlayVisibility.value,
                 modifier = Modifier.align(Alignment.BottomCenter),
                 enter = slideInVertically(initialOffsetY = { it }),
                 exit = slideOutVertically(targetOffsetY = { it }),
                 content = {
                     CartContent(
-                        product, uiState, quantity, total,
+                        product.value, uiState.value, quantity, total,
                         onAddToCardClicked = { viewModel.addProductToCart(product.value!!, quantity.intValue) },
                         onRemoveFromCardClicked = { viewModel.removeProductFromCart(product.value!!.id!!) },
+                        onViewInCartClicked = {}
                     )
                 }
             )
@@ -398,17 +385,18 @@ private fun ProductTabs(tabs: List<Int>, selected: MutableIntState, scope: Corou
 @SuppressLint("DefaultLocale")
 @Composable
 private fun BoxScope.CartContent(
-    product: State<Product?>,
-    uiState: State<ProductDetailUiState>,
+    product: Product?,
+    uiState: ProductDetailUiState,
     quantity: MutableIntState,
     total: MutableDoubleState,
     onAddToCardClicked: () -> Unit,
-    onRemoveFromCardClicked: () -> Unit
+    onRemoveFromCardClicked: () -> Unit,
+    onViewInCartClicked: () -> Unit
 ) {
-    val addedIntoCart = product.value?.addedToCart == true
+    val addedIntoCart = product?.addedToCart == true
     if (quantity.intValue == 0) {
-        quantity.intValue = product.value?.minimumOrderQuantity ?: 0
-        total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
+        quantity.intValue = product?.minimumOrderQuantity ?: 0
+        total.doubleValue = product?.calculateTotal(quantity.intValue) ?: 0.0
     }
 
     Row(
@@ -424,114 +412,202 @@ private fun BoxScope.CartContent(
             )
             .padding(horizontal = 5.sdp)
     ) {
-        if (!addedIntoCart) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .weight(0.3f)
-                    .padding(horizontal = 3.sdp)
-            ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                        .size(25.sdp)
-                        .clickable {
-                            if (quantity.intValue > (product.value?.minimumOrderQuantity ?: 0)) {
-                                quantity.intValue--
-                                total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
-                            }
-                        },
-                ) {
-                    SvgImage(
-                        asset = "minus",
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(13.sdp)
-                    )
-                }
+        if (addedIntoCart)
+            ProductIntoCartComposable(
+                onRemoveFromCardClicked = onRemoveFromCardClicked,
+                onViewInCartClicked = onViewInCartClicked,
+            )
+        else
+            AddToCartComposable(
+                product = product,
+                uiState = uiState,
+                quantity = quantity,
+                total = total,
+                onAddToCardClicked = onAddToCardClicked,
+            )
+    }
+}
 
-                Text(
-                    text = quantity.intValue.toString(),
-                    fontSize = 11.ssp,
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.weight(1f)
-                )
+@Composable
+private fun RowScope.ProductIntoCartComposable(
+    onRemoveFromCardClicked: () -> Unit,
+    onViewInCartClicked: () -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .weight(0.2f)
+            .height(45.sdp)
+            .clickable { onRemoveFromCardClicked.invoke() }
+            .background(color = Red, shape = RoundedCornerShape(8.sdp))
+    ) {
+        SvgImage(
+            asset = "delete",
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.size(25.sdp)
+        )
+    }
 
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier
-                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
-                        .size(25.sdp)
-                        .clickable {
-                            if (quantity.intValue < (product.value?.stock ?: 0)) {
-                                quantity.intValue++
-                                total.doubleValue = product.value?.calculateTotal(quantity.intValue) ?: 0.0
-                            }
-                        },
-                ) {
-                    SvgImage(
-                        asset = "plus",
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(13.sdp)
-                    )
-                }
-            }
+    Spacer(Modifier.width(5.sdp))
 
-            Spacer(Modifier.width(5.sdp))
+    Row(
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .weight(0.8f)
+            .height(45.sdp)
+            .clickable(onClick = { onViewInCartClicked.invoke() })
+            .background(color = Green, shape = RoundedCornerShape(8.sdp))
+    ) {
+
+        SvgImage(
+            asset = "check_circle",
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.size(18.sdp)
+        )
+
+        Spacer(Modifier.width(8.sdp))
+
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.in_cart),
+                fontSize = 10.ssp,
+                color = MaterialTheme.colorScheme.surface,
+            )
+
+            Spacer(Modifier.height(1.sdp))
+
+            Text(
+                text = stringResource(R.string.view_cart),
+                fontSize = 15.ssp,
+                softWrap = false,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.surface,
+            )
         }
 
-        Row(
-            horizontalArrangement = if(addedIntoCart) Arrangement.Center else Arrangement.Start,
-            verticalAlignment = Alignment.CenterVertically,
+        Spacer(Modifier.width(8.sdp))
+
+        SvgImage(
+            asset = "cart",
+            color = MaterialTheme.colorScheme.surface,
+            modifier = Modifier.size(20.sdp)
+        )
+    }
+}
+
+@SuppressLint("DefaultLocale")
+@Composable
+private fun RowScope.AddToCartComposable(
+    product: Product?,
+    uiState: ProductDetailUiState,
+    quantity: MutableIntState,
+    total: MutableDoubleState,
+    onAddToCardClicked: () -> Unit,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .weight(0.3f)
+            .padding(horizontal = 3.sdp)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .weight(if (addedIntoCart) 1f else 0.7f)
-                .height(45.sdp)
-                .background(
-                    color = if (!addedIntoCart) MaterialTheme.colorScheme.primary else Red,
-                    shape = RoundedCornerShape(8.sdp)
-                )
-                .clickable(onClick = { if (addedIntoCart) onRemoveFromCardClicked.invoke() else onAddToCardClicked.invoke() })
-                .padding(horizontal = 10.sdp)
+                .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                .size(25.sdp)
+                .clickable {
+                    if (quantity.intValue > (product?.minimumOrderQuantity ?: 0)) {
+                        quantity.intValue--
+                        total.doubleValue = product?.calculateTotal(quantity.intValue) ?: 0.0
+                    }
+                },
         ) {
+            SvgImage(
+                asset = "minus",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(13.sdp)
+            )
+        }
 
-            when (uiState.value.isLoading) {
-                true -> CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
+        Text(
+            text = quantity.intValue.toString(),
+            fontSize = 11.ssp,
+            textAlign = TextAlign.Center,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f)
+        )
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                .size(25.sdp)
+                .clickable {
+                    if (quantity.intValue < (product?.stock ?: 0)) {
+                        quantity.intValue++
+                        total.doubleValue = product?.calculateTotal(quantity.intValue) ?: 0.0
+                    }
+                },
+        ) {
+            SvgImage(
+                asset = "plus",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(13.sdp)
+            )
+        }
+    }
+
+    Spacer(Modifier.width(5.sdp))
+
+    Row(
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .weight(0.7f)
+            .height(45.sdp)
+            .background(
+                color = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(8.sdp)
+            )
+            .clickable(onClick = { onAddToCardClicked.invoke() })
+            .padding(horizontal = 10.sdp)
+    ) {
+
+        when (uiState.isLoading) {
+            true -> CircularProgressIndicator(
+                modifier = Modifier.size(20.dp),
+                color = MaterialTheme.colorScheme.onPrimary
+            )
+
+            false -> {
+                SvgImage(
+                    asset = "cart",
+                    color = MaterialTheme.colorScheme.surface,
+                    modifier = Modifier.size(20.sdp)
                 )
 
-                false -> {
-                    SvgImage(
-                        asset = if (addedIntoCart) "delete" else "cart",
+                Spacer(Modifier.width(8.sdp))
+
+                Column {
+                    Text(
+                        text = stringResource(R.string.add_to_cart),
+                        fontSize = 10.ssp,
                         color = MaterialTheme.colorScheme.surface,
-                        modifier = Modifier.size(20.sdp)
                     )
 
-                    Spacer(Modifier.width(8.sdp))
+                    Spacer(Modifier.height(1.sdp))
 
-                    Column {
-                        if (!addedIntoCart) {
-                            Text(
-                                text = stringResource(R.string.add_to_cart),
-                                fontSize = 10.ssp,
-                                color = MaterialTheme.colorScheme.surface,
-                            )
 
-                            Spacer(Modifier.height(1.sdp))
-                        }
-
-                        Text(
-                            text = if (addedIntoCart) stringResource(R.string.remove_from_cart)
-                            else "$${String.format("%.2f", total.doubleValue)}",
-                            fontSize = 15.ssp,
-                            softWrap = false,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.surface,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                    Text(
+                        text = "$${String.format("%.2f", total.doubleValue)}",
+                        fontSize = 15.ssp,
+                        softWrap = false,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.surface,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
