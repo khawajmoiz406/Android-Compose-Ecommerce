@@ -2,6 +2,7 @@ package com.example.myapplication.ui.cart.presentation.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +13,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Red
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.example.myapplication.R
 import com.example.myapplication.config.components.image.NetworkImage
 import com.example.myapplication.config.components.image.SvgImage
+import com.example.myapplication.config.theme.Yellow
 import com.example.myapplication.core.model.Dimensions
 import com.example.myapplication.core.model.Meta
 import com.example.myapplication.core.model.Product
@@ -42,27 +51,20 @@ fun ItemCart(
     cartItem: CartItemWithProduct,
     index: Int,
     itemCount: Int,
+    onFavClicked: () -> Unit,
     onRemoveClicked: () -> Unit,
     onAddClicked: () -> Unit,
     onMinusClicked: () -> Unit
 ) {
     Column(
         modifier = Modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceDim,
-                shape = RoundedCornerShape(
-                    topStart = if (index == 0) 12.sdp else 0.sdp,
-                    topEnd = if (index == 0) 12.sdp else 0.sdp,
-                    bottomStart = if (index == (itemCount - 1)) 12.sdp else 0.sdp,
-                    bottomEnd = if (index == (itemCount - 1)) 12.sdp else 0.sdp,
-                )
+            .background(color = MaterialTheme.colorScheme.surface)
+            .border(
+                width = 1.sdp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = RoundedCornerShape(12.sdp)
             )
-            .padding(
-                start = 10.sdp,
-                end = 10.sdp,
-                top = 10.sdp,
-                bottom = if (index == (itemCount - 1)) 10.sdp else 0.sdp
-            )
+            .padding(10.sdp)
             .fillMaxWidth()
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -71,7 +73,7 @@ fun ItemCart(
                 imageUrl = cartItem.product.thumbnail ?: "",
                 contentScale = ContentScale.Fit,
                 modifier = Modifier
-                    .size(50.sdp, 50.sdp)
+                    .size(70.sdp, 70.sdp)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
                         shape = RoundedCornerShape(12.sdp)
@@ -80,93 +82,160 @@ fun ItemCart(
 
             Spacer(Modifier.width(10.sdp))
 
-            Column(modifier = Modifier.weight(1f)) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = cartItem.product.title ?: "",
-                        fontSize = 13.ssp,
-                        lineHeight = 13.ssp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .wrapContentHeight()
+            ) {
+                Text(
+                    text = cartItem.product.title ?: "",
+                    fontSize = 13.ssp,
+                    lineHeight = 13.ssp,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
 
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .background(color = Color.Transparent, shape = CircleShape)
-                            .size(20.sdp)
-                            .clickable { onRemoveClicked.invoke() },
-                    ) {
-                        SvgImage(
-                            asset = "delete",
-                            color = Red,
-                            modifier = Modifier.size(15.sdp)
-                        )
-                    }
+
+                cartItem.product.brand?.let {
+                    Spacer(Modifier.height(5.sdp))
+
+                    Text(
+                        text = it,
+                        fontSize = 11.ssp,
+                        lineHeight = 11.ssp,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                    )
                 }
 
                 Spacer(Modifier.height(5.sdp))
 
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = "$${String.format("%.2f", cartItem.product.calculateTotal(cartItem.cartItem.quantity))}",
-                        fontSize = 13.ssp,
-                        lineHeight = 13.ssp,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .background(color = MaterialTheme.colorScheme.outlineVariant, shape = CircleShape)
-                            .size(20.sdp)
-                            .clickable { onMinusClicked.invoke() },
-                    ) {
-                        SvgImage(
-                            asset = "minus",
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(10.sdp)
-                        )
-                    }
-
-                    Spacer(Modifier.width(5.sdp))
-
-                    Text(
-                        text = cartItem.cartItem.quantity.toString(),
-                        fontSize = 10.ssp,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-
-                    Spacer(Modifier.width(5.sdp))
-
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .background(color = MaterialTheme.colorScheme.outlineVariant, shape = CircleShape)
-                            .size(20.sdp)
-                            .clickable { onAddClicked.invoke() },
-
-                        ) {
-                        SvgImage(
-                            asset = "plus",
-                            color = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(10.sdp)
-                        )
-                    }
-                }
+                Text(
+                    text = "$${String.format("%.2f", cartItem.product.calculateTotal(cartItem.cartItem.quantity))}",
+                    fontSize = 14.ssp,
+                    lineHeight = 14.ssp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
             }
         }
 
-        if (index != (itemCount - 1)) {
-            Spacer(Modifier.height(10.sdp))
+        Spacer(Modifier.height(10.sdp))
 
-            HorizontalDivider(
+        HorizontalDivider(modifier = Modifier.height(2.sdp))
+
+        Spacer(Modifier.height(10.sdp))
+
+        if ((cartItem.product.stock ?: 0) < 10) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .height(2.sdp)
-                    .padding(start = 60.sdp)
-            )
+                    .fillMaxWidth()
+                    .border(width = 0.5.dp, color = Yellow, shape = RoundedCornerShape(8.sdp))
+                    .background(Yellow.copy(alpha = 0.1f), shape = RoundedCornerShape(8.sdp))
+                    .padding(horizontal = 5.sdp, vertical = 8.sdp)
+            ) {
+                Icon(
+                    imageVector = Icons.Outlined.Info,
+                    tint = Yellow,
+                    contentDescription = null,
+                    modifier = Modifier.size(15.sdp),
+                )
+
+                Spacer(Modifier.width(5.sdp))
+
+                Text(
+                    text = stringResource(R.string.stock_left_).replace(
+                        "@value",
+                        cartItem.product.stock?.toString() ?: ""
+                    ),
+                    color = Yellow,
+                    fontSize = 11.ssp,
+                    textAlign = TextAlign.Start,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+
+            Spacer(Modifier.height(10.sdp))
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .size(25.sdp)
+                        .clickable { onMinusClicked.invoke() },
+                ) {
+                    SvgImage(
+                        asset = "minus",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(13.sdp)
+                    )
+                }
+
+                Spacer(Modifier.width(10.sdp))
+
+                Text(
+                    text = cartItem.cartItem.quantity.toString(),
+                    fontSize = 12.ssp,
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+
+                Spacer(Modifier.width(10.sdp))
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
+                        .size(25.sdp)
+                        .clickable { onAddClicked.invoke() },
+
+                    ) {
+                    SvgImage(
+                        asset = "plus",
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(13.sdp)
+                    )
+                }
+            }
+
+            Spacer(Modifier.width(10.sdp))
+
+            Row {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(25.sdp)
+                        .background(color = Color.Transparent, shape = CircleShape)
+                        .clickable { onFavClicked.invoke() },
+                ) {
+                    SvgImage(
+                        asset = if (cartItem.product.isFavourite) "fav_filled" else "fav_outline",
+                        color = if (cartItem.product.isFavourite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant,
+                        modifier = Modifier.size(19.sdp)
+                    )
+                }
+
+                Spacer(Modifier.width(10.sdp))
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(25.sdp)
+                        .background(color = Color.Transparent, shape = CircleShape)
+                        .clickable { onRemoveClicked.invoke() },
+                ) {
+                    SvgImage(
+                        asset = "delete",
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        modifier = Modifier.size(20.sdp)
+                    )
+                }
+            }
         }
     }
 }
@@ -180,6 +249,7 @@ private fun PreviewItemCart() {
         onAddClicked = {},
         onMinusClicked = {},
         onRemoveClicked = {},
+        onFavClicked = {},
         cartItem = CartItemWithProduct(
             cartItem = CartItem(productId = 1, quantity = 48),
             product = Product(

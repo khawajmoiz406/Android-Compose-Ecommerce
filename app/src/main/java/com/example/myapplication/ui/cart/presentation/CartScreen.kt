@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,9 +47,10 @@ import com.example.myapplication.config.components.layout.CustomToolbar
 import com.example.myapplication.config.components.state.EmptyState
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
 import com.example.myapplication.core.model.Cart
-import com.example.myapplication.ui.cart.presentation.components.InvoiceWidget
+import com.example.myapplication.ui.cart.presentation.components.DeliveryEstimateWidget
 import com.example.myapplication.ui.cart.presentation.components.ItemCart
-import com.example.myapplication.ui.cart.presentation.components.PaymentMethodWidget
+import com.example.myapplication.ui.cart.presentation.components.OrderSummaryWidget
+import com.example.myapplication.ui.cart.presentation.components.PromoCodeWidget
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import org.koin.androidx.compose.koinViewModel
@@ -59,6 +59,7 @@ import org.koin.androidx.compose.koinViewModel
 fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
     val cartData = viewModel.cart.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
+    val promoCode = viewModel.promo.collectAsState()
     val checkoutVisibility = remember { mutableStateOf(true) }
 
 
@@ -81,6 +82,7 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                 )
 
                 else -> LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(15.sdp),
                     modifier = Modifier
                         .fillMaxHeight()
                         .padding(horizontal = 8.sdp)
@@ -96,7 +98,7 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                             }
                         )
                 ) {
-                    item { Spacer(Modifier.height(10.sdp)) }
+                    item { Spacer(Modifier) }
 
                     items(key = { "cart_item_$it" }, count = cartData.value!!.items.size) { index ->
                         val item = cartData.value!!.items[index]
@@ -104,9 +106,8 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                             cartItem = item,
                             index = index,
                             itemCount = cartData.value!!.items.size,
-                            onRemoveClicked = {
-                                viewModel.removeCartItem(item.product.id!!)
-                            },
+                            onRemoveClicked = { viewModel.removeCartItem(item.product.id!!) },
+                            onFavClicked = { viewModel.toggleFavourite(item.product.id!!) },
                             onAddClicked = {
                                 val newValue = item.cartItem.quantity + 1
                                 if (newValue < (item.product.stock ?: 0))
@@ -120,18 +121,26 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                         )
                     }
 
-                    item { Spacer(Modifier.height(10.sdp)) }
-
-                    item(key = "paymentMethod") {
-                        PaymentMethodWidget {}
+                    item(key = "key_delivery_estimate") {
+                        DeliveryEstimateWidget()
                     }
 
-                    item { Spacer(Modifier.height(10.sdp)) }
-
-                    item(key = "invoice") {
-                        InvoiceWidget(cartData.value!!)
+                    item(key = "key_promo_code") {
+                        PromoCodeWidget(
+                            isLoading = uiState.value.promoLoading,
+                            initialValue = promoCode.value,
+                            onApplyClicked = { viewModel.checkPromoCode(it) },
+                            onCancelClicked = { viewModel.removePromo() }
+                        )
                     }
 
+                    item(key = "key_order_summary") {
+                        OrderSummaryWidget(cart = cartData.value!!, promoCode = promoCode.value)
+                    }
+
+                    item {
+                        Spacer(Modifier.height(10.sdp))
+                    }
                 }
             }
 
@@ -141,7 +150,7 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                     modifier = Modifier.align(Alignment.BottomCenter),
                     enter = slideInVertically(initialOffsetY = { it }),
                     exit = slideOutVertically(targetOffsetY = { it }),
-                    content = { TotalContent(cartData.value!!, uiState) {} }
+                    content = { TotalContent(cartData.value!!, promoCode.value, uiState.value) {} }
                 )
         }
     }
@@ -149,7 +158,12 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
 
 @SuppressLint("DefaultLocale")
 @Composable
-private fun BoxScope.TotalContent(cart: Cart, uiState: State<CartUiState>, onCheckoutClicked: () -> Unit) {
+private fun BoxScope.TotalContent(
+    cart: Cart,
+    promoCode: Pair<String, Double>?,
+    uiState: CartUiState,
+    onCheckoutClicked: () -> Unit
+) {
     Column(
         verticalArrangement = Arrangement.spacedBy(8.sdp),
         modifier = Modifier
@@ -192,7 +206,7 @@ private fun BoxScope.TotalContent(cart: Cart, uiState: State<CartUiState>, onChe
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "$${String.format("%.2f", cart.getTotal())}",
+                    text = "$${String.format("%.2f", cart.getTotal(promoCode?.second))}",
                     fontSize = 15.ssp,
                     softWrap = false,
                     fontWeight = FontWeight.Bold,
@@ -220,14 +234,14 @@ private fun BoxScope.TotalContent(cart: Cart, uiState: State<CartUiState>, onChe
                 .height(40.sdp)
                 .padding(horizontal = 10.sdp)
                 .fillMaxWidth()
-                .clickable(onClick = { if (!uiState.value.isLoading) onCheckoutClicked.invoke() })
+                .clickable(onClick = { if (!uiState.isLoading) onCheckoutClicked.invoke() })
                 .background(
-                    color = if (uiState.value.isLoading) MaterialTheme.colorScheme.surfaceDim else MaterialTheme.colorScheme.primary,
+                    color = if (uiState.isLoading) MaterialTheme.colorScheme.surfaceDim else MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(8.sdp)
                 )
         ) {
 
-            when (uiState.value.isLoading) {
+            when (uiState.isLoading) {
                 true -> CircularProgressIndicator(
                     modifier = Modifier.size(20.sdp),
                     color = MaterialTheme.colorScheme.onSurface

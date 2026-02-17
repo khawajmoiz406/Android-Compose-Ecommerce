@@ -41,6 +41,7 @@
     <string name="returns">Return</string>
     <string name="stock">Stock</string>
     <string name="stock_left">Only @value left</string>
+    <string name="stock_left_">Only @value left in stock</string>
     <string name="product_overview">Product Overview</string>
     <string name="category">Category</string>
     <string name="min_orders">Min. Order</string>
@@ -101,4 +102,21 @@
     <string name="no_favourites_found">No Favourites Found</string>
     <string name="in_cart">In Cart</string>
     <string name="view_cart">View Cart</string>
+    <string name="estimated_delivery">Estimated Delivery</string>
+    <string name="estimated_delivery_msg">Calculated at checkout</string>
+    <string name="promo_code_msg">Have promo code?</string>
+    <string name="enter_promo_code">Enter promo code</string>
+    <string name="try_">Try</string>
+    <string name="apply">Apply</string>
+    <string name="or_">or</string>
+    <string name="order_summary">Order Summary</string>
+    <string name="total">Total</string>
+    <string name="secure_payment">Secure Payment</string>
+    <string name="easy_return">Easy Return</string>
+    <string name="fast_shipping">Fast Shipping</string>
+    <string name="inclusive_of_tax">Including all tax and fees</string>
+    <string name="product_discount">Product Discount</string>
+    <string name="promo_code">Promo (@value)</string>
+    <string name="free">Free</string>
+    <string name="promo_code_applied">Promo code applied</string>
 </resources>

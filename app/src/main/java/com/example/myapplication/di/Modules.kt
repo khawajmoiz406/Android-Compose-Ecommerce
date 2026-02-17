@@ -130,7 +130,8 @@ val cartModule = module {
         CartViewModel(
             getCartUseCase = get(),
             removeFromCartUseCase = get(),
-            updateQuantityUseCase = get()
+            updateQuantityUseCase = get(),
+            toggleFavouriteUseCase = get(),
         )
     }
 }

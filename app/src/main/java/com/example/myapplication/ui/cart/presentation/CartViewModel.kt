@@ -4,9 +4,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.base.BaseViewModel
 import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
+import com.example.myapplication.core.shared.domain.usecase.ToggleFavouriteUseCase
 import com.example.myapplication.ui.cart.data.remote.dto.UpdateCartItemRequest
 import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -14,9 +16,11 @@ import kotlinx.coroutines.launch
 class CartViewModel(
     private val getCartUseCase: GetCartUseCase,
     private val removeFromCartUseCase: RemoveFromCartUseCase,
-    private val updateQuantityUseCase: UpdateQuantityUseCase
+    private val updateQuantityUseCase: UpdateQuantityUseCase,
+    private val toggleFavouriteUseCase: ToggleFavouriteUseCase,
 ) : BaseViewModel<CartUiState, Unit>(CartUiState()) {
     val cart: MutableStateFlow<Cart?> = MutableStateFlow(null)
+    val promo: MutableStateFlow<Pair<String, Double>?> = MutableStateFlow(null)
 
     init {
         getUserCart()
@@ -71,4 +75,34 @@ class CartViewModel(
         }
     }
 
+    fun toggleFavourite(productId: Int) = viewModelScope.launch {
+        cart.value?.let {
+            val result = toggleFavouriteUseCase.invoke(productId)
+            if (result.isSuccess) {
+                this@CartViewModel.cart.update {
+                    it?.copy(
+                        items = it.items.map { item ->
+                            if (item.cartItem.productId == productId)
+                                item.copy(product = item.product.copy(isFavourite = !item.product.isFavourite))
+                            else item
+                        }
+                    )
+                }
+            }
+        }
+    }
+
+    fun checkPromoCode(promoCode: String) = viewModelScope.launch {
+        updateUiState(uiState.value.copy(promoLoading = true))
+        delay(2000L)
+        promo.value = Pair(promoCode, 20.0)
+        updateUiState(uiState.value.copy(promoLoading = false))
+    }
+
+    fun removePromo() = viewModelScope.launch {
+        updateUiState(uiState.value.copy(promoLoading = true))
+        delay(1000L)
+        promo.value = null
+        updateUiState(uiState.value.copy(promoLoading = false))
+    }
 }

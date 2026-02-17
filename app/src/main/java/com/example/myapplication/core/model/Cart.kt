@@ -18,8 +18,10 @@ data class Cart(val items: List<CartItemWithProduct>) {
         item.cartItem.quantity * item.product.getDiscountPrice()
     }
 
-    fun getTotal(): Double {
+    fun getTotal(promo: Double? = null): Double {
         val subTotal = getSubTotalPrice()
-        return subTotal + PLATFORM_FEES + DELIVERY_FEES + VAT
+        var total = (subTotal + PLATFORM_FEES + DELIVERY_FEES + VAT)
+        promo?.let { total -= it }
+        return total
     }
 }

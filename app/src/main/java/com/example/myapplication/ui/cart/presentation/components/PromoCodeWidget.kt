@@ -1,0 +1,239 @@
+package com.example.myapplication.ui.cart.presentation.components
+
+import android.annotation.SuppressLint
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.myapplication.R
+import com.example.myapplication.config.components.image.SvgImage
+import com.example.myapplication.config.theme.Brown
+import com.example.myapplication.config.theme.Green
+import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
+
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("DefaultLocale")
+@Composable
+fun PromoCodeWidget(
+    isLoading: Boolean,
+    initialValue: Pair<String, Double>?,
+    onApplyClicked: (String) -> Unit,
+    onCancelClicked: () -> Unit,
+) {
+    val promoString = remember { mutableStateOf("") }
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.sdp),
+        modifier = Modifier
+            .border(width = 0.5.dp, color = Brown, shape = RoundedCornerShape(12.sdp))
+            .background(color = Brown.copy(alpha = 0.1f), shape = RoundedCornerShape(12.sdp))
+            .padding(10.sdp)
+            .fillMaxWidth()
+    ) {
+
+        Text(
+            text = stringResource(R.string.promo_code_msg),
+            fontSize = 12.ssp,
+            lineHeight = 12.ssp,
+            fontWeight = FontWeight.Medium,
+            color = Brown,
+        )
+
+        if (initialValue == null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                BasicTextField(
+                    singleLine = true,
+                    value = promoString.value,
+                    onValueChange = { promoString.value = it },
+                    textStyle = LocalTextStyle.current.copy(fontSize = 13.ssp),
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                    modifier = Modifier
+                        .height(35.sdp)
+                        .weight(0.7f),
+                    decorationBox = { innerTextField ->
+                        TextFieldDefaults.DecorationBox(
+                            value = promoString.value,
+                            innerTextField = innerTextField,
+                            enabled = true,
+                            singleLine = true,
+                            visualTransformation = VisualTransformation.None,
+                            interactionSource = remember { MutableInteractionSource() },
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                            colors = TextFieldDefaults.colors(
+                                focusedContainerColor = MaterialTheme.colorScheme.surface,
+                                unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                                disabledContainerColor = MaterialTheme.colorScheme.surface,
+                                focusedIndicatorColor = Color.Transparent,
+                                unfocusedIndicatorColor = Color.Transparent,
+                                disabledIndicatorColor = Color.Transparent
+                            ),
+                            placeholder = {
+                                Text(
+                                    text = stringResource(R.string.enter_promo_code),
+                                    fontSize = 13.ssp,
+                                    color = MaterialTheme.colorScheme.outlineVariant
+                                )
+                            },
+                            leadingIcon = {
+                                SvgImage(
+                                    asset = "tag",
+                                    color = MaterialTheme.colorScheme.onSurface,
+                                    modifier = Modifier.size(15.sdp, 15.sdp)
+                                )
+                            },
+                        )
+                    }
+                )
+
+                Spacer(Modifier.width(10.sdp))
+
+                Button(
+                    onClick = { if (!isLoading) onApplyClicked.invoke(promoString.value) },
+                    modifier = Modifier
+                        .weight(0.3f)
+                        .height(35.sdp),
+                    shape = RoundedCornerShape(7.sdp)
+                ) {
+                    when (isLoading) {
+                        false -> Text(
+                            stringResource(R.string.apply),
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+
+                        true -> CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
+            }
+
+            Text(
+                fontSize = 11.ssp,
+                lineHeight = 11.ssp,
+                color = MaterialTheme.colorScheme.outline,
+                text = buildAnnotatedString {
+                    append(stringResource(R.string.try_))
+                    append(" ")
+                    withStyle(
+                        style = SpanStyle(color = Brown),
+                        block = { append("SAVE20") }
+                    )
+                    append(" ")
+                    append(stringResource(R.string.or_))
+                    append(" ")
+                    withStyle(
+                        style = SpanStyle(color = Brown),
+                        block = { append("WELCOME10") }
+                    )
+                },
+            )
+
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .height(50.sdp)
+                    .border(width = 0.5.dp, color = Green, shape = RoundedCornerShape(12.sdp))
+                    .background(color = Green.copy(alpha = 0.1f), shape = RoundedCornerShape(12.sdp))
+                    .padding(horizontal = 5.sdp)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(28.sdp)
+                        .background(color = Green.copy(alpha = 0.2f), shape = CircleShape)
+                ) {
+                    SvgImage(
+                        asset = "check_circle",
+                        color = Green,
+                        modifier = Modifier.size(18.sdp, 18.sdp)
+                    )
+                }
+
+                Spacer(Modifier.width(10.sdp))
+
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = initialValue.first,
+                        fontSize = 12.ssp,
+                        lineHeight = 12.ssp,
+                        color = Green,
+                    )
+
+                    Spacer(Modifier.height(2.sdp))
+
+                    Text(
+                        text = stringResource(R.string.promo_code_applied),
+                        fontSize = 11.ssp,
+                        lineHeight = 11.ssp,
+                        color = MaterialTheme.colorScheme.outline,
+                    )
+                }
+
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .size(28.sdp)
+                        .clickable {
+                            promoString.value = ""
+                            onCancelClicked.invoke()
+                        },
+                ) {
+                    SvgImage(
+                        asset = "cancel_circle",
+                        color = MaterialTheme.colorScheme.outline,
+                        modifier = Modifier.size(18.sdp, 18.sdp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewPromoCodeWidget() {
+    PromoCodeWidget(false, null, {}) { }
+}

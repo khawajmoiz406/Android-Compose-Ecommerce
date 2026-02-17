@@ -6,4 +6,5 @@ import androidx.compose.runtime.Stable
 data class CartUiState(
     val error: String = "",
     val isLoading: Boolean = false,
+    val promoLoading: Boolean = false,
 )
