@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.cart.presentation.components
+package com.example.myapplication.ui.cart.presentation.cart.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background

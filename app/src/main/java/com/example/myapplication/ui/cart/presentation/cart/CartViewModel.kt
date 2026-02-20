@@ -1,8 +1,9 @@
-package com.example.myapplication.ui.cart.presentation
+package com.example.myapplication.ui.cart.presentation.cart
 
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.base.BaseViewModel
 import com.example.myapplication.core.model.Cart
+import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
 import com.example.myapplication.core.shared.domain.usecase.ToggleFavouriteUseCase
 import com.example.myapplication.ui.cart.data.remote.dto.UpdateCartItemRequest
@@ -20,7 +21,7 @@ class CartViewModel(
     private val toggleFavouriteUseCase: ToggleFavouriteUseCase,
 ) : BaseViewModel<CartUiState, Unit>(CartUiState()) {
     val cart: MutableStateFlow<Cart?> = MutableStateFlow(null)
-    val promo: MutableStateFlow<Pair<String, Double>?> = MutableStateFlow(null)
+    val promo: MutableStateFlow<PromoCode?> = MutableStateFlow(null)
 
     init {
         getUserCart()
@@ -95,7 +96,7 @@ class CartViewModel(
     fun checkPromoCode(promoCode: String) = viewModelScope.launch {
         updateUiState(uiState.value.copy(promoLoading = true))
         delay(2000L)
-        promo.value = Pair(promoCode, 20.0)
+        promo.value = PromoCode(id = 101, promoCode, 20.0)
         updateUiState(uiState.value.copy(promoLoading = false))
     }
 

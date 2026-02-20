@@ -5,20 +5,25 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.myapplication.core.local.converter.OrderConverters
 import com.example.myapplication.core.local.converter.ProductConverters
+import com.example.myapplication.core.local.dao.AddressDao
 import com.example.myapplication.core.local.dao.CartDao
 import com.example.myapplication.core.local.dao.CategoryDao
+import com.example.myapplication.core.local.dao.OrderDao
 import com.example.myapplication.core.local.dao.ProductDao
+import com.example.myapplication.core.model.Address
 import com.example.myapplication.core.model.Category
+import com.example.myapplication.core.model.Order
 import com.example.myapplication.core.model.Product
 import com.example.myapplication.ui.cart.data.local.entity.CartItem
 
 @Database(
     version = DatabaseConfig.DATABASE_VERSION,
     exportSchema = DatabaseConfig.EXPORT_SCHEMA,
-    entities = [Product::class, Category::class, CartItem::class]
+    entities = [Product::class, Category::class, CartItem::class, Address::class, Order::class]
 )
-@TypeConverters(ProductConverters::class)
+@TypeConverters(ProductConverters::class, OrderConverters::class)
 abstract class AppDatabase : RoomDatabase() {
     companion object {
         @Volatile
@@ -34,4 +39,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getProductDao(): ProductDao
     abstract fun getCategoryDao(): CategoryDao
     abstract fun getCartDao(): CartDao
+    abstract fun getAddressDao(): AddressDao
+    abstract fun getOrderDao(): OrderDao
 }

@@ -12,4 +12,6 @@ object DatabaseConfig {
     const val PRODUCT = "product"
     const val CATEGORY = "category"
     const val CART = "cart"
+    const val ADDRESS = "address"
+    const val ORDER = "order"
 }

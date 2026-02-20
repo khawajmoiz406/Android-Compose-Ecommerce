@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.cart.presentation.components
+package com.example.myapplication.ui.cart.presentation.cart.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
@@ -39,7 +39,9 @@ import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.model.Dimensions
 import com.example.myapplication.core.model.Meta
 import com.example.myapplication.core.model.Product
+import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.core.model.Review
+import com.example.myapplication.core.model.Shipping
 import com.example.myapplication.ui.cart.data.local.entity.CartItem
 import com.example.myapplication.ui.cart.data.local.relation.CartItemWithProduct
 import ir.kaaveh.sdpcompose.sdp
@@ -48,7 +50,12 @@ import ir.kaaveh.sdpcompose.ssp
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
-fun OrderSummaryWidget(cart: Cart, shipping: Pair<String, Double>? = null, promoCode: Pair<String, Double>? = null) {
+fun OrderSummaryWidget(
+    cart: Cart,
+    shipping: Shipping? = null,
+    promoCode: PromoCode? = null,
+    showBottomInfo: Boolean = true
+) {
 
     Column(
         modifier = Modifier
@@ -126,8 +133,8 @@ fun OrderSummaryWidget(cart: Cart, shipping: Pair<String, Double>? = null, promo
             Spacer(Modifier.height(5.sdp))
 
             HeadingValue(
-                heading = stringResource(R.string.promo_code).replace("@value", it.first),
-                value = "-$${it.second}",
+                heading = stringResource(R.string.promo_code).replace("@value", it.name),
+                value = "-$${it.discountPrice}",
                 valueTint = Green
             )
         }
@@ -141,8 +148,9 @@ fun OrderSummaryWidget(cart: Cart, shipping: Pair<String, Double>? = null, promo
 
             HeadingValue(
                 heading = stringResource(R.string.shipping),
-                value = if (shipping.second == 0.0) stringResource(R.string.free) else shipping.second.toString(),
-                valueTint = if (shipping.second == 0.0) Green else null
+                value = if (shipping.price == 0.0) stringResource(R.string.free)
+                else "$${String.format("%.2f", shipping.price)}",
+                valueTint = if (shipping.price == 0.0) Green else null
             )
         }
 
@@ -182,7 +190,7 @@ fun OrderSummaryWidget(cart: Cart, shipping: Pair<String, Double>? = null, promo
                 )
 
                 Text(
-                    text = "$${String.format("%.2f", cart.getTotal(promoCode?.second))}",
+                    text = "$${String.format("%.2f", cart.getTotal(promoCode?.discountPrice, shipping?.price))}",
                     fontSize = 18.ssp,
                     lineHeight = 18.ssp,
                     textAlign = TextAlign.End,
@@ -206,17 +214,20 @@ fun OrderSummaryWidget(cart: Cart, shipping: Pair<String, Double>? = null, promo
 
         Spacer(Modifier.height(15.sdp))
 
-        HorizontalDivider()
+        if (showBottomInfo) {
 
-        Spacer(Modifier.height(15.sdp))
+            HorizontalDivider()
 
-        Row {
-            IconValue("shield", stringResource(R.string.secure_payment), Green)
-            IconValue("rotate", stringResource(R.string.easy_return), Purple80)
-            IconValue("truck", stringResource(R.string.fast_shipping), Blue)
+            Spacer(Modifier.height(15.sdp))
+
+            Row {
+                IconValue("shield", stringResource(R.string.secure_payment), Green)
+                IconValue("rotate", stringResource(R.string.easy_return), Purple80)
+                IconValue("truck", stringResource(R.string.fast_shipping), Blue)
+            }
+
+            Spacer(Modifier.height(10.sdp))
         }
-
-        Spacer(Modifier.height(10.sdp))
     }
 }
 
@@ -291,8 +302,8 @@ private fun DottedHorizontalDivider() {
 @Composable
 private fun PreviewOrderSummaryWidget() {
     OrderSummaryWidget(
-        shipping = Pair("standard", 0.0),
-        promoCode = Pair("SAVE20", 20.0),
+        shipping = Shipping(1, "Standard Shipping", "5-7 business days", 25.0),
+        promoCode = PromoCode(1, "SAVE20", 20.0),
         cart = Cart(
             items = listOf(
                 CartItemWithProduct(

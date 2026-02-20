@@ -58,6 +58,7 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.ui.sizing.sdp)
+    implementation(libs.libphonenumber)
 
     //Test
     testImplementation(libs.junit)

@@ -13,7 +13,7 @@ fun NavGraph(navController: NavHostController, padding: PaddingValues) {
         builder = {
             landingGraph()
             authGraph()
-            drawerGraph()
+            drawerGraph(navController)
         }
     )
 }

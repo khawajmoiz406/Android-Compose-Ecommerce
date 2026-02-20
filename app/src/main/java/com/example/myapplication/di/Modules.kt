@@ -15,9 +15,14 @@ import com.example.myapplication.ui.auth.presentation.login.LoginViewModel
 import com.example.myapplication.ui.cart.data.local.CartLocalDataSource
 import com.example.myapplication.ui.cart.data.remote.CartRemoteDataSource
 import com.example.myapplication.ui.cart.data.repository.CartRepositoryImpl
+import com.example.myapplication.ui.cart.data.repository.CheckoutRepositoryImpl
+import com.example.myapplication.ui.cart.domain.repository.CheckoutRepository
+import com.example.myapplication.ui.cart.domain.usecase.CheckoutUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
+import com.example.myapplication.ui.cart.domain.usecase.GetDefaultAddressUseCase
 import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase
-import com.example.myapplication.ui.cart.presentation.CartViewModel
+import com.example.myapplication.ui.cart.presentation.cart.CartViewModel
+import com.example.myapplication.ui.cart.presentation.checkout.CheckoutViewModel
 import com.example.myapplication.ui.favourite.data.local.FavouriteLocalDataSource
 import com.example.myapplication.ui.favourite.data.remote.FavouriteRemoteDataSource
 import com.example.myapplication.ui.favourite.data.repository.FavouriteRepositoryImpl
@@ -119,12 +124,18 @@ val cartModule = module {
     single { CartLocalDataSource(get()) }
     single { CartRemoteDataSource(androidContext(), get()) }
     single<CartRepository> { CartRepositoryImpl(get(), get()) }
+    single<CheckoutRepository> { CheckoutRepositoryImpl(get(), get()) }
 
+    //Cart Use Cases
     factory { GetCartCountUseCase(get()) }
     factory { AddToCartUseCase(get()) }
     factory { GetCartUseCase(get()) }
     factory { RemoveFromCartUseCase(get()) }
     factory { UpdateQuantityUseCase(get()) }
+
+    //Checkout Use Cases
+    factory { CheckoutUseCase(get()) }
+    factory { GetDefaultAddressUseCase(get()) }
 
     viewModel {
         CartViewModel(
@@ -132,6 +143,13 @@ val cartModule = module {
             removeFromCartUseCase = get(),
             updateQuantityUseCase = get(),
             toggleFavouriteUseCase = get(),
+        )
+    }
+
+    viewModel {
+        CheckoutViewModel(
+            checkoutUseCase = get(),
+            getDefaultAddressUseCase = get()
         )
     }
 }

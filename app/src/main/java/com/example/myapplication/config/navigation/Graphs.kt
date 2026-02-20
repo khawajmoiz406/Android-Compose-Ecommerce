@@ -1,10 +1,14 @@
 package com.example.myapplication.config.navigation
 
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import com.example.myapplication.core.model.Cart
+import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.ui.auth.presentation.login.LoginScreen
-import com.example.myapplication.ui.cart.presentation.CartScreen
+import com.example.myapplication.ui.cart.presentation.cart.CartScreen
+import com.example.myapplication.ui.cart.presentation.checkout.CheckoutScreen
 import com.example.myapplication.ui.dashboard.presentation.DashboardScreen
 import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
@@ -36,7 +40,8 @@ fun NavGraphBuilder.bottomNavGraph() = navigation(
     composable(Destinations.Profile.route) {}
 }
 
-fun NavGraphBuilder.drawerGraph() = navigation(
+@Suppress("DEPRECATION")
+fun NavGraphBuilder.drawerGraph(navController: NavController) = navigation(
     route = Destinations.DrawerGraph.route,
     startDestination = Destinations.Dashboard.route
 ) {
@@ -45,6 +50,12 @@ fun NavGraphBuilder.drawerGraph() = navigation(
     composable(Destinations.PrivacyPolicy.route) {}
     composable(Destinations.Settings.route) {}
     composable(Destinations.Cart.route) { CartScreen() }
+    composable(Destinations.Checkout.route) {
+        val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
+        val cart = savedStateHandle?.get<Cart>("cart") ?: return@composable
+        val promoCode = savedStateHandle.get<PromoCode?>("promoCode")
+        CheckoutScreen(cart = cart, promoCode = promoCode)
+    }
     composable(Destinations.ProductDetail.route, Destinations.ProductDetail.arguments) { bse ->
         ProductDetailScreen(productId = bse.arguments?.getInt("id")!!)
     }

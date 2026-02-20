@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.cart.presentation.components
+package com.example.myapplication.ui.cart.presentation.cart.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Blue
-import com.example.myapplication.config.theme.Orange
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 

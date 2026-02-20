@@ -1,4 +1,4 @@
-package com.example.myapplication.ui.cart.presentation
+package com.example.myapplication.ui.cart.presentation.cart
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
@@ -45,12 +45,15 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.config.components.layout.CustomToolbar
 import com.example.myapplication.config.components.state.EmptyState
+import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
 import com.example.myapplication.core.model.Cart
-import com.example.myapplication.ui.cart.presentation.components.DeliveryEstimateWidget
-import com.example.myapplication.ui.cart.presentation.components.ItemCart
-import com.example.myapplication.ui.cart.presentation.components.OrderSummaryWidget
-import com.example.myapplication.ui.cart.presentation.components.PromoCodeWidget
+import com.example.myapplication.core.model.PromoCode
+import com.example.myapplication.ui.cart.presentation.cart.component.DeliveryEstimateWidget
+import com.example.myapplication.ui.cart.presentation.cart.component.ItemCart
+import com.example.myapplication.ui.cart.presentation.cart.component.OrderSummaryWidget
+import com.example.myapplication.ui.cart.presentation.cart.component.PromoCodeWidget
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import org.koin.androidx.compose.koinViewModel
@@ -60,8 +63,8 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
     val cartData = viewModel.cart.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
     val promoCode = viewModel.promo.collectAsState()
+    val parentNavController = LocalParentNavController.current
     val checkoutVisibility = remember { mutableStateOf(true) }
-
 
     if (cartData.value == null && uiState.value.isLoading) return Box(
         modifier = Modifier.fillMaxSize(),
@@ -150,7 +153,20 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                     modifier = Modifier.align(Alignment.BottomCenter),
                     enter = slideInVertically(initialOffsetY = { it }),
                     exit = slideOutVertically(targetOffsetY = { it }),
-                    content = { TotalContent(cartData.value!!, promoCode.value, uiState.value) {} }
+                    content = {
+                        TotalContent(cartData.value!!, promoCode.value, uiState.value) {
+                            parentNavController?.apply {
+                                currentBackStackEntry?.savedStateHandle?.let {
+                                    it["cart"] = cartData.value!!
+                                    it["promoCode"] = promoCode.value
+                                }
+                                navigate(Destinations.Checkout.route) {
+                                    popUpTo(parentNavController.graph.startDestinationId) { saveState = true }
+                                    restoreState = true
+                                }
+                            }
+                        }
+                    }
                 )
         }
     }
@@ -160,7 +176,7 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
 @Composable
 private fun BoxScope.TotalContent(
     cart: Cart,
-    promoCode: Pair<String, Double>?,
+    promoCode: PromoCode?,
     uiState: CartUiState,
     onCheckoutClicked: () -> Unit
 ) {
@@ -206,7 +222,7 @@ private fun BoxScope.TotalContent(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "$${String.format("%.2f", cart.getTotal(promoCode?.second))}",
+                    text = "$${String.format("%.2f", cart.getTotal(promoCode?.discountPrice))}",
                     fontSize = 15.ssp,
                     softWrap = false,
                     fontWeight = FontWeight.Bold,
@@ -248,7 +264,7 @@ private fun BoxScope.TotalContent(
                 )
 
                 false -> Text(
-                    text = stringResource(R.string.checkout),
+                    text = stringResource(R.string.proceed_to_checkout),
                     fontSize = 14.ssp,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.SemiBold,

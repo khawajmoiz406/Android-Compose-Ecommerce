@@ -95,7 +95,7 @@
     <string name="credit_card">Credit / Debit Card</string>
     <string name="wallet">Wallet</string>
     <string name="payment_method">Payment Method</string>
-    <string name="checkout">Confirm &amp; Checkout</string>
+    <string name="checkout">Checkout</string>
     <string name="total_heading">Total</string>
     <string name="total_msg">(incl. tax &amp; fees)</string>
     <string name="remove_from_cart">Remove From Cart</string>
@@ -119,4 +119,13 @@
     <string name="promo_code">Promo (@value)</string>
     <string name="free">Free</string>
     <string name="promo_code_applied">Promo code applied</string>
+    <string name="place_order">Place Order</string>
+    <string name="total_to_pay">Total to pay</string>
+    <string name="contact_info">Contact Information</string>
+    <string name="phone_number_hint">Phone Number (+XXX XX XXX XXXX)</string>
+    <string name="email_adrress">Email Address</string>
+    <string name="contact_info_msg">We\'ll use this for order updates and delivery coordination</string>
+    <string name="shipping_method">Shipping Method</string>
+    <string name="secure">Secure</string>
+    <string name="proceed_to_checkout">Proceed to Checkout</string>
 </resources>

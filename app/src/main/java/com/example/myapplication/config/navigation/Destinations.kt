@@ -2,15 +2,16 @@ package com.example.myapplication.config.navigation
 
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.example.myapplication.core.model.PromoCode
 
 sealed class Destinations(val route: String) {
     //Landing routes
-    data object LandingGraph: Destinations("landing_graph")
+    data object LandingGraph : Destinations("landing_graph")
     data object Splash : Destinations("splash")
     data object Intro : Destinations("intro")
 
     //Authentication routes
-    data object AuthGraph: Destinations("auth_graph")
+    data object AuthGraph : Destinations("auth_graph")
     data object Login : Destinations("login")
     data object Signup : Destinations("signup")
 
@@ -28,7 +29,8 @@ sealed class Destinations(val route: String) {
     data object Settings : Destinations("settings")
 
     //Other routes
-    data object Cart: Destinations("cart")
+    data object Cart : Destinations("cart")
+    data object Checkout : Destinations("cart/checkout")
     data object ProductDetail : Destinations("product_detail/{id}") {
         fun createRoute(id: Int) = "product_detail/$id"
         val arguments = listOf(navArgument("id") { type = NavType.IntType })
