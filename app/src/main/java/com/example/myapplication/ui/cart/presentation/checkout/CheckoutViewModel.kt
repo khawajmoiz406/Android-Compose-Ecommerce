@@ -2,13 +2,12 @@ package com.example.myapplication.ui.cart.presentation.checkout
 
 import androidx.lifecycle.viewModelScope
 import com.example.myapplication.base.BaseViewModel
+import com.example.myapplication.core.model.Address
 import com.example.myapplication.core.model.Cart
+import com.example.myapplication.core.model.PaymentMethod
 import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.core.model.Shipping
-import com.example.myapplication.core.model.User
-import com.example.myapplication.core.pref.EncryptedSharedPref
 import com.example.myapplication.ui.cart.data.remote.dto.CheckoutRequest
-import com.example.myapplication.ui.cart.data.remote.dto.PaymentMethod
 import com.example.myapplication.ui.cart.domain.usecase.CheckoutUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetDefaultAddressUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,9 +26,9 @@ class CheckoutViewModel(
         if (result.isSuccess) {
             val defaultAddress = result.getOrNull()
             shippingMethods = listOf(
-                Shipping(1, "Standard Shipping", "5-7 business days" ,25.0),
-                Shipping(2, "Express Shipping", "2-3 business days" ,35.0),
-                Shipping(3, "Overnight Shipping", "Next business days" ,50.0),
+                Shipping(1, "Standard Shipping", "5-7 business days", 25.0),
+                Shipping(2, "Express Shipping", "2-3 business days", 35.0),
+                Shipping(3, "Overnight Shipping", "Next business days", 50.0),
             )
             checkoutRequest.value = CheckoutRequest(
                 cart = cart,
@@ -55,5 +54,9 @@ class CheckoutViewModel(
 
     fun paymentMethodChanged(method: PaymentMethod) {
         checkoutRequest.value = checkoutRequest.value?.copy(paymentMethod = method)
+    }
+
+    fun onShippingAddressChanged(address: Address) {
+        checkoutRequest.value = checkoutRequest.value?.copy(shippingAddress = address)
     }
 }

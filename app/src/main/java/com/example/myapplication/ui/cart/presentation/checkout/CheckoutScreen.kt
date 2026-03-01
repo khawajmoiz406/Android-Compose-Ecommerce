@@ -42,26 +42,45 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.components.layout.CustomToolbar
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.theme.Green
+import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
+import com.example.myapplication.core.model.Address
 import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.ui.cart.presentation.cart.component.OrderSummaryWidget
+import com.example.myapplication.ui.cart.presentation.checkout.component.AddressWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.PaymentMethodWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.ShippingMethodWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.UserInfoWidget
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
+import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
+    val parentNavController = LocalParentNavController.current
     val checkoutRequest = viewModel.checkoutRequest.collectAsState()
     val confirmVisibility = remember { mutableStateOf(true) }
+    val address = parentNavController?.currentBackStackEntry?.savedStateHandle
+        ?.getStateFlow<String?>("selected_address_json", null)
+        ?.collectAsState()
+
+    LaunchedEffect(address?.value) {
+        address?.value?.let {
+            viewModel.onShippingAddressChanged(Json.decodeFromString(it))
+            parentNavController.currentBackStackEntry
+                ?.savedStateHandle
+                ?.remove<String?>("selected_address_json")
+        }
+    }
 
     LaunchedEffect(checkoutRequest.value) {
         if (checkoutRequest.value == null) viewModel.initCheckout(cart, promoCode)
@@ -88,7 +107,10 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                     .nestedScroll(
                         connection = remember {
                             object : NestedScrollConnection {
-                                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                                override fun onPreScroll(
+                                    available: Offset,
+                                    source: NestedScrollSource
+                                ): Offset {
                                     if (available.y < 0) confirmVisibility.value = false
                                     else if (available.y > 0) confirmVisibility.value = true
                                     return Offset.Zero
@@ -100,6 +122,17 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                 item { Spacer(Modifier) }
 
                 item { UserInfoWidget() }
+
+                item {
+                    AddressWidget(
+                        selected = checkoutRequest.value!!.shippingAddress,
+                        onChangeAddress = {
+                            parentNavController?.let {
+                                handleItemClicked(it, Destination.AddressListing(true))
+                            }
+                        },
+                    )
+                }
 
                 item {
                     ShippingMethodWidget(
@@ -120,7 +153,6 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                     OrderSummaryWidget(
                         cart = cart,
                         promoCode = promoCode,
-                        showBottomInfo = false,
                         shipping = checkoutRequest.value!!.shippingMethod,
                     )
                 }
@@ -136,7 +168,10 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                 content = {
                     checkoutRequest.value?.let {
                         TotalContent(
-                            total = it.cart.getTotal(it.promoCode?.discountPrice, it.shippingMethod.price),
+                            total = it.cart.getTotal(
+                                it.promoCode?.discountPrice,
+                                it.shippingMethod.price
+                            ),
                             uiState = uiState.value,
                             onPlaceOrderClicked = {}
                         )
@@ -243,5 +278,13 @@ private fun BoxScope.TotalContent(
                 )
             }
         }
+    }
+}
+
+private fun handleItemClicked(navController: NavController, route: Any) {
+    navController.navigate(route) {
+        popUpTo(navController.graph.startDestinationId) { saveState = true }
+        launchSingleTop = true
+        restoreState = true
     }
 }

@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Orange
-import com.example.myapplication.ui.cart.data.remote.dto.PaymentMethod
+import com.example.myapplication.core.model.PaymentMethod
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
@@ -99,7 +99,11 @@ fun PaymentMethodWidget(selected: PaymentMethod, onPaymentMethodChanged: (Paymen
 
 @SuppressLint("DefaultLocale")
 @Composable
-private fun ItemPaymentMethod(method: PaymentMethod, selected: Boolean, onPaymentChanged: (PaymentMethod) -> Unit) {
+private fun ItemPaymentMethod(
+    method: PaymentMethod,
+    selected: Boolean,
+    onPaymentChanged: (PaymentMethod) -> Unit
+) {
     val bgColor = if (!selected) MaterialTheme.colorScheme.surface
     else MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
 

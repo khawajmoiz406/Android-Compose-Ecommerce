@@ -44,6 +44,8 @@ import com.example.myapplication.config.utils.SnackbarUtils
 import com.example.myapplication.ui.address.presentation.listing.component.ItemAddress
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -175,7 +177,13 @@ fun AddressListingScreen(
                     }
                 }
 
-                if (selectionMode) UseThisAddressButton {}
+                if (selectionMode && addresses.value.isNotEmpty()) UseThisAddressButton {
+                    val address = addresses.value[uiState.value.selectedAddress]
+                    parentNavController?.previousBackStackEntry
+                        ?.savedStateHandle
+                        ?.set("selected_address_json", Json.encodeToString(address))
+                    parentNavController?.popBackStack()
+                }
             }
         }
     }

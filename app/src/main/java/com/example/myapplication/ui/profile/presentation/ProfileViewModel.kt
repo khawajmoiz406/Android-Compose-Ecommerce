@@ -4,8 +4,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.myapplication.base.BaseViewModel
 import com.example.myapplication.config.theme.ThemeMode
 import com.example.myapplication.config.theme.ThemeState
+import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.core.model.User
-import com.example.myapplication.ui.cart.data.remote.dto.OrderStatus
 import com.example.myapplication.ui.profile.domain.usecase.ChangeNotificationSettingUseCase
 import com.example.myapplication.ui.profile.domain.usecase.ChangeThemeModeUseCase
 import com.example.myapplication.ui.profile.domain.usecase.GetTotalOrdersUseCase
@@ -25,10 +25,10 @@ class ProfileViewModel(
     private val changeNotificationSettingUseCase: ChangeNotificationSettingUseCase,
 ) : BaseViewModel<ProfileUiState, ProfileEvents>(ProfileUiState()) {
     val userProfile: MutableStateFlow<User?> = MutableStateFlow(null)
-    val totalActiveOrders = getTotalOrdersUseCase.invoke(OrderStatus.InProgress)
+    val totalActiveOrders = getTotalOrdersUseCase.invoke(OrderStatus.Confirmed)
         .map { it ?: 0 } // Flow emits null if table is empty
         .stateIn(viewModelScope, SharingStarted.Lazily, 0)
-    val totalCompletedOrders = getTotalOrdersUseCase.invoke(OrderStatus.Completed)
+    val totalCompletedOrders = getTotalOrdersUseCase.invoke(OrderStatus.Delivered)
         .map { it ?: 0 } // Flow emits null if table is empty
         .stateIn(viewModelScope, SharingStarted.Lazily, 0)
 

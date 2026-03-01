@@ -2,9 +2,9 @@ package com.example.myapplication.ui.profile.data.local
 
 import com.example.myapplication.config.theme.ThemeMode
 import com.example.myapplication.core.local.AppDatabase
+import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.core.model.User
 import com.example.myapplication.core.pref.EncryptedSharedPref
-import com.example.myapplication.ui.cart.data.remote.dto.OrderStatus
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow

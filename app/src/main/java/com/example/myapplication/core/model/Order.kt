@@ -15,6 +15,12 @@ data class Order(
     @ColumnInfo("id")
     val id: Int = 0,
 
+    @ColumnInfo("order_number")
+    val orderNumber: String,
+
+    @ColumnInfo("tracking_number")
+    val trackingNumber: String,
+
     @ColumnInfo("items")
     val items: List<OrderItem>,
 
@@ -28,10 +34,10 @@ data class Order(
     val shippingAddress: Address,
 
     @ColumnInfo("payment_method")
-    val paymentMethod: Int,
+    val paymentMethod: PaymentMethod,
 
     @ColumnInfo("order_status")
-    val orderStatus: Int,
+    val orderStatus: OrderStatus,
 
     @ColumnInfo("created_at")
     val createdAt: Long = System.currentTimeMillis(),
@@ -39,3 +45,17 @@ data class Order(
     @ColumnInfo("updated_at")
     val updatedAt: Long = System.currentTimeMillis()
 )
+
+sealed class PaymentMethod(val id: Int, val image: String, val name: String) {
+    data object CashOnDelivery : PaymentMethod(1, "money", "Cash on Delivery")
+    data object Card : PaymentMethod(2, "card", "Debit / Credit Card")
+}
+
+sealed class OrderStatus(val value: Int) {
+    data object Pending : OrderStatus(1)
+    data object Confirmed : OrderStatus(2)
+    data object Shipped : OrderStatus(3)
+    data object Delivered : OrderStatus(4)
+    data object Cancelled : OrderStatus(5)
+    data object Failed : OrderStatus(6)
+}

@@ -1,8 +1,8 @@
 package com.example.myapplication.ui.profile.domain.repository
 
 import com.example.myapplication.config.theme.ThemeMode
+import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.core.model.User
-import com.example.myapplication.ui.cart.data.remote.dto.OrderStatus
 import kotlinx.coroutines.flow.Flow
 
 

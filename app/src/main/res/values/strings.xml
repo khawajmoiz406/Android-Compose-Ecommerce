@@ -170,4 +170,7 @@
     <string name="address_delete_msg">Address has been deleted successfully</string>
     <string name="add_new_address">Add New Address</string>
     <string name="use_this_address">Use This Address</string>
+    <string name="shipping_address">Shipping Address</string>
+    <string name="change_address">Change Address</string>
+    <string name="select_address">Select Address</string>
 </resources>

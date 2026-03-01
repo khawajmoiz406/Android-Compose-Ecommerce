@@ -5,7 +5,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.myapplication.core.local.DatabaseConfig
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Stable
 @Entity(tableName = DatabaseConfig.ADDRESS)
 data class Address(

@@ -2,44 +2,60 @@ package com.example.myapplication.core.local.converter
 
 import androidx.room.TypeConverter
 import com.example.myapplication.core.model.Address
+import com.example.myapplication.core.model.OrderStatus
+import com.example.myapplication.core.model.PaymentMethod
 import com.example.myapplication.core.model.Shipping
 import com.example.myapplication.core.shared.data.local.entity.OrderItem
 import com.example.myapplication.core.shared.data.local.entity.Receipt
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 object OrderConverters {
-    private val gson = Gson()
+    @TypeConverter
+    fun fromOrderItemList(value: List<OrderItem>): String = Json.encodeToString(value)
 
     @TypeConverter
-    fun fromOrderItemList(value: List<OrderItem>): String =
-        gson.toJson(value)
+    fun toOrderItemList(value: String): List<OrderItem> = Json.decodeFromString(value)
 
     @TypeConverter
-    fun toOrderItemList(value: String): List<OrderItem> =
-        gson.fromJson(value, object : TypeToken<List<OrderItem>>() {}.type)
+    fun fromReceipt(value: Receipt): String = Json.encodeToString(value)
 
     @TypeConverter
-    fun fromReceipt(value: Receipt): String =
-        gson.toJson(value)
+    fun toReceipt(value: String): Receipt = Json.decodeFromString(value)
 
     @TypeConverter
-    fun toReceipt(value: String): Receipt =
-        gson.fromJson(value, Receipt::class.java)
+    fun fromShipping(value: Shipping): String = Json.encodeToString(value)
 
     @TypeConverter
-    fun fromShipping(value: Shipping): String =
-        gson.toJson(value)
+    fun toShipping(value: String): Shipping = Json.decodeFromString(value)
 
     @TypeConverter
-    fun toShipping(value: String): Shipping =
-        gson.fromJson(value, Shipping::class.java)
+    fun fromAddress(value: Address): String = Json.encodeToString(value)
 
     @TypeConverter
-    fun fromAddress(value: Address): String =
-        gson.toJson(value)
+    fun toAddress(value: String): Address = Json.decodeFromString(value)
 
     @TypeConverter
-    fun toAddress(value: String): Address =
-        gson.fromJson(value, Address::class.java)
+    fun fromOrderStatus(value: OrderStatus): Int = value.value
+
+    @TypeConverter
+    fun toOrderStatus(value: Int): OrderStatus = when (value) {
+        1 -> OrderStatus.Pending
+        2 -> OrderStatus.Confirmed
+        3 -> OrderStatus.Shipped
+        4 -> OrderStatus.Delivered
+        5 -> OrderStatus.Cancelled
+        6 -> OrderStatus.Failed
+        else -> throw IllegalArgumentException("Unknown OrderStatus: $value")
+    }
+
+    @TypeConverter
+    fun fromPaymentMethod(value: PaymentMethod): Int = value.id
+
+    @TypeConverter
+    fun toPaymentMethod(value: Int): PaymentMethod = when (value) {
+        1 -> PaymentMethod.CashOnDelivery
+        2 -> PaymentMethod.Card
+        else -> throw IllegalArgumentException("Unknown PaymentMethod: $value")
+    }
 }

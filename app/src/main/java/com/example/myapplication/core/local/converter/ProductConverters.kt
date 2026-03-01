@@ -4,41 +4,31 @@ import androidx.room.TypeConverter
 import com.example.myapplication.core.model.Dimensions
 import com.example.myapplication.core.model.Meta
 import com.example.myapplication.core.model.Review
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 object ProductConverters {
-    private val gson = Gson()
+    @TypeConverter
+    fun fromStringList(value: List<String>?): String? = value?.let { Json.encodeToString(it) }
 
     @TypeConverter
-    fun fromStringList(value: List<String>?): String? = gson.toJson(value)
+    fun toStringList(value: String?): List<String>? = value?.let { Json.decodeFromString(it) }
 
     @TypeConverter
-    fun toStringList(value: String?): List<String>? = value?.let {
-        gson.fromJson(value, object : TypeToken<List<String>>() {}.type)
-    }
+    fun fromDimensions(value: Dimensions?): String? = value?.let { Json.encodeToString(it) }
 
     @TypeConverter
-    fun fromDimensions(dim: Dimensions?): String? = gson.toJson(dim)
+    fun toDimensions(value: String?): Dimensions? = value?.let { Json.decodeFromString(it) }
 
     @TypeConverter
-    fun toDimensions(value: String?): Dimensions? = value?.let {
-        gson.fromJson(it, Dimensions::class.java)
-    }
+    fun fromMeta(value: Meta?): String? = value?.let { Json.encodeToString(it) }
 
     @TypeConverter
-    fun fromMeta(meta: Meta?): String? = gson.toJson(meta)
+    fun toMeta(value: String?): Meta? = value?.let { Json.decodeFromString(it) }
 
     @TypeConverter
-    fun toMeta(value: String?): Meta? = value?.let {
-        gson.fromJson(it, Meta::class.java)
-    }
+    fun fromReviewList(value: List<Review>?): String? = value?.let { Json.encodeToString(it) }
 
     @TypeConverter
-    fun fromReviewList(list: List<Review>?): String? = gson.toJson(list)
-
-    @TypeConverter
-    fun toReviewList(value: String?): List<Review>? = value?.let {
-        gson.fromJson(it, object : TypeToken<List<Review>>() {}.type)
-    }
+    fun toReviewList(value: String?): List<Review>? = value?.let { Json.decodeFromString(it) }
 }
