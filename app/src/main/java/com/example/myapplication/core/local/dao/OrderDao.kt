@@ -13,6 +13,9 @@ interface OrderDao {
     @Query("SELECT * FROM `${DatabaseConfig.ORDER}` WHERE order_status = :status")
     fun getUserOrders(status: Int): Flow<List<Order>?>
 
+    @Query("SELECT COUNT(*) FROM `${DatabaseConfig.ORDER}` WHERE order_status = :status")
+    fun getUserOrdersCount(status: Int): Flow<Int>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(order: Order): Long
 }

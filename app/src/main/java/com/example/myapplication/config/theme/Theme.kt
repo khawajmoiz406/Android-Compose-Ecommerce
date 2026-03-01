@@ -1,7 +1,6 @@
 package com.example.myapplication.config.theme
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +22,15 @@ import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+
+object ThemeState {
+    val darkTheme = mutableStateOf(false)
+}
+
+sealed class ThemeMode(val value: Int) {
+    data object Dark : ThemeMode(1)
+    data object Light : ThemeMode(2)
+}
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -101,7 +110,7 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun MyApplicationTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = ThemeState.darkTheme.value,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

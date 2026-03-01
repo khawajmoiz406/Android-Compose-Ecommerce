@@ -1,8 +1,11 @@
 package com.example.myapplication.core.model
 
+import androidx.compose.runtime.Stable
+import com.example.myapplication.config.theme.ThemeMode
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
+@Stable
 data class User(
     @SerializedName("id")
     val id: Int?,
@@ -21,5 +24,10 @@ data class User(
     @SerializedName("accessToken")
     val accessToken: String?,
     @SerializedName("refreshToken")
-    val refreshToken: String?
+    val refreshToken: String?,
+
+    //For app use, these fields are not in api response
+    val phoneNumber: String? = "",
+    val notificationEnabled: Boolean = true,
+    val themeMode: Int = ThemeMode.Light.value
 ) : Serializable

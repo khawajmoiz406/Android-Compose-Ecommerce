@@ -21,8 +21,14 @@ interface AddressDao {
     suspend fun removeAddress(id: Int)
 
     @Query("SELECT * FROM ${DatabaseConfig.ADDRESS}")
-    fun getUserAddresses(): Flow<List<Address>>
+    fun getUserAddresses(): Flow<List<Address>?>
 
     @Query("SELECT * FROM ${DatabaseConfig.ADDRESS} WHERE default_address = 1 ORDER BY id ASC LIMIT 1")
     suspend fun getDefaultAddress(): Address?
+
+    @Query("SELECT * FROM ${DatabaseConfig.ADDRESS} WHERE id = :id")
+    suspend fun getAddress(id: Int): Address?
+
+    @Query("UPDATE ${DatabaseConfig.ADDRESS} SET default_address = 0")
+    suspend fun clearAllDefaults()
 }

@@ -38,7 +38,7 @@ import com.example.myapplication.config.components.layout.ItemProduct
 import com.example.myapplication.config.components.layout.SwipeRefresh
 import com.example.myapplication.config.components.state.EmptyState
 import com.example.myapplication.config.components.state.ProgressBar
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.core.model.Category
@@ -75,8 +75,9 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                 scrollBehavior = scrollBehavior,
                 onFilterClicked = { scope.launch { bottomSheetState.show() } },
                 onCartClicked = {
-                    parentNavController?.navigate(Destinations.Cart.route) {
+                    parentNavController?.navigate(Destination.CartScreen) {
                         popUpTo(parentNavController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
                         restoreState = true
                     }
                 },
@@ -241,8 +242,9 @@ private fun CategoryRow(
 
 private fun handleItemClicked(navController: NavController, productId: Int?) {
     if (productId == null) return
-    navController.navigate(Destinations.ProductDetail.createRoute(productId)) {
+    navController.navigate(Destination.ProductDetail(productId)) {
         popUpTo(navController.graph.startDestinationId) { saveState = true }
+        launchSingleTop = true
         restoreState = true
     }
 }

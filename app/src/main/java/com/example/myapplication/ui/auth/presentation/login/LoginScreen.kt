@@ -42,7 +42,7 @@ import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -147,8 +147,8 @@ private suspend fun handleEvents(navController: NavController, viewModel: LoginV
             }
 
             is LoginEvents.OnLoginSuccess -> {
-                navController.navigate(Destinations.DrawerGraph.route) {
-                    popUpTo(Destinations.Login.route) { inclusive = true }
+                navController.navigate(Destination.DrawerGraph) {
+                    popUpTo(Destination.Login) { inclusive = true }
                     launchSingleTop = true
                 }
             }

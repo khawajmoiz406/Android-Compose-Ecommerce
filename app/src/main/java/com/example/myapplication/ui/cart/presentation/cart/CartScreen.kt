@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import com.example.myapplication.R
 import com.example.myapplication.config.components.layout.CustomToolbar
 import com.example.myapplication.config.components.state.EmptyState
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
 import com.example.myapplication.core.model.Cart
@@ -92,7 +92,10 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                         .nestedScroll(
                             connection = remember {
                                 object : NestedScrollConnection {
-                                    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                                    override fun onPreScroll(
+                                        available: Offset,
+                                        source: NestedScrollSource
+                                    ): Offset {
                                         if (available.y < 0) checkoutVisibility.value = false
                                         else if (available.y > 0) checkoutVisibility.value = true
                                         return Offset.Zero
@@ -156,14 +159,7 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                     content = {
                         TotalContent(cartData.value!!, promoCode.value, uiState.value) {
                             parentNavController?.apply {
-                                currentBackStackEntry?.savedStateHandle?.let {
-                                    it["cart"] = cartData.value!!
-                                    it["promoCode"] = promoCode.value
-                                }
-                                navigate(Destinations.Checkout.route) {
-                                    popUpTo(parentNavController.graph.startDestinationId) { saveState = true }
-                                    restoreState = true
-                                }
+                                navigate(Destination.Checkout(cartData.value!!, promoCode.value))
                             }
                         }
                     }

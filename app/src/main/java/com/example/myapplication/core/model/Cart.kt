@@ -4,9 +4,10 @@ import com.example.myapplication.config.utils.Constants.DELIVERY_FEES
 import com.example.myapplication.config.utils.Constants.PLATFORM_FEES
 import com.example.myapplication.config.utils.Constants.VAT
 import com.example.myapplication.ui.cart.data.local.relation.CartItemWithProduct
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
-data class Cart(val items: List<CartItemWithProduct>) : Serializable {
+@Serializable
+data class Cart(val items: List<CartItemWithProduct>) {
     fun getSubTotalPrice(): Double = items.sumOf { item ->
         item.cartItem.quantity * (item.product.price ?: 0.0)
     }

@@ -25,7 +25,7 @@ import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNa
 import com.example.myapplication.config.utils.Constants
 import com.example.myapplication.core.pref.EncryptedSharedPref
 import com.example.myapplication.core.model.User
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.delay
 
@@ -63,10 +63,10 @@ fun SplashScreen() {
 
 private suspend fun handleSplash(navController: NavController) {
     val user = EncryptedSharedPref.getInstance(navController.context).getModel(object : TypeToken<User>() {})
-    val route = if (user == null) Destinations.AuthGraph.route else Destinations.DrawerGraph.route
+    val route = if (user == null) Destination.AuthGraph else Destination.DrawerGraph
     delay(Constants.SPLASH_DELAY)
     navController.navigate(route) {
-        popUpTo(Destinations.Splash.route) { inclusive = true }
+        popUpTo(Destination.Splash) { inclusive = true }
         launchSingleTop = true
     }
 }

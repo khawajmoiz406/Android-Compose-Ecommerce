@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 room {
@@ -59,6 +60,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.ui.sizing.sdp)
     implementation(libs.libphonenumber)
+    implementation(libs.kotlinx.serialization.json)
 
     //Test
     testImplementation(libs.junit)

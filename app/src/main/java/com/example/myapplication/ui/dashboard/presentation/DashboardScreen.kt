@@ -14,7 +14,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.navigation.bottomNavGraph
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
 import com.example.myapplication.ui.dashboard.presentation.component.BottomNav
@@ -36,7 +36,7 @@ fun DashboardScreen() {
                 CompositionLocalProvider(LocalDrawerStateController provides drawerState) {
                     NavHost(
                         navController = navController,
-                        startDestination = Destinations.BottomGraph.route,
+                        startDestination = Destination.BottomGraph,
                         modifier = Modifier.padding(innerPadding),
                         builder = { bottomNavGraph() }
                     )

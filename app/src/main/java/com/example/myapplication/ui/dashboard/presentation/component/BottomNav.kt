@@ -23,8 +23,8 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.config.components.image.SvgImage
-import com.example.myapplication.core.model.NavigationItem
 import com.example.myapplication.config.utils.Constants.BOTTOM_NAV_ITEMS
+import com.example.myapplication.core.model.NavigationItem
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 
@@ -54,9 +54,15 @@ fun BottomNav(navController: NavController) {
 }
 
 @Composable
-fun BottomNavItem(item: NavigationItem, selectedRoute: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun BottomNavItem(
+    item: NavigationItem,
+    selectedRoute: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     val isSelected = selectedRoute == item.route
-    val color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
+    val color =
+        if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onBackground
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -80,7 +86,7 @@ fun BottomNavItem(item: NavigationItem, selectedRoute: String, modifier: Modifie
     }
 }
 
-private fun onItemClicked(route: String, navController: NavController) {
+private fun onItemClicked(route: Any, navController: NavController) {
     navController.navigate(route) {
         popUpTo(navController.graph.startDestinationId) { saveState = true }
         launchSingleTop = true

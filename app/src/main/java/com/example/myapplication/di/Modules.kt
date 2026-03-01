@@ -6,6 +6,17 @@ import com.example.myapplication.core.shared.domain.usecase.AddToCartUseCase
 import com.example.myapplication.core.shared.domain.usecase.GetCartCountUseCase
 import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
 import com.example.myapplication.core.shared.domain.usecase.ToggleFavouriteUseCase
+import com.example.myapplication.ui.address.data.local.AddressLocalDataSource
+import com.example.myapplication.ui.address.data.remote.AddressRemoteDataSource
+import com.example.myapplication.ui.address.data.repository.AddressRepositoryImpl
+import com.example.myapplication.ui.address.domain.repository.AddressRepository
+import com.example.myapplication.ui.address.domain.usecase.DeleteAddressUseCase
+import com.example.myapplication.ui.address.domain.usecase.GetAddressUseCase
+import com.example.myapplication.ui.address.domain.usecase.GetUserAddressUseCase
+import com.example.myapplication.ui.address.domain.usecase.NewAddressUseCase
+import com.example.myapplication.ui.address.domain.usecase.UpdateAddressUseCase
+import com.example.myapplication.ui.address.presentation.add.NewAddressViewModel
+import com.example.myapplication.ui.address.presentation.listing.AddressListingViewModel
 import com.example.myapplication.ui.auth.data.local.AuthLocalDataSource
 import com.example.myapplication.ui.auth.data.remote.AuthRemoteDataSource
 import com.example.myapplication.ui.auth.data.repository.AuthRepositoryImpl
@@ -42,6 +53,16 @@ import com.example.myapplication.ui.product_detail.data.repository.ProductDetail
 import com.example.myapplication.ui.product_detail.domain.repository.ProductDetailRepository
 import com.example.myapplication.ui.product_detail.domain.usecase.GetProductDetailUseCase
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailViewModel
+import com.example.myapplication.ui.profile.data.local.ProfileLocalDataSource
+import com.example.myapplication.ui.profile.data.remote.ProfileRemoteDataSource
+import com.example.myapplication.ui.profile.data.repository.ProfileRepositoryImpl
+import com.example.myapplication.ui.profile.domain.repository.ProfileRepository
+import com.example.myapplication.ui.profile.domain.usecase.ChangeNotificationSettingUseCase
+import com.example.myapplication.ui.profile.domain.usecase.ChangeThemeModeUseCase
+import com.example.myapplication.ui.profile.domain.usecase.GetTotalOrdersUseCase
+import com.example.myapplication.ui.profile.domain.usecase.GetUserInfoUseCase
+import com.example.myapplication.ui.profile.domain.usecase.LogoutUseCase
+import com.example.myapplication.ui.profile.presentation.ProfileViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -150,6 +171,55 @@ val cartModule = module {
         CheckoutViewModel(
             checkoutUseCase = get(),
             getDefaultAddressUseCase = get()
+        )
+    }
+}
+
+val profileModule = module {
+    single { ProfileLocalDataSource(get(), get()) }
+    single { ProfileRemoteDataSource(androidContext(), get()) }
+    single<ProfileRepository> { ProfileRepositoryImpl(get(), get()) }
+
+    factory { LogoutUseCase(get()) }
+    factory { GetUserInfoUseCase(get()) }
+    factory { GetTotalOrdersUseCase(get()) }
+    factory { ChangeThemeModeUseCase(get()) }
+    factory { ChangeNotificationSettingUseCase(get()) }
+
+    viewModel {
+        ProfileViewModel(
+            logoutUseCase = get(),
+            getUserInfoUseCase = get(),
+            getTotalOrdersUseCase = get(),
+            changeThemeModeUseCase = get(),
+            changeNotificationSettingUseCase = get()
+        )
+    }
+}
+
+val addressModule = module {
+    single { AddressLocalDataSource(get(), get()) }
+    single { AddressRemoteDataSource(androidContext(), get()) }
+    single<AddressRepository> { AddressRepositoryImpl(get(), get()) }
+
+    factory { GetAddressUseCase(get()) }
+    factory { NewAddressUseCase(get()) }
+    factory { UpdateAddressUseCase(get()) }
+    factory { DeleteAddressUseCase(get()) }
+    factory { GetUserAddressUseCase(get()) }
+
+    viewModel {
+        NewAddressViewModel(
+            getAddressUseCase = get(),
+            newAddressUseCase = get(),
+            updateAddressUseCase = get(),
+        )
+    }
+
+    viewModel {
+        AddressListingViewModel(
+            addressUseCase = get(),
+            deleteAddressUseCase = get(),
         )
     }
 }

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+
+    <!-- Shadow -->
+    <ellipse cx="100" cy="172" rx="38" ry="6" fill="none" stroke="#5C6BC0" stroke-width="1.5"
+        stroke-dasharray="4 3" />
+
+    <!-- Map pin outline -->
+    <path d="M100 28C79 28 62 45 62 66C62 95 100 143 100 143C100 143 138 95 138 66C138 45 121 28 100 28Z"
+        stroke="#5C6BC0" stroke-width="2.5" stroke-linejoin="round" />
+
+    <!-- Pin inner circle -->
+    <circle cx="100" cy="66" r="16" stroke="#5C6BC0" stroke-width="2.5" />
+
+    <!-- X mark inside pin -->
+    <line x1="93" y1="59" x2="107" y2="73" stroke="#5C6BC0" stroke-width="2.5" stroke-linecap="round" />
+    <line x1="107" y1="59" x2="93" y2="73" stroke="#5C6BC0" stroke-width="2.5" stroke-linecap="round" />
+
+    <!-- Dashed search circle -->
+    <circle cx="100" cy="66" r="48" stroke="#5C6BC0" stroke-width="1.5" stroke-dasharray="5 4" />
+
+</svg>

@@ -7,8 +7,9 @@ import androidx.room.PrimaryKey
 import com.example.myapplication.base.BaseResponse
 import com.example.myapplication.core.local.DatabaseConfig
 import com.google.gson.annotations.SerializedName
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Stable
 @Entity(tableName = DatabaseConfig.PRODUCT)
 data class Product(
@@ -106,7 +107,7 @@ data class Product(
 
     @ColumnInfo(name = "addedToCart", defaultValue = "0")
     val addedToCart: Boolean = false
-) : Serializable {
+) {
 
     fun calculateTotal(quantity: Int) = (price ?: 0.0) * quantity
 
@@ -124,26 +125,29 @@ data class Product(
     }
 }
 
+@Serializable
 data class Meta(
     val barcode: String?,
     val createdAt: String?,
     val qrCode: String?,
     val updatedAt: String?
-) : Serializable
+)
 
+@Serializable
 data class Dimensions(
     val depth: Double?,
     val height: Double?,
     val width: Double?
-) : Serializable
+)
 
+@Serializable
 data class Review(
     val comment: String?,
     val date: String?,
     val rating: Int?,
     val reviewerEmail: String?,
     val reviewerName: String?
-) : Serializable
+)
 
 data class ProductsResponse(
     val products: List<Product>?

@@ -11,7 +11,7 @@ import com.example.myapplication.core.local.DatabaseConfig
 data class Address(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int,
+    val id: Int = 0,
 
     @ColumnInfo(name = "type")
     val type: Int,
@@ -19,14 +19,11 @@ data class Address(
     @ColumnInfo(name = "full_name")
     val fullName: String,
 
-    @ColumnInfo(name = "phone_number")
-    val phoneNumber: String,
-
     @ColumnInfo(name = "address")
     val address: String,
 
     @ColumnInfo(name = "house_no")
-    val houseNo: String,
+    val houseNo: String? = "",
 
     @ColumnInfo(name = "city")
     val city: String,
@@ -41,9 +38,9 @@ data class Address(
     val zipCode: String,
 
     @ColumnInfo(name = "default_address")
-    val defaultAddress: Boolean,
+    val defaultAddress: Boolean = true,
 ) {
-    fun getAddressType(): AddressType = when (type) {
+    fun getAddressType() = when (type) {
         0 -> AddressType.Home
         1 -> AddressType.Office
         2 -> AddressType.Other
@@ -51,8 +48,8 @@ data class Address(
     }
 }
 
-sealed class AddressType(val value: Int) {
-    data object Home : AddressType(0)
-    data object Office : AddressType(1)
-    data object Other : AddressType(2)
+sealed class AddressType(val value: Int, val asset: String) {
+    data object Home : AddressType(0, "home")
+    data object Office : AddressType(1, "occupation")
+    data object Other : AddressType(2, "location")
 }

@@ -1,11 +1,14 @@
 package com.example.myapplication.config.navigation
 
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
+import androidx.navigation.toRoute
+import com.example.myapplication.config.utils.extension.toNavType
 import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.model.PromoCode
+import com.example.myapplication.ui.address.presentation.add.NewAddressScreen
+import com.example.myapplication.ui.address.presentation.listing.AddressListingScreen
 import com.example.myapplication.ui.auth.presentation.login.LoginScreen
 import com.example.myapplication.ui.cart.presentation.cart.CartScreen
 import com.example.myapplication.ui.cart.presentation.checkout.CheckoutScreen
@@ -14,49 +17,62 @@ import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
 import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen
+import com.example.myapplication.ui.profile.presentation.ProfileScreen
+import kotlin.reflect.typeOf
 
-fun NavGraphBuilder.landingGraph() = navigation(
-    route = Destinations.LandingGraph.route,
-    startDestination = Destinations.Splash.route
+fun NavGraphBuilder.landingGraph() = navigation<Destination.LandingGraph>(
+    startDestination = Destination.Splash
 ) {
-    composable(Destinations.Splash.route) { SplashScreen() }
-    composable(Destinations.Intro.route) {}
+    composable<Destination.Splash> { SplashScreen() }
+    composable<Destination.Intro> { }
 }
 
-fun NavGraphBuilder.authGraph() = navigation(
-    route = Destinations.AuthGraph.route,
-    startDestination = Destinations.Login.route
+fun NavGraphBuilder.authGraph() = navigation<Destination.AuthGraph>(
+    startDestination = Destination.Login
 ) {
-    composable(Destinations.Login.route) { LoginScreen() }
-    composable(Destinations.Signup.route) {}
+    composable<Destination.Login> { LoginScreen() }
+    composable<Destination.Signup> { }
 }
 
-fun NavGraphBuilder.bottomNavGraph() = navigation(
-    route = Destinations.BottomGraph.route,
-    startDestination = Destinations.Home.route
+fun NavGraphBuilder.bottomNavGraph() = navigation<Destination.BottomGraph>(
+    startDestination = Destination.Home
 ) {
-    composable(Destinations.Home.route) { HomeScreen() }
-    composable(Destinations.Favourites.route) { FavouriteScreen() }
-    composable(Destinations.Profile.route) {}
+    composable<Destination.Home> { HomeScreen() }
+    composable<Destination.Favourites> { FavouriteScreen() }
+    composable<Destination.Profile> { ProfileScreen() }
 }
 
-@Suppress("DEPRECATION")
-fun NavGraphBuilder.drawerGraph(navController: NavController) = navigation(
-    route = Destinations.DrawerGraph.route,
-    startDestination = Destinations.Dashboard.route
+fun NavGraphBuilder.drawerGraph() = navigation<Destination.DrawerGraph>(
+    startDestination = Destination.Dashboard
 ) {
-    composable(Destinations.Dashboard.route) { DashboardScreen() }
-    composable(Destinations.AboutUs.route) {}
-    composable(Destinations.PrivacyPolicy.route) {}
-    composable(Destinations.Settings.route) {}
-    composable(Destinations.Cart.route) { CartScreen() }
-    composable(Destinations.Checkout.route) {
-        val savedStateHandle = navController.previousBackStackEntry?.savedStateHandle
-        val cart = savedStateHandle?.get<Cart>("cart") ?: return@composable
-        val promoCode = savedStateHandle.get<PromoCode?>("promoCode")
-        CheckoutScreen(cart = cart, promoCode = promoCode)
+    composable<Destination.Dashboard> { DashboardScreen() }
+    composable<Destination.AboutUs> { }
+    composable<Destination.PrivacyPolicy> { }
+    composable<Destination.Settings> { }
+    composable<Destination.CartScreen> { CartScreen() }
+
+    composable<Destination.AddressListing> {
+        val route = it.toRoute<Destination.AddressListing>()
+        AddressListingScreen(selectionMode = route.selectionMode)
     }
-    composable(Destinations.ProductDetail.route, Destinations.ProductDetail.arguments) { bse ->
-        ProductDetailScreen(productId = bse.arguments?.getInt("id")!!)
+
+    composable<Destination.NewAddress> {
+        val route = it.toRoute<Destination.NewAddress>()
+        NewAddressScreen(addressId = route.id)
+    }
+
+    composable<Destination.ProductDetail> {
+        val route = it.toRoute<Destination.ProductDetail>()
+        ProductDetailScreen(productId = route.id)
+    }
+
+    composable<Destination.Checkout>(
+        typeMap = mapOf(
+            typeOf<Cart>() to toNavType<Cart>(),
+            typeOf<PromoCode?>() to toNavType<PromoCode>(nullable = true),
+        )
+    ) {
+        val route = it.toRoute<Destination.Checkout>()
+        CheckoutScreen(cart = route.cart, promoCode = route.promoCode)
     }
 }

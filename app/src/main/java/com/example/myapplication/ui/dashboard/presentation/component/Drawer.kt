@@ -33,19 +33,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.myapplication.BuildConfig
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.core.model.NavigationItem
-import com.example.myapplication.config.navigation.Destinations
 import ir.kaaveh.sdpcompose.sdp
 
 @Composable
 fun Drawer(navController: NavController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route ?: ""
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -67,7 +67,7 @@ fun Drawer(navController: NavController) {
             itemsIndexed(drawerItemsList) { index, item ->
                 DrawerItem(
                     item = item,
-                    selectedRoute = currentRoute,
+                    isSelected = navBackStackEntry?.destination?.hasRoute(item.route::class) == true,
                     onClick = { onItemClicked(item.route, navController) }
                 )
                 if (index < drawerItemsList.size - 1) {
@@ -87,10 +87,11 @@ fun Drawer(navController: NavController) {
 }
 
 @Composable
-fun DrawerItem(item: NavigationItem, selectedRoute: String, onClick: () -> Unit) {
-    val isSelected = selectedRoute == item.route
-    val color = if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
-    val bgColor = if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+fun DrawerItem(item: NavigationItem, isSelected: Boolean, onClick: () -> Unit) {
+    val color =
+        if (isSelected) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.onPrimary
+    val bgColor =
+        if (isSelected) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
 
     Box(
         contentAlignment = Alignment.Center,
@@ -126,7 +127,7 @@ fun DrawerItem(item: NavigationItem, selectedRoute: String, onClick: () -> Unit)
     }
 }
 
-private fun onItemClicked(route: String, navController: NavController) {
+private fun onItemClicked(route: Any, navController: NavController) {
     navController.navigate(route) {
         popUpTo(navController.graph.startDestinationId) { saveState = true }
         launchSingleTop = true
@@ -137,22 +138,22 @@ private fun onItemClicked(route: String, navController: NavController) {
 private val drawerItemsList = listOf(
     NavigationItem(
         name = R.string.dashboard,
-        route = Destinations.Dashboard.route,
+        route = Destination.Dashboard,
         icon = "home",
     ),
     NavigationItem(
         name = R.string.about_us,
-        route = Destinations.AboutUs.route,
+        route = Destination.AboutUs,
         icon = "about_us",
     ),
     NavigationItem(
         name = R.string.privacy_policy,
-        route = Destinations.PrivacyPolicy.route,
+        route = Destination.PrivacyPolicy,
         icon = "privacy_policy",
     ),
     NavigationItem(
         name = R.string.settings,
-        route = Destinations.Settings.route,
+        route = Destination.Settings,
         icon = "settings",
     )
 )

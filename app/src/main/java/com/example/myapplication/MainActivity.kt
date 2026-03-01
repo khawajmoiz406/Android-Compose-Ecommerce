@@ -14,14 +14,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.config.navigation.NavGraph
 import com.example.myapplication.config.theme.MyApplicationTheme
+import com.example.myapplication.config.theme.ThemeMode
+import com.example.myapplication.config.theme.ThemeState
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
-import com.example.myapplication.config.navigation.NavGraph
+import com.example.myapplication.core.model.User
+import com.example.myapplication.core.pref.EncryptedSharedPref
+import com.google.gson.reflect.TypeToken
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,10 +39,14 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen() {
-    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    val user = EncryptedSharedPref.getInstance(context).getModel(object : TypeToken<User>() {})
+    ThemeState.darkTheme.value = user?.themeMode == ThemeMode.Dark.value
 
     SnackbarUtils.init(snackbarHostState, scope)
 

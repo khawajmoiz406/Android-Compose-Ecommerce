@@ -2,7 +2,7 @@ package com.example.myapplication.config.utils
 
 import com.example.myapplication.R
 import com.example.myapplication.core.model.NavigationItem
-import com.example.myapplication.config.navigation.Destinations
+import com.example.myapplication.config.navigation.Destination
 
 object Constants {
     const val SPLASH_DELAY = 1500L //In Milliseconds
@@ -42,19 +42,19 @@ object Constants {
     val BOTTOM_NAV_ITEMS = listOf(
         NavigationItem(
             name = R.string.home,
-            route = Destinations.Home.route,
+            route = Destination.Home,
             icon = "home",
             showToolbar = true,
         ),
         NavigationItem(
             name = R.string.favourites,
-            route = Destinations.Favourites.route,
+            route = Destination.Favourites,
             icon = "heart",
             showToolbar = true,
         ),
         NavigationItem(
             name = R.string.profile,
-            route = Destinations.Profile.route,
+            route = Destination.Profile,
             icon = "user",
         ),
     )

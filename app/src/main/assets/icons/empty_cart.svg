@@ -1,11 +1,13 @@
 <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
     <!-- Cart body with rounded corners - outlined only -->
-    <path d="M 55 75 Q 60 70 65 75 L 75 135 Q 75 140 80 140 L 140 140 Q 145 140 145 135 L 155 75 Q 160 70 165 75"
+    <path
+        d="M 55 75 Q 60 70 65 75 L 75 135 Q 75 140 80 140 L 140 140 Q 145 140 145 135 L 155 75 Q 160 70 165 75"
         fill="none" stroke="#6B7280" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
 
     <!-- Cart handle with curve -->
-    <path d="M 45 75 Q 40 70 40 65 L 40 50 Q 40 45 45 45 L 175 45 Q 180 45 180 50 L 180 65 Q 180 70 175 75" fill="none"
-        stroke="#6B7280" stroke-width="4" stroke-linecap="round" />
+    <path
+        d="M 45 75 Q 40 70 40 65 L 40 50 Q 40 45 45 45 L 175 45 Q 180 45 180 50 L 180 65 Q 180 70 175 75"
+        fill="none" stroke="#6B7280" stroke-width="4" stroke-linecap="round" />
 
     <!-- Handle grips -->
     <circle cx="45" cy="75" r="6" fill="none" stroke="#6B7280" stroke-width="3" />
@@ -26,9 +28,10 @@
         stroke-dasharray="6,6" />
 
     <!-- Small sparkle/shine effects -->
-    <path d="M 50 55 L 50 65 M 45 60 L 55 60" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round" opacity="0.6" />
-    <path d="M 170 50 L 170 60 M 165 55 L 175 55" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"
+    <path d="M 50 55 L 50 65 M 45 60 L 55 60" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"
         opacity="0.6" />
+    <path d="M 170 50 L 170 60 M 165 55 L 175 55" stroke="#9CA3AF" stroke-width="2"
+        stroke-linecap="round" opacity="0.6" />
     <path d="M 100 45 L 100 55 M 95 50 L 105 50" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"
         opacity="0.6" />
 </svg>

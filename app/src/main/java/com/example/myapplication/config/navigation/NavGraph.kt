@@ -9,11 +9,11 @@ import androidx.navigation.compose.NavHost
 fun NavGraph(navController: NavHostController, padding: PaddingValues) {
     NavHost(
         navController = navController,
-        startDestination = Destinations.LandingGraph.route,
+        startDestination = Destination.LandingGraph,
         builder = {
             landingGraph()
             authGraph()
-            drawerGraph(navController)
+            drawerGraph()
         }
     )
 }
