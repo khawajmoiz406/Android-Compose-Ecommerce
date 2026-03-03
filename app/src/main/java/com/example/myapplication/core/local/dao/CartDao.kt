@@ -27,4 +27,7 @@ interface CartDao {
 
     @Query("UPDATE ${DatabaseConfig.CART} SET quantity = :quantity, updated_at = :updatedAt WHERE product_id = :productId")
     suspend fun updateQuantity(productId: Int, quantity: Int, updatedAt: Long = System.currentTimeMillis())
+
+    @Query("DELETE FROM ${DatabaseConfig.CART}")
+    suspend fun clearAll()
 }

@@ -135,7 +135,9 @@ fun CartScreen(viewModel: CartViewModel = koinViewModel()) {
                         PromoCodeWidget(
                             isLoading = uiState.value.promoLoading,
                             initialValue = promoCode.value,
-                            onApplyClicked = { viewModel.checkPromoCode(it) },
+                            fieldState = uiState.value.promoFieldState,
+                            onPromoCodeChanged = { viewModel.onPromoFieldChanged(it) },
+                            onApplyClicked = { viewModel.checkPromoCode() },
                             onCancelClicked = { viewModel.removePromo() }
                         )
                     }

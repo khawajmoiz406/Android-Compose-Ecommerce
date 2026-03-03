@@ -22,10 +22,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -37,6 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.components.input.AppTextField
+import com.example.myapplication.config.components.state.FieldState
 import com.example.myapplication.config.theme.Brown
 import com.example.myapplication.config.theme.Green
 import com.example.myapplication.core.model.PromoCode
@@ -48,12 +48,14 @@ import ir.kaaveh.sdpcompose.ssp
 @Composable
 fun PromoCodeWidget(
     isLoading: Boolean,
+    fieldState: FieldState,
     initialValue: PromoCode?,
-    onApplyClicked: (String) -> Unit,
+    onPromoCodeChanged: (String) -> Unit,
+    onApplyClicked: () -> Unit,
     onCancelClicked: () -> Unit,
 ) {
-    val promoString = remember { mutableStateOf("") }
-
+    val focusManager = LocalFocusManager.current
+    
     Column(
         verticalArrangement = Arrangement.spacedBy(10.sdp),
         modifier = Modifier
@@ -74,17 +76,19 @@ fun PromoCodeWidget(
         if (initialValue == null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AppTextField(
-                    value = promoString.value,
-                    onValueChange = { promoString.value = it },
+                    value = fieldState.value,
+                    onValueChange = { onPromoCodeChanged.invoke(it) },
                     placeholder = stringResource(R.string.enter_promo_code),
                     leadingIcon = "tag",
-                    modifier = Modifier.weight(0.7f)
+                    modifier = Modifier.weight(0.7f),
+                    error = fieldState.error?.let { stringResource(it) },
+                    onImeActionPerformed = { focusManager.clearFocus() },
                 )
 
                 Spacer(Modifier.width(10.sdp))
 
                 Button(
-                    onClick = { if (!isLoading) onApplyClicked.invoke(promoString.value) },
+                    onClick = { if (!isLoading) onApplyClicked.invoke() },
                     modifier = Modifier
                         .weight(0.3f)
                         .height(35.sdp),
@@ -173,7 +177,7 @@ fun PromoCodeWidget(
                     modifier = Modifier
                         .size(28.sdp)
                         .clickable {
-                            promoString.value = ""
+                            onPromoCodeChanged.invoke("")
                             onCancelClicked.invoke()
                         },
                 ) {
@@ -191,5 +195,5 @@ fun PromoCodeWidget(
 @Preview
 @Composable
 private fun PreviewPromoCodeWidget() {
-    PromoCodeWidget(false, null, {}) { }
+    PromoCodeWidget(false, FieldState(), null, {}, {}) { }
 }

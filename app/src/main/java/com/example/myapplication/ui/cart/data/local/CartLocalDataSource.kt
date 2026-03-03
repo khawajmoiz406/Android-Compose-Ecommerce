@@ -42,4 +42,8 @@ class CartLocalDataSource(private val database: AppDatabase) {
     suspend fun checkout(order: Order): Int {
         return database.getOrderDao().insertOrder(order).toInt()
     }
+
+    suspend fun clearCart() {
+        return database.getCartDao().clearAll()
+    }
 }

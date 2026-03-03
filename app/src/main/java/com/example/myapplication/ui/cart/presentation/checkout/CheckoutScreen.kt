@@ -42,6 +42,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
@@ -50,13 +53,14 @@ import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.theme.Green
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.ComposableUtils.topShadowScope
-import com.example.myapplication.core.model.Address
+import com.example.myapplication.config.utils.SnackbarUtils
 import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.ui.cart.presentation.cart.component.OrderSummaryWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.AddressWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.PaymentMethodWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.ShippingMethodWidget
+import com.example.myapplication.ui.cart.presentation.checkout.component.TermsAndConditionWidget
 import com.example.myapplication.ui.cart.presentation.checkout.component.UserInfoWidget
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -66,12 +70,19 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
     val parentNavController = LocalParentNavController.current
     val checkoutRequest = viewModel.checkoutRequest.collectAsState()
     val confirmVisibility = remember { mutableStateOf(true) }
     val address = parentNavController?.currentBackStackEntry?.savedStateHandle
         ?.getStateFlow<String?>("selected_address_json", null)
         ?.collectAsState()
+
+    LaunchedEffect(Unit) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            handleEvents(parentNavController, viewModel)
+        }
+    }
 
     LaunchedEffect(address?.value) {
         address?.value?.let {
@@ -121,7 +132,11 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
             ) {
                 item { Spacer(Modifier) }
 
-                item { UserInfoWidget() }
+                item {
+                    UserInfoWidget(uiState.value.phoneNumberField) {
+                        viewModel.onPhoneNumberChanged(it)
+                    }
+                }
 
                 item {
                     AddressWidget(
@@ -157,6 +172,12 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                     )
                 }
 
+                item {
+                    TermsAndConditionWidget(uiState.value.termsAccepted) {
+                        viewModel.toggleTerms()
+                    }
+                }
+
                 item { Spacer(Modifier.height(10.sdp)) }
             }
 
@@ -168,12 +189,12 @@ fun CheckoutScreen(cart: Cart, promoCode: PromoCode?, viewModel: CheckoutViewMod
                 content = {
                     checkoutRequest.value?.let {
                         TotalContent(
+                            uiState = uiState.value,
+                            onPlaceOrderClicked = { viewModel.checkout() },
                             total = it.cart.getTotal(
                                 it.promoCode?.discountPrice,
                                 it.shippingMethod.price
                             ),
-                            uiState = uiState.value,
-                            onPlaceOrderClicked = {}
                         )
                     }
                 }
@@ -189,6 +210,9 @@ private fun BoxScope.TotalContent(
     uiState: CheckoutUiState,
     onPlaceOrderClicked: () -> Unit
 ) {
+    val enabled =
+        !uiState.isLoading && uiState.termsAccepted && uiState.phoneNumberField.value.isNotEmpty()
+
     Column(
         verticalArrangement = Arrangement.spacedBy(8.sdp),
         modifier = Modifier
@@ -255,9 +279,9 @@ private fun BoxScope.TotalContent(
                 .height(40.sdp)
                 .padding(horizontal = 10.sdp)
                 .fillMaxWidth()
-                .clickable(onClick = { if (!uiState.isLoading) onPlaceOrderClicked.invoke() })
+                .clickable(onClick = { if (enabled) onPlaceOrderClicked.invoke() })
                 .background(
-                    color = if (uiState.isLoading) MaterialTheme.colorScheme.surfaceDim else MaterialTheme.colorScheme.primary,
+                    color = if (!enabled) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else MaterialTheme.colorScheme.primary,
                     shape = RoundedCornerShape(8.sdp)
                 )
         ) {
@@ -286,5 +310,22 @@ private fun handleItemClicked(navController: NavController, route: Any) {
         popUpTo(navController.graph.startDestinationId) { saveState = true }
         launchSingleTop = true
         restoreState = true
+    }
+}
+
+private suspend fun handleEvents(navController: NavController?, viewModel: CheckoutViewModel) {
+    viewModel.events.collect { event ->
+        when (event) {
+            is CheckoutEvents.OnOrderPlaced -> {
+                navController?.navigate(Destination.DrawerGraph) {
+                    popUpTo(navController.graph.id) { inclusive = true }
+                }
+                SnackbarUtils.show(navController?.context?.getString(R.string.order_placed_msg) ?: "")
+            }
+
+            is CheckoutEvents.OnError -> {
+                SnackbarUtils.show("Order placing error: ${event.error}")
+            }
+        }
     }
 }

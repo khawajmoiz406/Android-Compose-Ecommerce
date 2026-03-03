@@ -19,11 +19,10 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -32,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.components.input.AppTextField
+import com.example.myapplication.config.components.state.FieldState
 import com.example.myapplication.config.theme.Green
 import com.example.myapplication.config.utils.transformation.PhoneNumberVisualTransformation
 import com.example.myapplication.core.model.User
@@ -43,9 +43,10 @@ import ir.kaaveh.sdpcompose.ssp
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("DefaultLocale")
 @Composable
-fun UserInfoWidget() {
-    val user = EncryptedSharedPref.getInstance(LocalContext.current).getModel(object : TypeToken<User>() {})
-    val phoneNumber = remember { mutableStateOf("") }
+fun UserInfoWidget(fieldState: FieldState, onChanged: (String) -> Unit) {
+    val focusManager = LocalFocusManager.current
+    val user =
+        EncryptedSharedPref.getInstance(LocalContext.current).getModel(object : TypeToken<User>() {})
 
     Column(
         modifier = Modifier
@@ -111,17 +112,19 @@ fun UserInfoWidget() {
             Spacer(Modifier.height(10.sdp))
 
             AppTextField(
-                value = phoneNumber.value,
+                value = fieldState.value,
                 height = 40.sdp,
                 borderWidth = 1.sdp,
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Phone,
                 modifier = Modifier.fillMaxWidth(),
-                onValueChange = { phoneNumber.value = it.filter { c -> c.isDigit() }.take(12) },
+                onValueChange = { onChanged.invoke(it.filter { c -> c.isDigit() }.take(12)) },
                 borderColor = MaterialTheme.colorScheme.outlineVariant,
                 placeholder = stringResource(R.string.phone_number_hint),
                 containerColor = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
-                visualTransformation = PhoneNumberVisualTransformation()
+                visualTransformation = PhoneNumberVisualTransformation(),
+                onImeActionPerformed = { focusManager.clearFocus() },
+                error = fieldState.error?.let { stringResource(it) }
             )
 
             Spacer(Modifier.height(15.sdp))
@@ -141,5 +144,5 @@ fun UserInfoWidget() {
 @Preview
 @Composable
 private fun PreviewUserInfoWidget() {
-    UserInfoWidget()
+    UserInfoWidget(FieldState()) {}
 }

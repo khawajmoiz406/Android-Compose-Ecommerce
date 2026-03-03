@@ -12,4 +12,5 @@ data class CheckoutRequest(
     val shippingMethod: Shipping,
     val paymentMethod: PaymentMethod,
     val shippingAddress: Address?,
+    val phoneNumber: String
 )

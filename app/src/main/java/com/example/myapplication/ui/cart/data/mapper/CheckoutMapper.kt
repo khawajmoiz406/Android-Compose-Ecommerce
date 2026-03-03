@@ -24,7 +24,7 @@ fun CartItemWithProduct.toOrderItem(): OrderItem = OrderItem(
 
 fun CheckoutRequest.toOrder(): Order = Order(
     orderNumber = Calendar.getInstance()
-        .let { "ORD-${it[Calendar.YEAR]}${it[Calendar.MONTH]}${it[Calendar.DATE]}-${it[Calendar.HOUR_OF_DAY]}${Calendar.MINUTE}${Calendar.SECOND}" },
+        .let { "ORD-${it[Calendar.YEAR]}${it[Calendar.MONTH]}${it[Calendar.DATE]}-${it[Calendar.HOUR_OF_DAY]}${Calendar.MINUTE}${Calendar.SECOND}${Calendar.MILLISECOND}" },
     trackingNumber = "TRK${Random.nextLong(0..1000000000000L)}",
     items = cart.items.map { it.toOrderItem() },
     shippingMethod = shippingMethod,

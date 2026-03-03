@@ -29,6 +29,7 @@ import com.example.myapplication.ui.cart.data.repository.CartRepositoryImpl
 import com.example.myapplication.ui.cart.data.repository.CheckoutRepositoryImpl
 import com.example.myapplication.ui.cart.domain.repository.CheckoutRepository
 import com.example.myapplication.ui.cart.domain.usecase.CheckoutUseCase
+import com.example.myapplication.ui.cart.domain.usecase.ClearCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetDefaultAddressUseCase
 import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase

@@ -163,6 +163,7 @@
     <string name="country">Country</string>
     <string name="save_address">Save Address</string>
     <string name="field_is_required">This field is required</string>
+    <string name="invalid_phone_number">Invalid phone number</string>
     <string name="no_address_found">No Address Found</string>
     <string name="default_">Default</string>
     <string name="edit">Edit</string>
@@ -173,4 +174,9 @@
     <string name="shipping_address">Shipping Address</string>
     <string name="change_address">Change Address</string>
     <string name="select_address">Select Address</string>
+    <string name="terms_of_service">Terms of Service</string>
+    <string name="i_agree_to">I agree to the</string>
+    <string name="and">and</string>
+    <string name="i_understand_msg">I understand that I can return items within 30 days.</string>
+    <string name="order_placed_msg">Order has been placed successfully.</string>
 </resources>

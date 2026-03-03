@@ -1,7 +1,9 @@
 package com.example.myapplication.ui.cart.presentation.cart
 
 import androidx.lifecycle.viewModelScope
+import com.example.myapplication.R
 import com.example.myapplication.base.BaseViewModel
+import com.example.myapplication.config.components.state.FieldState
 import com.example.myapplication.core.model.Cart
 import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.core.shared.domain.usecase.RemoveFromCartUseCase
@@ -93,16 +95,23 @@ class CartViewModel(
         }
     }
 
-    fun checkPromoCode(promoCode: String) = viewModelScope.launch {
+    fun onPromoFieldChanged(value: String) {
+        updateUiState(uiState.value.copy(promoFieldState = FieldState(value)))
+    }
+
+    fun checkPromoCode() = viewModelScope.launch {
+        val promoField = uiState.value.promoFieldState
+        if (promoField.value.isEmpty())
+            return@launch updateUiState(uiState.value.copy(promoFieldState = promoField.copy(error = R.string.field_is_required)))
+
         updateUiState(uiState.value.copy(promoLoading = true))
         delay(2000L)
-        promo.value = PromoCode(id = 101, promoCode, 20.0)
+        promo.value = PromoCode(id = 101, uiState.value.promoFieldState.value, 20.0)
         updateUiState(uiState.value.copy(promoLoading = false))
     }
 
     fun removePromo() = viewModelScope.launch {
         updateUiState(uiState.value.copy(promoLoading = true))
-        delay(1000L)
         promo.value = null
         updateUiState(uiState.value.copy(promoLoading = false))
     }

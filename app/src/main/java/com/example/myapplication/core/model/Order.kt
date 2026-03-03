@@ -7,7 +7,9 @@ import androidx.room.PrimaryKey
 import com.example.myapplication.core.local.DatabaseConfig
 import com.example.myapplication.core.shared.data.local.entity.OrderItem
 import com.example.myapplication.core.shared.data.local.entity.Receipt
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Stable
 @Entity(tableName = DatabaseConfig.ORDER)
 data class Order(
@@ -46,11 +48,13 @@ data class Order(
     val updatedAt: Long = System.currentTimeMillis()
 )
 
+@Serializable
 sealed class PaymentMethod(val id: Int, val image: String, val name: String) {
     data object CashOnDelivery : PaymentMethod(1, "money", "Cash on Delivery")
     data object Card : PaymentMethod(2, "card", "Debit / Credit Card")
 }
 
+@Serializable
 sealed class OrderStatus(val value: Int) {
     data object Pending : OrderStatus(1)
     data object Confirmed : OrderStatus(2)
