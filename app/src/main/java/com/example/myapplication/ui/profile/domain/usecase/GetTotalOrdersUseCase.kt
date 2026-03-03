@@ -5,8 +5,9 @@ import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.ui.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetTotalOrdersUseCase(private val repo: ProfileRepository) : FlowUseCase<Int?, OrderStatus> {
-    override fun invoke(params: OrderStatus): Flow<Int?> {
-        return repo.getTotalOrders(params)
+class GetTotalOrdersUseCase(private val repo: ProfileRepository) :
+    FlowUseCase<List<OrderStatus>?, Unit> {
+    override fun invoke(params: Unit): Flow<List<OrderStatus>?> {
+        return repo.getTotalOrders()
     }
 }

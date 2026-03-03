@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 interface ProfileRepository {
-    fun getTotalOrders(status: OrderStatus): Flow<Int?>
+    fun getTotalOrders(): Flow<List<OrderStatus>?>
     suspend fun getUserInfo(): Result<User?>
     suspend fun changeThemeMode(themeMode: ThemeMode): Result<User?>
     suspend fun changeNotificationSettings(notificationEnable: Boolean): Result<User?>

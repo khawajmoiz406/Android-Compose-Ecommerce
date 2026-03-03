@@ -7,7 +7,6 @@ import com.example.myapplication.ui.profile.data.local.ProfileLocalDataSource
 import com.example.myapplication.ui.profile.data.remote.ProfileRemoteDataSource
 import com.example.myapplication.ui.profile.domain.repository.ProfileRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 
 class ProfileRepositoryImpl(
     private val localDataSource: ProfileLocalDataSource,
@@ -42,12 +41,7 @@ class ProfileRepositoryImpl(
         Result.failure(ex)
     }
 
-    override fun getTotalOrders(status: OrderStatus): Flow<Int?> = flow {
-        try {
-            Result.success(localDataSource.getTotalOrders(status))
-        } catch (ex: Exception) {
-            Result.failure(ex)
-        }
+    override fun getTotalOrders(): Flow<List<OrderStatus>?> {
+        return localDataSource.getTotalOrders()
     }
-
 }

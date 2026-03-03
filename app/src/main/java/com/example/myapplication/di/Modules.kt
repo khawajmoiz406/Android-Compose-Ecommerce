@@ -29,7 +29,6 @@ import com.example.myapplication.ui.cart.data.repository.CartRepositoryImpl
 import com.example.myapplication.ui.cart.data.repository.CheckoutRepositoryImpl
 import com.example.myapplication.ui.cart.domain.repository.CheckoutRepository
 import com.example.myapplication.ui.cart.domain.usecase.CheckoutUseCase
-import com.example.myapplication.ui.cart.domain.usecase.ClearCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetDefaultAddressUseCase
 import com.example.myapplication.ui.cart.domain.usecase.UpdateQuantityUseCase
@@ -48,6 +47,12 @@ import com.example.myapplication.ui.home.domain.usecase.GetHomeUseCase
 import com.example.myapplication.ui.home.domain.usecase.GetProductsByFiltersUseCase
 import com.example.myapplication.ui.home.domain.usecase.ObserverProductsFavouriteUseCase
 import com.example.myapplication.ui.home.presentation.HomeViewModel
+import com.example.myapplication.ui.order.data.local.OrderLocalDataSource
+import com.example.myapplication.ui.order.data.remote.OrderRemoteDataSource
+import com.example.myapplication.ui.order.data.repository.OrderRepositoryImpl
+import com.example.myapplication.ui.order.domain.repository.OrderRepository
+import com.example.myapplication.ui.order.domain.usecase.GetUserOrdersUseCase
+import com.example.myapplication.ui.order.presentation.listing.OrdersViewModel
 import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalDataSource
 import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteDataSource
 import com.example.myapplication.ui.product_detail.data.repository.ProductDetailRepositoryImpl
@@ -223,4 +228,14 @@ val addressModule = module {
             deleteAddressUseCase = get(),
         )
     }
+}
+
+val orderModule = module {
+    single { OrderLocalDataSource(get()) }
+    single { OrderRemoteDataSource(androidContext(), get()) }
+    single<OrderRepository> { OrderRepositoryImpl(get(), get()) }
+
+    factory { GetUserOrdersUseCase(get()) }
+
+    viewModel { OrdersViewModel(getUserOrdersUseCase = get()) }
 }

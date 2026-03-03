@@ -18,8 +18,8 @@ class ProfileLocalDataSource(
         return pref.getModel(object : TypeToken<User>() {})
     }
 
-    fun getTotalOrders(status: OrderStatus): Flow<Int> {
-        return database.getOrderDao().getUserOrdersCount(status.value)
+    fun getTotalOrders(): Flow<List<OrderStatus>?> {
+        return database.getOrderDao().getUserOrdersCount()
     }
 
     fun changeThemeMode(themeMode: ThemeMode): User? {

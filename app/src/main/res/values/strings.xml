@@ -100,6 +100,7 @@
     <string name="total_msg">(incl. tax &amp; fees)</string>
     <string name="remove_from_cart">Remove From Cart</string>
     <string name="no_favourites_found">No Favourites Found</string>
+    <string name="no_order_found">No Order Found</string>
     <string name="in_cart">In Cart</string>
     <string name="view_cart">View Cart</string>
     <string name="estimated_delivery">Estimated Delivery</string>
@@ -179,4 +180,5 @@
     <string name="and">and</string>
     <string name="i_understand_msg">I understand that I can return items within 30 days.</string>
     <string name="order_placed_msg">Order has been placed successfully.</string>
+    <string name="my_orders">My Orders</string>
 </resources>

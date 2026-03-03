@@ -27,6 +27,7 @@ import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.theme.ThemeMode
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
+import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.ui.profile.presentation.component.AccountSettingWidget
 import com.example.myapplication.ui.profile.presentation.component.LogoutButton
 import com.example.myapplication.ui.profile.presentation.component.PreferenceWidget
@@ -42,8 +43,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     val navController = LocalParentNavController.current
     val uiState = viewModel.uiState.collectAsState()
     val userProfile = viewModel.userProfile.collectAsState()
-    val activeOrders = viewModel.totalActiveOrders.collectAsState()
-    val completedOrders = viewModel.totalCompletedOrders.collectAsState()
+    val totalOrders = viewModel.totalOrders.collectAsState()
 
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -78,9 +78,13 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 item {
                     UserInfoWidget(
                         userProfile.value!!,
-                        activeOrders.value,
-                        completedOrders.value,
-                        onViewOrdersClicked = {}
+                        totalOrders.value.filterNot { it == OrderStatus.Delivered && it == OrderStatus.Cancelled && it == OrderStatus.Failed }.size,
+                        totalOrders.value.filter { it == OrderStatus.Delivered }.size,
+                        onViewOrdersClicked = {
+                            navController?.let {
+                                handleItemClicked(it, Destination.OrderListing)
+                            }
+                        }
                     )
                 }
 

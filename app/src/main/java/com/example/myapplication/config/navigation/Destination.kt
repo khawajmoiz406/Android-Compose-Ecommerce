@@ -48,6 +48,8 @@ object Destination {
     data class AddressListing(val selectionMode: Boolean = false)
     @Serializable
     data class NewAddress(val id: Int = 0)
+    @Serializable
+    data object OrderListing
 
     //Other routes
     @Serializable

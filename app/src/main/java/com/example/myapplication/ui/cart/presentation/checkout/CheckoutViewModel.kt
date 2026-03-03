@@ -12,7 +12,6 @@ import com.example.myapplication.core.model.PromoCode
 import com.example.myapplication.core.model.Shipping
 import com.example.myapplication.ui.cart.data.remote.dto.CheckoutRequest
 import com.example.myapplication.ui.cart.domain.usecase.CheckoutUseCase
-import com.example.myapplication.ui.cart.domain.usecase.ClearCartUseCase
 import com.example.myapplication.ui.cart.domain.usecase.GetDefaultAddressUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch

@@ -16,6 +16,7 @@ import com.example.myapplication.ui.dashboard.presentation.DashboardScreen
 import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
 import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
+import com.example.myapplication.ui.order.presentation.listing.OrdersScreen
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen
 import com.example.myapplication.ui.profile.presentation.ProfileScreen
 import kotlin.reflect.typeOf
@@ -50,6 +51,7 @@ fun NavGraphBuilder.drawerGraph() = navigation<Destination.DrawerGraph>(
     composable<Destination.PrivacyPolicy> { }
     composable<Destination.Settings> { }
     composable<Destination.CartScreen> { CartScreen() }
+    composable<Destination.OrderListing> { OrdersScreen() }
 
     composable<Destination.AddressListing> {
         val route = it.toRoute<Destination.AddressListing>()

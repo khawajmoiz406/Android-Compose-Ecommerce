@@ -3,6 +3,7 @@ package com.example.myapplication.ui.profile.presentation.component
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color.Companion.Transparent
 import androidx.compose.ui.layout.ContentScale
@@ -126,6 +128,8 @@ fun OrdersWidgets(activeOrders: Int, completedOrders: Int, onViewOrdersClicked: 
             .border(width = 0.5.dp, color = Blue, shape = RoundedCornerShape(10.sdp))
             .background(color = Blue.copy(alpha = 0.1f), shape = RoundedCornerShape(10.sdp))
             .fillMaxWidth()
+            .clip(RoundedCornerShape(10.sdp))
+            .clickable { onViewOrdersClicked.invoke() }
             .padding(vertical = 13.sdp, horizontal = 10.sdp)
     ) {
         Box(

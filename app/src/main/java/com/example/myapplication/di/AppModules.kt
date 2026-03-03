@@ -9,5 +9,6 @@ val appModules = arrayListOf(
     productDetailModule,
     cartModule,
     profileModule,
-    addressModule
+    addressModule,
+    orderModule
 )
