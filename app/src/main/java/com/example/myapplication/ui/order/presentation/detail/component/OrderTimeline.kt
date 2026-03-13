@@ -1,26 +1,28 @@
-package com.example.myapplication.ui.order.presentation.listing.component
+package com.example.myapplication.ui.order.presentation.detail.component
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.config.components.image.SvgImage
@@ -37,127 +39,158 @@ import ir.kaaveh.sdpcompose.ssp
 
 @SuppressLint("DefaultLocale")
 @Composable
-fun ItemOrder(index: Int, order: Order, onClick: () -> Unit) {
+fun OrderTimeline(order: Order) {
     Column(
         modifier = Modifier
-            .padding(
-                top = if (index == 0) 15.sdp else 0.sdp,
-                bottom = 12.sdp,
-                start = 10.sdp,
-                end = 10.sdp
-            )
             .border(1.sdp, MaterialTheme.colorScheme.outlineVariant, RoundedCornerShape(10.sdp))
             .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(10.sdp))
             .fillMaxWidth()
-            .clip(RoundedCornerShape(10.sdp))
-            .clickable { onClick.invoke() }
             .padding(10.sdp)
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Box(
-                contentAlignment = Alignment.Center,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .size(32.sdp)
-                    .background(
-                        color = order.orderStatus.color.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(10.sdp)
-                    )
+                    .background(order.orderStatus.color.copy(alpha = 0.2f), RoundedCornerShape(20.sdp))
+                    .padding(horizontal = 10.sdp, vertical = 4.sdp)
             ) {
                 SvgImage(
                     asset = order.orderStatus.icon,
                     color = order.orderStatus.color,
-                    modifier = Modifier.size(18.sdp, 18.sdp)
-                )
-            }
-
-            Spacer(Modifier.width(10.sdp))
-
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = order.orderNumber,
-                    fontSize = 12.ssp,
-                    lineHeight = 12.ssp,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.Medium
+                    modifier = Modifier.size(15.sdp, 15.sdp)
                 )
 
-                Spacer(Modifier.height(1.sdp))
+                Spacer(Modifier.width(5.sdp))
 
                 Text(
                     text = order.orderStatus.toString(),
-                    fontSize = 10.ssp,
-                    lineHeight = 10.ssp,
+                    fontSize = 11.ssp,
+                    lineHeight = 11.ssp,
+                    fontWeight = FontWeight.SemiBold,
                     color = order.orderStatus.color,
                 )
             }
 
-            Column(horizontalAlignment = Alignment.End) {
-                Text(
-                    text = "$${String.format("%.2f", order.receipt.totalAmount)}",
-                    fontSize = 13.ssp,
-                    lineHeight = 13.ssp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+            Spacer(Modifier.weight(1f))
 
-                Spacer(Modifier.height(1.sdp))
-
-                Text(
-                    text = DateTimeUtils.convertMilliToDateTime(order.createdAt, "MMM dd, yyyy"),
-                    fontSize = 10.ssp,
-                    lineHeight = 10.ssp,
-                    color = MaterialTheme.colorScheme.outline,
-                )
-            }
+            Text(
+                text = DateTimeUtils.convertMilliToDateTime(order.createdAt, "MMM dd, yyyy"),
+                fontSize = 11.ssp,
+                lineHeight = 11.ssp,
+                color = MaterialTheme.colorScheme.outline,
+            )
         }
 
         Spacer(Modifier.height(10.sdp))
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
+        LinearProgressIndicator(
+            progress = { order.getOrderProgress().let { if (it < 1.0f) it - 0.12f else it } },
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = MaterialTheme.colorScheme.primary.copy(0.1f),
+            strokeCap = StrokeCap.Round,
             modifier = Modifier
+                .height(6.sdp)
                 .fillMaxWidth()
-                .background(
-                    color = MaterialTheme.colorScheme.surfaceDim,
-                    shape = RoundedCornerShape(10.sdp)
-                )
-                .padding(horizontal = 10.sdp, vertical = 10.sdp)
-        ) {
-            SvgImage(
-                asset = "occupation",
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.size(12.sdp, 12.sdp)
+        )
+
+        Spacer(Modifier.height(15.sdp))
+
+        Row {
+            ItemTimeline(
+                1,
+                OrderStatus.Pending,
+                order.getOrderProgress() > 0.25,
+                order.createdAt,
             )
-
-            Spacer(Modifier.width(5.sdp))
-
-            Text(
-                text = order.getProductsNames(),
-                fontSize = 10.ssp,
-                lineHeight = 10.ssp,
-                maxLines = 1,
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier.weight(1f)
+            ItemTimeline(
+                2,
+                OrderStatus.Confirmed,
+                order.getOrderProgress() >= 0.50,
+                order.createdAt,
             )
-
-            Spacer(Modifier.width(5.sdp))
-
-            SvgImage(
-                asset = "back",
-                color = MaterialTheme.colorScheme.outline,
-                modifier = Modifier
-                    .size(14.sdp, 14.sdp)
-                    .rotate(180f)
+            ItemTimeline(
+                3,
+                OrderStatus.Shipped,
+                order.getOrderProgress() >= 0.75,
+                order.createdAt,
+            )
+            ItemTimeline(
+                4,
+                OrderStatus.Delivered,
+                order.getOrderProgress() == 1.0f,
+                order.createdAt,
             )
         }
     }
 }
 
+@Composable
+private fun RowScope.ItemTimeline(
+    number: Int,
+    orderStatus: OrderStatus,
+    completed: Boolean,
+    time: Long
+) {
+    val bgColor =
+        if (completed) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outlineVariant
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.weight(1f)
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(25.sdp)
+                .background(bgColor, CircleShape)
+        ) {
+            if (completed)
+                SvgImage(
+                    asset = "check_circle",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(15.sdp, 15.sdp)
+                )
+            else
+                Text(
+                    text = number.toString(),
+                    fontSize = 11.ssp,
+                    lineHeight = 11.ssp,
+                    color = MaterialTheme.colorScheme.outline,
+                )
+        }
+
+        Spacer(Modifier.height(5.sdp))
+
+        Text(
+            text = orderStatus.toString(),
+            fontSize = 10.ssp,
+            lineHeight = 10.ssp,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+
+        Text(
+            text = "${if (completed) "" else "Est."} ${
+                DateTimeUtils.convertMilliToDateTime(
+                    time,
+                    "MMM dd"
+                )
+            }",
+            fontSize = 8.ssp,
+            lineHeight = 8.ssp,
+            color = MaterialTheme.colorScheme.outline,
+        )
+    }
+}
+
 @Preview
 @Composable
-private fun PreviewItemOrder() {
-    ItemOrder(
-        0, Order(
+private fun PreviewOrderTimeline() {
+    OrderTimeline(
+        Order(
             id = 2,
             orderNumber = "ORD-202623-19121314",
             trackingNumber = "TRK328567502684",
@@ -224,9 +257,9 @@ private fun PreviewItemOrder() {
                 zipCode = "54000"
             ),
             paymentMethod = PaymentMethod.CashOnDelivery,
-            orderStatus = OrderStatus.Pending,
+            orderStatus = OrderStatus.Confirmed,
             createdAt = 1772549570993,
             updatedAt = 1772549570993
         )
-    ) { }
+    )
 }

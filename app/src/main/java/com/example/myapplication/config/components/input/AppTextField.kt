@@ -68,7 +68,7 @@ fun AppTextField(
         disabledIndicatorColor = Color.Transparent
     ),
 ) {
-    val errorBorderColor = if (error != null) MaterialTheme.colorScheme.error else borderColor // 👈
+    val errorBorderColor = if (error != null) MaterialTheme.colorScheme.error else borderColor
 
     Column(modifier = modifier) {
         BasicTextField(

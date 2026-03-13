@@ -50,6 +50,8 @@ object Destination {
     data class NewAddress(val id: Int = 0)
     @Serializable
     data object OrderListing
+    @Serializable
+    data class OrderDetail(val orderId: Int)
 
     //Other routes
     @Serializable

@@ -16,6 +16,7 @@ import com.example.myapplication.ui.dashboard.presentation.DashboardScreen
 import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
 import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
+import com.example.myapplication.ui.order.presentation.detail.OrderDetailScreen
 import com.example.myapplication.ui.order.presentation.listing.OrdersScreen
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen
 import com.example.myapplication.ui.profile.presentation.ProfileScreen
@@ -52,6 +53,11 @@ fun NavGraphBuilder.drawerGraph() = navigation<Destination.DrawerGraph>(
     composable<Destination.Settings> { }
     composable<Destination.CartScreen> { CartScreen() }
     composable<Destination.OrderListing> { OrdersScreen() }
+
+    composable<Destination.OrderDetail> {
+        val route = it.toRoute<Destination.OrderDetail>()
+        OrderDetailScreen(orderId = route.orderId)
+    }
 
     composable<Destination.AddressListing> {
         val route = it.toRoute<Destination.AddressListing>()

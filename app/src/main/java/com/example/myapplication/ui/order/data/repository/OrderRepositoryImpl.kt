@@ -13,4 +13,10 @@ class OrderRepositoryImpl(
     override fun getUserOrders(): Flow<List<Order>?> {
         return localDataSource.getUserOrders()
     }
+
+    override suspend fun getOrderDetail(orderId: Int): Result<Order> = try {
+        Result.success(localDataSource.getOrderDetail(orderId))
+    } catch (e: Exception) {
+        Result.failure(e)
+    }
 }

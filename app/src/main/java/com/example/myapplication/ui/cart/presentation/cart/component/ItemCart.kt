@@ -25,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
@@ -166,6 +167,7 @@ fun ItemCart(
                     modifier = Modifier
                         .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
                         .size(25.sdp)
+                        .clip(CircleShape)
                         .clickable { onMinusClicked.invoke() },
                 ) {
                     SvgImage(
@@ -192,6 +194,7 @@ fun ItemCart(
                     modifier = Modifier
                         .border(width = 1.sdp, color = MaterialTheme.colorScheme.primary, shape = CircleShape)
                         .size(25.sdp)
+                        .clip(CircleShape)
                         .clickable { onAddClicked.invoke() },
 
                     ) {
@@ -211,6 +214,7 @@ fun ItemCart(
                     modifier = Modifier
                         .size(25.sdp)
                         .background(color = Color.Transparent, shape = CircleShape)
+                        .clip(CircleShape)
                         .clickable { onFavClicked.invoke() },
                 ) {
                     SvgImage(
@@ -227,6 +231,7 @@ fun ItemCart(
                     modifier = Modifier
                         .size(25.sdp)
                         .background(color = Color.Transparent, shape = CircleShape)
+                        .clip(CircleShape)
                         .clickable { onRemoveClicked.invoke() },
                 ) {
                     SvgImage(

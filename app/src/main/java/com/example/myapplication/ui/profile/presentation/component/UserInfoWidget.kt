@@ -33,6 +33,7 @@ import com.example.myapplication.R
 import com.example.myapplication.config.components.image.NetworkImage
 import com.example.myapplication.config.components.image.SvgImage
 import com.example.myapplication.config.theme.Blue
+import com.example.myapplication.core.model.OrderStatus
 import com.example.myapplication.core.model.User
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -42,8 +43,7 @@ import ir.kaaveh.sdpcompose.ssp
 @Composable
 fun UserInfoWidget(
     user: User,
-    activeOrders: Int,
-    completedOrders: Int,
+    orders: List<OrderStatus>,
     onViewOrdersClicked: () -> Unit
 ) {
     Column(
@@ -104,7 +104,7 @@ fun UserInfoWidget(
         Spacer(Modifier.height(15.sdp))
 
         Box(Modifier.padding(horizontal = 10.sdp)) {
-            OrdersWidgets(activeOrders, completedOrders, onViewOrdersClicked)
+            OrdersWidgets(orders, onViewOrdersClicked)
         }
 
         Spacer(Modifier.height(15.sdp))
@@ -112,15 +112,12 @@ fun UserInfoWidget(
 }
 
 @Composable
-fun OrdersWidgets(activeOrders: Int, completedOrders: Int, onViewOrdersClicked: () -> Unit) {
-    val total = stringResource(R.string.total_orders_value).replace(
-        "@value", "${activeOrders + completedOrders}"
-    )
-    val desc = "$activeOrders ${stringResource(R.string.active).lowercase()} · $completedOrders ${
-        stringResource(
-            R.string.completed
-        ).lowercase()
-    }"
+fun OrdersWidgets(totalOrders: List<OrderStatus>, onViewOrdersClicked: () -> Unit) {
+    val activeOrders = totalOrders.filter { it != OrderStatus.Delivered && it != OrderStatus.Cancelled && it != OrderStatus.Failed }.size
+    val completedOrders = totalOrders.filter { it == OrderStatus.Delivered }.size
+
+    val total = stringResource(R.string.total_orders_value).replace("@value", "${totalOrders.size}")
+    val desc = "$activeOrders ${stringResource(R.string.active).lowercase()} · $completedOrders ${stringResource(R.string.completed).lowercase()}"
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -190,7 +187,7 @@ fun OrdersWidgets(activeOrders: Int, completedOrders: Int, onViewOrdersClicked: 
 @Composable
 private fun PreviewUserInfoWidgetWidget() {
     UserInfoWidget(
-        activeOrders = 3, completedOrders = 7, user = User(
+        user = User(
             id = 1,
             email = "Testing123@gmail.com",
             firstName = "Testing",
@@ -200,6 +197,20 @@ private fun PreviewUserInfoWidgetWidget() {
             username = "testing.name",
             accessToken = "",
             refreshToken = ""
+        ),
+        orders = listOf(
+            OrderStatus.Delivered,
+            OrderStatus.Pending,
+            OrderStatus.Shipped,
+            OrderStatus.Delivered,
+            OrderStatus.Shipped,
+            OrderStatus.Cancelled,
+            OrderStatus.Cancelled,
+            OrderStatus.Delivered,
+            OrderStatus.Delivered,
+            OrderStatus.Delivered,
+            OrderStatus.Confirmed,
+            OrderStatus.Failed,
         )
     ) {}
 }

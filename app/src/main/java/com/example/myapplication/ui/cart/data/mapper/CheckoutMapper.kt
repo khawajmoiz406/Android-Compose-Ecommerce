@@ -30,6 +30,7 @@ fun CheckoutRequest.toOrder(): Order = Order(
     shippingAddress = shippingAddress!!,
     paymentMethod = paymentMethod,
     orderStatus = OrderStatus.Pending,
+    phoneNumber = phoneNumber,
     receipt = Receipt(
         subtotal = cart.getSubTotalPrice(),
         productDiscount = cart.getSubTotalDiscount(),

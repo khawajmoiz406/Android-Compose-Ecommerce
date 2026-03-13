@@ -31,6 +31,9 @@ data class Order(
     @ColumnInfo("tracking_number")
     val trackingNumber: String,
 
+    @ColumnInfo("phone_number")
+    val phoneNumber: String,
+
     @ColumnInfo("items")
     val items: List<OrderItem>,
 
@@ -58,6 +61,14 @@ data class Order(
     fun getProductsNames(): String = when {
         items.size == 1 -> items.first().productName
         else -> "${items.first().productName} & ${items.size - 1} more"
+    }
+
+    fun getOrderProgress(): Float = when (orderStatus) {
+        OrderStatus.Pending -> 0f
+        OrderStatus.Confirmed -> 0.50f
+        OrderStatus.Shipped -> 0.75f
+        OrderStatus.Delivered -> 1.0f
+        else -> 0.0f
     }
 }
 

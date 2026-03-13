@@ -74,7 +74,7 @@ fun PromoCodeWidget(
         )
 
         if (initialValue == null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(verticalAlignment = Alignment.Top) {
                 AppTextField(
                     value = fieldState.value,
                     onValueChange = { onPromoCodeChanged.invoke(it) },

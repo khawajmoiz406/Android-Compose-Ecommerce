@@ -19,4 +19,7 @@ interface OrderDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertOrder(order: Order): Long
+
+    @Query("SELECT * FROM `${DatabaseConfig.ORDER}` WHERE id = :orderId")
+    suspend fun getOrderDetail(orderId: Int): Order
 }

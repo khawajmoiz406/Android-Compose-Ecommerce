@@ -1,5 +1,6 @@
 package com.example.myapplication.config.utils.validator
 
+import android.util.Log
 import com.example.myapplication.R
 import com.google.i18n.phonenumbers.PhoneNumberUtil
 
@@ -17,7 +18,8 @@ object GenericValidators {
         return runCatching {
             val phoneUtil = PhoneNumberUtil.getInstance()
             val number = phoneUtil.parseAndKeepRawInput("+$digits", null)
-            phoneUtil.isValidNumber(number)
+            val region = phoneUtil.getRegionCodeForNumber(number)
+            phoneUtil.isValidNumberForRegion(number, region)
         }.getOrDefault(false)
     }
 }

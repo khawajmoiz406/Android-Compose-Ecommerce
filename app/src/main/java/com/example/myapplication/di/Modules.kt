@@ -51,7 +51,9 @@ import com.example.myapplication.ui.order.data.local.OrderLocalDataSource
 import com.example.myapplication.ui.order.data.remote.OrderRemoteDataSource
 import com.example.myapplication.ui.order.data.repository.OrderRepositoryImpl
 import com.example.myapplication.ui.order.domain.repository.OrderRepository
+import com.example.myapplication.ui.order.domain.usecase.GetOrderDetailUseCase
 import com.example.myapplication.ui.order.domain.usecase.GetUserOrdersUseCase
+import com.example.myapplication.ui.order.presentation.detail.OrderDetailViewModel
 import com.example.myapplication.ui.order.presentation.listing.OrdersViewModel
 import com.example.myapplication.ui.product_detail.data.local.ProductDetailLocalDataSource
 import com.example.myapplication.ui.product_detail.data.remote.ProductDetailRemoteDataSource
@@ -236,6 +238,8 @@ val orderModule = module {
     single<OrderRepository> { OrderRepositoryImpl(get(), get()) }
 
     factory { GetUserOrdersUseCase(get()) }
+    factory { GetOrderDetailUseCase(get()) }
 
     viewModel { OrdersViewModel(getUserOrdersUseCase = get()) }
+    viewModel { OrderDetailViewModel(getOrderDetailUseCase = get()) }
 }

@@ -181,4 +181,11 @@
     <string name="i_understand_msg">I understand that I can return items within 30 days.</string>
     <string name="order_placed_msg">Order has been placed successfully.</string>
     <string name="my_orders">My Orders</string>
+    <string name="order_detail">Order Detail</string>
+    <string name="tracking_number">Tracking Number</string>
+    <string name="payment_summary">Payment Summary</string>
+    <string name="items">Items</string>
+    <string name="qty">Qty</string>
+    <string name="price">Price</string>
+    <string name="tacking_number_copied">Tracking number copied!</string>
 </resources>

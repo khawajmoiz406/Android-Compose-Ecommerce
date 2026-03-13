@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -133,7 +136,10 @@ private fun Toolbar(drawerState: DrawerState, cartCount: StateFlow<Int>?, onCart
     val scope = rememberCoroutineScope()
 
     Box(
-        contentAlignment = Alignment.Center, modifier = Modifier.padding(top = 25.sdp, bottom = 5.sdp)
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .windowInsetsPadding(WindowInsets.statusBars)
+            .padding(top = 8.sdp, bottom = 5.sdp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
@@ -144,7 +150,7 @@ private fun Toolbar(drawerState: DrawerState, cartCount: StateFlow<Int>?, onCart
                     .clickable { scope.launch { drawerState.open() } },
             ) {
                 SvgImage(
-                    asset = "menu", color = MaterialTheme.colorScheme.onSurface, modifier = Modifier.size(20.sdp)
+                    asset = "menu", color = MaterialTheme.colorScheme.surface, modifier = Modifier.size(20.sdp)
                 )
             }
 
@@ -153,7 +159,7 @@ private fun Toolbar(drawerState: DrawerState, cartCount: StateFlow<Int>?, onCart
                 fontSize = 15.ssp,
                 lineHeight = 15.ssp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = MaterialTheme.colorScheme.surface,
                 modifier = Modifier.weight(1f),
             )
 
@@ -274,7 +280,7 @@ private fun RowScope.CartIconWithBadge(cartCount: StateFlow<Int>?, onCartClicked
     ) {
         SvgImage(
             asset = "cart",
-            color = MaterialTheme.colorScheme.onSurface,
+            color = MaterialTheme.colorScheme.surface,
             modifier = Modifier.size(20.sdp),
         )
 

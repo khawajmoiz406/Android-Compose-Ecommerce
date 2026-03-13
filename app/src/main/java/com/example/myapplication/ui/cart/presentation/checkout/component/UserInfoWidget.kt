@@ -127,7 +127,7 @@ fun UserInfoWidget(fieldState: FieldState, onChanged: (String) -> Unit) {
                 error = fieldState.error?.let { stringResource(it) }
             )
 
-            Spacer(Modifier.height(15.sdp))
+            Spacer(Modifier.height(10.sdp))
 
             Text(
                 text = stringResource(R.string.contact_info_msg),

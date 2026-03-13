@@ -56,7 +56,7 @@ fun OrdersScreen(viewModel: OrdersViewModel = koinViewModel()) {
                 isRefreshing = uiState.value.isRefreshing,
                 onRefresh = { viewModel.getUserOrders(true) },
                 modifier = Modifier
-                    .padding(top = innerPadding.calculateTopPadding())
+                    .padding(innerPadding)
                     .fillMaxSize(),
             ) {
                 LazyColumn(modifier = Modifier.fillMaxHeight()) {
@@ -96,7 +96,15 @@ fun OrdersScreen(viewModel: OrdersViewModel = koinViewModel()) {
                             count = orders.value.size,
                             key = { orders.value[it].id }) { index ->
                             val item = orders.value[index]
-                            ItemOrder(index = index, order = item, onClick = {})
+                            ItemOrder(
+                                index = index,
+                                order = item,
+                                onClick = {
+                                    parentNavController?.let {
+                                        handleItemClicked(it, item.id)
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -105,9 +113,8 @@ fun OrdersScreen(viewModel: OrdersViewModel = koinViewModel()) {
     }
 }
 
-private fun handleItemClicked(navController: NavController, productId: Int?) {
-    if (productId == null) return
-    navController.navigate(Destination.ProductDetail(productId)) {
+private fun handleItemClicked(navController: NavController, orderId: Int) {
+    navController.navigate(Destination.OrderDetail(orderId)) {
         popUpTo(navController.graph.startDestinationId) { saveState = true }
         launchSingleTop = true
         restoreState = true

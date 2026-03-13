@@ -31,7 +31,14 @@ abstract class AppDatabase : RoomDatabase() {
 
         fun getInstance(context: Context): AppDatabase {
             return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(context, AppDatabase::class.java, DatabaseConfig.databaseName(context)).build()
+                Room
+                    .databaseBuilder(
+                        context,
+                        AppDatabase::class.java,
+                        DatabaseConfig.databaseName(context)
+                    )
+                    .addMigrations(MIGRATION_3_4)
+                    .build()
             }
         }
     }

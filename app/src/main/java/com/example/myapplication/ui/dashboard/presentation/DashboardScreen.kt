@@ -1,8 +1,11 @@
 package com.example.myapplication.ui.dashboard.presentation
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -12,15 +15,19 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.integerResource
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import com.example.myapplication.R
 import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.navigation.bottomNavGraph
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
 import com.example.myapplication.ui.dashboard.presentation.component.BottomNav
 import com.example.myapplication.ui.dashboard.presentation.component.Drawer
+import ir.kaaveh.sdpcompose.sdp
 
 @OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun DashboardScreen() {
     val navController = rememberNavController()
@@ -31,15 +38,19 @@ fun DashboardScreen() {
             Scaffold(
                 containerColor = MaterialTheme.colorScheme.surface,
                 bottomBar = { BottomNav(navController) },
-                contentWindowInsets = WindowInsets(0, 0, 0),
-            ) { innerPadding ->
+                contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            ) { _ ->
                 CompositionLocalProvider(LocalDrawerStateController provides drawerState) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = Destination.BottomGraph,
-                        modifier = Modifier.padding(innerPadding),
-                        builder = { bottomNavGraph() }
-                    )
+                    Column {
+                        NavHost(
+                            navController = navController,
+                            startDestination = Destination.BottomGraph,
+                            modifier = Modifier.weight(1f),
+                            builder = { bottomNavGraph() }
+                        )
+
+                        Spacer(Modifier.height(integerResource(R.integer.bottom_nav_height).sdp))
+                    }
                 }
             }
         }
