@@ -1,17 +1,15 @@
 package com.example.myapplication.ui.auth.presentation.login
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material3.AlertDialog
@@ -36,13 +34,16 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import com.example.myapplication.R
+import com.example.myapplication.config.components.image.SvgImage
+import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
-import com.example.myapplication.config.navigation.Destination
+import com.example.myapplication.ui.auth.presentation.login.component.AuthHeader
+import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -55,74 +56,85 @@ fun LoginScreen(viewModel: LoginViewModel = koinViewModel()) {
     LaunchedEffect(lifecycleOwner) { navController?.let { handleEvents(it, viewModel) } }
 
     Column(
-        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize()
     ) {
-
-        OutlinedTextField(
-            singleLine = true,
-            value = uiState.value.email,
-            shape = RoundedCornerShape(10.dp),
-            label = { Text(text = stringResource(R.string.username)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
-            onValueChange = { viewModel.updateUiState(uiState.value.copy(email = it)) },
-            placeholder = { Text(text = stringResource(R.string.username)) },
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.AccountCircle,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-            },
+        AuthHeader(
+            heading = stringResource(R.string.welcome_back),
+            subHeading = stringResource(R.string.login_caption)
         )
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(Modifier.height(15.sdp))
 
-        OutlinedTextField(
-            singleLine = true,
-            value = uiState.value.password,
-            shape = RoundedCornerShape(10.dp),
-            label = { Text(text = stringResource(R.string.password)) },
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            onValueChange = { viewModel.updateUiState(uiState.value.copy(password = it)) },
-            placeholder = { Text(text = stringResource(R.string.password)) },
-            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Outlined.Lock,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-            },
-            trailingIcon = {
-                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+        Column(Modifier.padding(horizontal = 15.sdp)) {
+            OutlinedTextField(
+                singleLine = true,
+                value = uiState.value.email,
+                shape = RoundedCornerShape(10.dp),
+                label = { Text(text = stringResource(R.string.username)) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
+                onValueChange = { viewModel.updateUiState(uiState.value.copy(email = it)) },
+                placeholder = { Text(text = stringResource(R.string.username)) },
+                modifier = Modifier.fillMaxWidth(),
+                leadingIcon = {
                     Icon(
-                        imageVector = if (passwordVisible) Icons.Default.FavoriteBorder else Icons.Default.Favorite,
+                        imageVector = Icons.Outlined.AccountCircle,
                         contentDescription = null,
                         modifier = Modifier.size(20.dp)
                     )
+                },
+            )
+
+            Spacer(modifier = Modifier.height(15.dp))
+
+            OutlinedTextField(
+                singleLine = true,
+                value = uiState.value.password,
+                shape = RoundedCornerShape(10.dp),
+                label = { Text(text = stringResource(R.string.password)) },
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                onValueChange = { viewModel.updateUiState(uiState.value.copy(password = it)) },
+                placeholder = { Text(text = stringResource(R.string.password)) },
+                modifier = Modifier.fillMaxWidth(),
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Lock,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
+                trailingIcon = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        SvgImage(
+                            asset = if (passwordVisible) "eye_closed" else "eye_open",
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
-            }
-        )
+            )
 
-        Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(15.dp))
 
-        Button(
-            onClick = { if (!uiState.value.isLoading) viewModel.login() },
-            modifier = Modifier.defaultMinSize(minWidth = 150.dp)
-        ) {
-            when (uiState.value.isLoading) {
-                false -> Text(
-                    stringResource(R.string.login),
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+            Button(
+                onClick = { if (!uiState.value.isLoading) viewModel.login() },
+                shape = RoundedCornerShape(8.sdp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.sdp),
+            ) {
+                when (uiState.value.isLoading) {
+                    false -> Text(
+                        stringResource(R.string.login),
+                        fontSize = 13.ssp,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
 
-                true -> CircularProgressIndicator(
-                    modifier = Modifier.size(20.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
+                    true -> CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
             }
         }
     }

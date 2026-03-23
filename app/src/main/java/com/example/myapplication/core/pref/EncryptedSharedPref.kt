@@ -2,11 +2,11 @@ package com.example.myapplication.core.pref
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import androidx.core.content.edit
 
 @Suppress("DEPRECATION")
 class EncryptedSharedPref private constructor(context: Context) {
@@ -51,6 +51,14 @@ class EncryptedSharedPref private constructor(context: Context) {
 
     fun removeModel(typeToken: TypeToken<*>) {
         prefs.edit { remove(typeToken.type.toString()) }
+    }
+
+    fun putBool(key: String, value: Boolean) {
+        prefs.edit { putBoolean(key, value) }
+    }
+
+    fun getBool(key: String): Boolean {
+        return prefs.getBoolean(key, false)
     }
 
     fun clearAll() {

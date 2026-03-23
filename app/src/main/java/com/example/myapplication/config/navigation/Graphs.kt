@@ -1,5 +1,6 @@
 package com.example.myapplication.config.navigation
 
+import SplashScreen
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
@@ -15,7 +16,6 @@ import com.example.myapplication.ui.cart.presentation.checkout.CheckoutScreen
 import com.example.myapplication.ui.dashboard.presentation.DashboardScreen
 import com.example.myapplication.ui.favourite.presentation.FavouriteScreen
 import com.example.myapplication.ui.home.presentation.HomeScreen
-import com.example.myapplication.ui.landing.splash.presentation.SplashScreen
 import com.example.myapplication.ui.order.presentation.detail.OrderDetailScreen
 import com.example.myapplication.ui.order.presentation.listing.OrdersScreen
 import com.example.myapplication.ui.product_detail.presentation.ProductDetailScreen

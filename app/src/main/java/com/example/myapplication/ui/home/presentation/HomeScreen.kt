@@ -1,5 +1,10 @@
 package com.example.myapplication.ui.home.presentation
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,13 +30,16 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.example.myapplication.R
 import com.example.myapplication.config.components.layout.ItemProduct
@@ -41,12 +49,19 @@ import com.example.myapplication.config.components.state.ProgressBar
 import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalDrawerStateController
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.config.utils.PermissionUtils
 import com.example.myapplication.core.model.Category
 import com.example.myapplication.core.model.Product
+import com.example.myapplication.core.model.User
+import com.example.myapplication.core.pref.EncryptedSharedPref
+import com.example.myapplication.core.pref.SharedPrefKeys.NOTIFICATION_PERMISSION_ASKED
+import com.example.myapplication.core.pref.SharedPrefUtils
 import com.example.myapplication.ui.dashboard.presentation.component.DashboardToolbar
 import com.example.myapplication.ui.home.presentation.components.HeadingRow
 import com.example.myapplication.ui.home.presentation.components.HomeFilters
 import com.example.myapplication.ui.home.presentation.components.ItemCategory
+import com.example.myapplication.ui.home.presentation.components.NotificationPermissionContent
+import com.google.gson.reflect.TypeToken
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
 import kotlinx.coroutines.launch
@@ -56,15 +71,25 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
     val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     val drawerState = LocalDrawerStateController.current
     val parentNavController = LocalParentNavController.current
-    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    val bottomSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val permissionAsked = SharedPrefUtils.isNotificationPermissionAsked(context)
+    val currentUser = SharedPrefUtils.getCurrentUser(context)
+    val showDialog = remember {
+        mutableStateOf(currentUser?.notificationEnabled != true && !permissionAsked)
+    }
 
     val products = viewModel.products.collectAsState()
     val categories = viewModel.categories.collectAsState()
     val uiState = viewModel.uiState.collectAsState()
     val selectedCategory = remember { mutableIntStateOf(0) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { handlePermissionResult(context, it) }
+    )
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -150,7 +175,10 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
 
                         products.value.isEmpty() -> item {
                             Box(Modifier.fillParentMaxHeight(0.65f)) {
-                                EmptyState(message = stringResource(R.string.no_products), scrollable = false)
+                                EmptyState(
+                                    message = stringResource(R.string.no_products),
+                                    scrollable = false
+                                )
                             }
                         }
 
@@ -184,7 +212,37 @@ fun HomeScreen(viewModel: HomeViewModel = koinViewModel()) {
                     }
                 })
         }
+
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) && !permissionAsked && showDialog.value) {
+            Dialog(
+                onDismissRequest = { scope.launch { showDialog.value = false } },
+                content = {
+                    NotificationPermissionContent(
+                        onCancelClicked = {
+                            showDialog.value = false
+                            EncryptedSharedPref.getInstance(context)
+                                .putBool(NOTIFICATION_PERMISSION_ASKED, true)
+                        },
+                        onAllowClicked = {
+                            showDialog.value = false
+                            scope.launch {
+                                PermissionUtils.requestPermission(
+                                    permissionLauncher,
+                                    Manifest.permission.POST_NOTIFICATIONS,
+                                )
+                            }
+                        },
+                    )
+                }
+            )
+        }
     }
+}
+
+private fun handlePermissionResult(context: Context, it: Boolean) {
+    val userUpdated = SharedPrefUtils.getCurrentUser(context)?.copy(notificationEnabled = it)
+    EncryptedSharedPref.getInstance(context).putModel(userUpdated, object : TypeToken<User?>() {})
+    EncryptedSharedPref.getInstance(context).putBool(NOTIFICATION_PERMISSION_ASKED, true)
 }
 
 @Composable

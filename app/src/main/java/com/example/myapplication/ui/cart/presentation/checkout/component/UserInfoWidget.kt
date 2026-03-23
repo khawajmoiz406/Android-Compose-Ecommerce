@@ -36,6 +36,7 @@ import com.example.myapplication.config.theme.Green
 import com.example.myapplication.config.utils.transformation.PhoneNumberVisualTransformation
 import com.example.myapplication.core.model.User
 import com.example.myapplication.core.pref.EncryptedSharedPref
+import com.example.myapplication.core.pref.SharedPrefUtils
 import com.google.gson.reflect.TypeToken
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -45,8 +46,7 @@ import ir.kaaveh.sdpcompose.ssp
 @Composable
 fun UserInfoWidget(fieldState: FieldState, onChanged: (String) -> Unit) {
     val focusManager = LocalFocusManager.current
-    val user =
-        EncryptedSharedPref.getInstance(LocalContext.current).getModel(object : TypeToken<User>() {})
+    val user = SharedPrefUtils.getCurrentUser(LocalContext.current)
 
     Column(
         modifier = Modifier

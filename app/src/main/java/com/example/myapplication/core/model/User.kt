@@ -28,6 +28,6 @@ data class User(
 
     //For app use, these fields are not in api response
     val phoneNumber: String? = "",
-    val notificationEnabled: Boolean = true,
+    val notificationEnabled: Boolean = false,
     val themeMode: Int = ThemeMode.Light.value
 ) : Serializable

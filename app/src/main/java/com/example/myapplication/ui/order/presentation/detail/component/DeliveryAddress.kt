@@ -20,10 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.myapplication.R
 import com.example.myapplication.config.components.image.SvgImage
+import com.example.myapplication.config.utils.transformation.PhoneNumberVisualTransformation
 import com.example.myapplication.core.model.Address
 import ir.kaaveh.sdpcompose.sdp
 import ir.kaaveh.sdpcompose.ssp
@@ -99,7 +101,7 @@ fun DeliveryAddress(address: Address, phoneNumber: String) {
         Spacer(Modifier.height(5.sdp))
 
         Text(
-            text = phoneNumber,
+            text = PhoneNumberVisualTransformation().filter(buildAnnotatedString { append(phoneNumber) }).text,
             fontSize = 12.ssp,
             lineHeight = 12.ssp,
             color = MaterialTheme.colorScheme.outline,

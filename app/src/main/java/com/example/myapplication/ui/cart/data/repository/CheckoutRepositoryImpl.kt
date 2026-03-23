@@ -19,9 +19,7 @@ class CheckoutRepositoryImpl(
     }
 
     override suspend fun checkout(request: CheckoutRequest): Result<Int?> = try {
-        val orderId = localRepo.checkout(request.toOrder())
-        localRepo.clearCart()
-        Result.success(orderId)
+        Result.success(localRepo.checkout(request.toOrder()))
     } catch (e: Exception) {
         Result.failure(e)
     }

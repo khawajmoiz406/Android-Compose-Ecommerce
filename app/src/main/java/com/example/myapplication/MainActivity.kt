@@ -1,5 +1,7 @@
 package com.example.myapplication
 
+import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,12 +12,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.navigation.compose.rememberNavController
@@ -25,9 +29,7 @@ import com.example.myapplication.config.theme.ThemeMode
 import com.example.myapplication.config.theme.ThemeState
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
 import com.example.myapplication.config.utils.SnackbarUtils
-import com.example.myapplication.core.model.User
-import com.example.myapplication.core.pref.EncryptedSharedPref
-import com.google.gson.reflect.TypeToken
+import com.example.myapplication.core.pref.SharedPrefUtils
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,15 +42,23 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun MainScreen() {
     val context = LocalContext.current
+    val view = LocalView.current
     val focusManager = LocalFocusManager.current
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val user = EncryptedSharedPref.getInstance(context).getModel(object : TypeToken<User>() {})
+    val user = SharedPrefUtils.getCurrentUser(context)
     ThemeState.darkTheme.value = user?.themeMode == ThemeMode.Dark.value
 
     SnackbarUtils.init(snackbarHostState, scope)
+
+    SideEffect {
+        val window = (view.context as Activity).window
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            window.isNavigationBarContrastEnforced = false
+        }
+    }
 
     MyApplicationTheme {
         CompositionLocalProvider(value = LocalParentNavController provides navController) {

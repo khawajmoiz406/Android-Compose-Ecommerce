@@ -38,6 +38,7 @@ class ProfileLocalDataSource(
 
     suspend fun logout() {
         pref.removeModel(object : TypeToken<User>() {})
+        pref.clearAll()
         withContext(Dispatchers.IO) { database.clearAllTables() }
     }
 }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProfileViewModel(
@@ -64,6 +65,8 @@ class ProfileViewModel(
         updateUiState(uiState.value.copy(loadingNotification = true))
         val result = changeNotificationSettingUseCase.invoke(enabled)
         if (result.isSuccess) {
+            val user = result.getOrNull()
+            userProfile.update { user }
             updateUiState(uiState.value.copy(loadingNotification = false))
         } else {
             val errorStr = result.exceptionOrNull().toErrorString()

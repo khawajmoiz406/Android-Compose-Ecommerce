@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -49,7 +51,13 @@ fun DashboardScreen() {
                             builder = { bottomNavGraph() }
                         )
 
-                        Spacer(Modifier.height(integerResource(R.integer.bottom_nav_height).sdp))
+                        Spacer(
+                            Modifier.height(
+                                (integerResource(R.integer.bottom_nav_height).sdp) +
+                                        (WindowInsets.navigationBars.asPaddingValues()
+                                            .calculateBottomPadding())
+                            )
+                        )
                     }
                 }
             }

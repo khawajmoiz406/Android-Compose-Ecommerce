@@ -1,5 +1,12 @@
 package com.example.myapplication.ui.profile.presentation
 
+import android.Manifest
+import android.content.Context
+import android.os.Build
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -15,6 +22,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -26,6 +34,7 @@ import com.example.myapplication.config.components.state.EmptyState
 import com.example.myapplication.config.navigation.Destination
 import com.example.myapplication.config.theme.ThemeMode
 import com.example.myapplication.config.utils.AppCompositionLocals.LocalParentNavController
+import com.example.myapplication.config.utils.PermissionUtils
 import com.example.myapplication.config.utils.SnackbarUtils
 import com.example.myapplication.ui.profile.presentation.component.AccountSettingWidget
 import com.example.myapplication.ui.profile.presentation.component.LogoutButton
@@ -43,7 +52,11 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     val uiState = viewModel.uiState.collectAsState()
     val userProfile = viewModel.userProfile.collectAsState()
     val totalOrders = viewModel.totalOrders.collectAsState()
-
+    val context = LocalContext.current
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { viewModel.changeNotificationEnabled(it) }
+    )
     LaunchedEffect(Unit) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             handleEvents(navController, viewModel)
@@ -101,8 +114,14 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         icon = "notification",
                         title = stringResource(R.string.notification),
                         desc = stringResource(R.string.notification_msg),
-                        value = userProfile.value?.notificationEnabled ?: false,
-                        onCheckChanged = {}
+                        value = isPermitted(userProfile.value?.notificationEnabled, context),
+                        onCheckChanged = {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                onNotificationCheckChanged(context, permissionLauncher, viewModel, it)
+                            } else {
+                                viewModel.changeNotificationEnabled(it)
+                            }
+                        }
                     )
                 }
 
@@ -135,6 +154,35 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 item { Spacer(Modifier) }
             }
         }
+    }
+}
+
+private fun isPermitted(permitted: Boolean?, context: Context): Boolean {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val i = PermissionUtils.isGranted(
+            context = context,
+            permission = Manifest.permission.POST_NOTIFICATIONS
+        )
+        return i && permitted == true
+    }
+    return permitted ?: false
+}
+
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun onNotificationCheckChanged(
+    context: Context,
+    permissionLauncher: ManagedActivityResultLauncher<String, Boolean>,
+    viewModel: ProfileViewModel,
+    it: Boolean
+) {
+    val permissionGranted = PermissionUtils.isGranted(
+        context = context,
+        permission = Manifest.permission.POST_NOTIFICATIONS
+    )
+    if (it && !permissionGranted) {
+        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    } else {
+        viewModel.changeNotificationEnabled(it)
     }
 }
 

@@ -1,5 +1,6 @@
 <resources>
-    <string name="app_name">My Application</string>
+    <string name="app_name">Shoppy</string>
+    <string name="app_name_caption">Your favourite store</string>
 
     <string name="ok">OK</string>
     <string name="unknown_error">Unknown Error</string>
@@ -188,4 +189,17 @@
     <string name="qty">Qty</string>
     <string name="price">Price</string>
     <string name="tacking_number_copied">Tracking number copied!</string>
+    <string name="welcome_back">Welcome Back</string>
+    <string name="login_caption">Log in to continue shopping</string>
+    <string name="order_updates">Order Updates</string>
+    <string name="order_updates_msg"><![CDATA[Know when your order ships & arrives]]></string>
+    <string name="exclusive_deals">Exclusive Deals</string>
+    <string name="exclusive_deals_msg"><![CDATA[Get early access to flash sales & offers]]></string>
+    <string name="account_security">Account Security</string>
+    <string name="account_security_msg"><![CDATA[Alerts for login activity & changes]]></string>
+    <string name="stay_updated">Stay in the Loop!</string>
+    <string name="stay_updated_msg">Enable notifications so you never miss important updates about your orders and exclusive deals.</string>
+    <string name="allow_notifications">Allow Notifications</string>
+    <string name="change_notificaiton_msg">You can change this anytime in Profile</string>
+    <string name="maybe_later">Maybe Later</string>
 </resources>
