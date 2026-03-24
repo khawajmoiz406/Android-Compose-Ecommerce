@@ -35,14 +35,14 @@ fun DashboardScreen() {
     val navController = rememberNavController()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
 
-    ModalNavigationDrawer(drawerContent = { Drawer(navController) }, drawerState = drawerState) {
-        Box {
-            Scaffold(
-                containerColor = MaterialTheme.colorScheme.surface,
-                bottomBar = { BottomNav(navController) },
-                contentWindowInsets = WindowInsets(0, 0, 0, 0),
-            ) { _ ->
-                CompositionLocalProvider(LocalDrawerStateController provides drawerState) {
+    CompositionLocalProvider(LocalDrawerStateController provides drawerState) {
+        ModalNavigationDrawer(drawerContent = { Drawer() }, drawerState = drawerState) {
+            Box {
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    bottomBar = { BottomNav(navController) },
+                    contentWindowInsets = WindowInsets(0, 0, 0, 0),
+                ) { _ ->
                     Column {
                         NavHost(
                             navController = navController,

@@ -1,10 +1,12 @@
 package com.example.myapplication.core.model
 
+import androidx.compose.ui.graphics.Color
 import java.io.Serializable
 
 data class NavigationItem(
     val name: Int,
     val route: Any,
     val icon: String,
+    val tint: Color? = null,
     val showToolbar: Boolean = false,
 ) : Serializable

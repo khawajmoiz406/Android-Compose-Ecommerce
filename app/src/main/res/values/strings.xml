@@ -202,4 +202,6 @@
     <string name="allow_notifications">Allow Notifications</string>
     <string name="change_notificaiton_msg">You can change this anytime in Profile</string>
     <string name="maybe_later">Maybe Later</string>
+    <string name="support">Support</string>
+    <string name="shopping">Shopping</string>
 </resources>
