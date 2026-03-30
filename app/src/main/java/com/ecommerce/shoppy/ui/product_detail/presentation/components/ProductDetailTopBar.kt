@@ -1,0 +1,232 @@
+package com.ecommerce.shoppy.ui.product_detail.presentation.components
+
+import android.annotation.SuppressLint
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.zIndex
+import com.ecommerce.shoppy.R
+import com.ecommerce.shoppy.config.components.image.NetworkImage
+import com.ecommerce.shoppy.config.components.image.SvgImage
+import com.ecommerce.shoppy.config.theme.Orange
+import com.ecommerce.shoppy.core.model.Product
+import ir.kaaveh.sdpcompose.sdp
+import ir.kaaveh.sdpcompose.ssp
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductDetailTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    product: Product,
+    onBackPressed: () -> Unit,
+    onFavToggle: () -> Unit
+) {
+    val collapsedAppBarHeightPx = remember { mutableIntStateOf(0) }
+    val expandedAppBarHeightPx = remember { mutableIntStateOf(0) }
+    var maxHeightPx = collapsedAppBarHeightPx.intValue + expandedAppBarHeightPx.intValue
+    val heightOffset = scrollBehavior.state.heightOffset
+
+    LaunchedEffect(collapsedAppBarHeightPx) {
+        if (collapsedAppBarHeightPx.intValue > 0) {
+            maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
+        }
+    }
+
+    LaunchedEffect(expandedAppBarHeightPx) {
+        if (expandedAppBarHeightPx.intValue > 0) {
+            scrollBehavior.state.heightOffsetLimit = -expandedAppBarHeightPx.intValue.toFloat()
+            maxHeightPx = expandedAppBarHeightPx.intValue + collapsedAppBarHeightPx.intValue
+        }
+    }
+
+    Layout(
+        modifier = Modifier
+            .background(color = MaterialTheme.colorScheme.primary)
+            .zIndex(0f),
+        content = {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                content = { CollapsedAppBar(product.isFavourite, onBackPressed, onFavToggle) }
+            )
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                content = { ExpandedAppBar(product) }
+            )
+        }
+    ) { measurables, constraints ->
+        val collapsedPlaceable = measurables[0].measure(constraints)
+        val expandedPlaceable = measurables[1].measure(constraints)
+
+        if (collapsedAppBarHeightPx.intValue == 0 && collapsedPlaceable.height > 0) {
+            collapsedAppBarHeightPx.intValue = collapsedPlaceable.height
+        }
+
+        if (expandedAppBarHeightPx.intValue == 0 && expandedPlaceable.height > 0) {
+            expandedAppBarHeightPx.intValue = expandedPlaceable.height
+        }
+
+        val finalHeight = maxOf(collapsedPlaceable.height, (maxHeightPx + heightOffset).toInt())
+
+        layout(constraints.maxWidth, finalHeight) {
+            collapsedPlaceable.place(0, 0)
+            expandedPlaceable.place(0, collapsedPlaceable.height)
+        }
+    }
+}
+
+@SuppressLint("DefaultLocale")
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun CollapsedAppBar(isFavourite: Boolean, onBackPressed: () -> Unit, onFavClicked: () -> Unit) {
+    Row(modifier = Modifier.padding(top = 40.sdp, bottom = 12.sdp, start = 10.sdp, end = 10.sdp)) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceDim)
+                .size(35.sdp)
+                .clickable { onBackPressed() },
+        ) {
+            SvgImage(
+                asset = "back",
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(20.sdp)
+            )
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceDim)
+                .size(35.sdp)
+                .clickable { onFavClicked.invoke() },
+        ) {
+            SvgImage(
+                asset = if (isFavourite) "fav_filled" else "fav_outline",
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.size(20.sdp)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ExpandedAppBar(product: Product) {
+    val scope = rememberCoroutineScope()
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { product.images?.size ?: 0 })
+
+    Column {
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 10.sdp)
+                .height(180.sdp)
+        ) { page ->
+            NetworkImage(
+                showShimmerWhenLoading = false,
+                imageUrl = product.images?.get(page) ?: "",
+                contentScale = ContentScale.Fit,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.sdp, vertical = 10.sdp)
+        ) {
+            if (product.discountPercentage != null) {
+                Text(
+                    fontSize = 10.ssp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.background,
+                    text = stringResource(R.string.discount_off).replace(
+                        "@value",
+                        product.discountPercentage.toInt().toString()
+                    ),
+                    modifier = Modifier
+                        .background(color = Color.Red, shape = RoundedCornerShape(15.sdp))
+                        .padding(horizontal = 8.sdp, vertical = 4.sdp)
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .wrapContentWidth()
+                    .align(Alignment.Center)
+            ) {
+                product.images?.forEachIndexed { index, _ ->
+                    val isSelected = pagerState.currentPage == index
+                    val size = animateDpAsState(targetValue = if (isSelected) 8.sdp else 7.sdp)
+                    val color = animateColorAsState(
+                        targetValue = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.surfaceDim
+                    )
+
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .size(size.value)
+                            .background(color.value)
+                            .clickable { scope.launch { pagerState.animateScrollToPage(index) } }
+                    )
+
+                    if (index != product.images.lastIndex) Spacer(modifier = Modifier.width(3.sdp))
+                }
+            }
+
+            if (product.availabilityStatus?.isNotEmpty() == true) {
+                Text(
+                    text = product.availabilityStatus,
+                    fontSize = 10.ssp,
+                    color = MaterialTheme.colorScheme.background,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                        .background(color = Orange, shape = RoundedCornerShape(15.sdp))
+                        .padding(horizontal = 8.sdp, vertical = 4.sdp)
+                        .align(Alignment.CenterEnd)
+                )
+            }
+        }
+    }
+}

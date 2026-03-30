@@ -12,11 +12,11 @@ room {
 }
 
 android {
-    namespace = "com.example.myapplication"
+    namespace = "com.ecommerce.shoppy"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.myapplication"
+        applicationId = "com.ecommerce.shoppy"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
